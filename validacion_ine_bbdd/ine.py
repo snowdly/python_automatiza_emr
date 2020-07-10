@@ -65,7 +65,7 @@ def codigo_ine(rootDir):
 	if Cod_Municipio.empty:
 	    #GENERAR CSV RECHAZO COD MUNICIPIO INE
 
-	    LOG=['Cod_Municipio', dato_Cod_INE_Termino_Municipal.text, 'KO', '', date.today()] 
+	    Log=['Cod_Municipio', dato_Cod_INE_Termino_Municipal.text, 'KO', '', date.today()] 
 	   	#GUARDAR LOG
 		writer = pd.ExcelWriter('./Auditorias/Resultado/Reporte_Estado_Auditoria/'+Reporte_Estado_Auditoria+'_RECHAZO.xlsx')
 		log.to_excel(writer,'sheet1')
@@ -78,7 +78,7 @@ def codigo_ine(rootDir):
 
 	if Cod_Municipio.empty:
 	    #GENERAR CSV RECHAZO COD PROVINCIA MUNICIPIO
-		LOG=['Cod_Municipio', dato_Cod_INE_Termino_Municipal.text, 'KO', '', date.today()]
+		Log=['Cod_provincia', dato_Cod_INE_Provincia.text, 'KO', '', date.today()]
 	   	#GUARDAR LOG
 		writer = pd.ExcelWriter('./Auditorias/Resultado/Reporte_Estado_Auditoria/'+Reporte_Estado_Auditoria+'_RECHAZO.xlsx')
 		log.to_excel(writer,'sheet1')
@@ -91,7 +91,7 @@ def codigo_ine(rootDir):
 
 		if (Nombre_Municipio!=dato_Poblacion.text):
 			#GENERAR CSV RECHAZO NOMBRE MUNICIPIO
-			LOG=['Cod_Municipio', dato_Cod_INE_Termino_Municipal.text, 'KO', '', date.today()]
+			Log=['Poblacion',Nombre_Municipio+'||'+ dato_Poblacion.text, 'KO', '', date.today()]
 
 		   	#GUARDAR LOG
 			writer = pd.ExcelWriter('./Auditorias/Resultado/Reporte_Estado_Auditoria/'+Reporte_Estado_Auditoria+'_RECHAZO.xlsx')

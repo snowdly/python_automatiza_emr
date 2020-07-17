@@ -268,3 +268,44 @@ def estructura_respuesta_error(etapa):
     r['Resultado'] = 'Pendiente'
     r['Fecha'] = datetime.datetime.now()
     return r
+
+
+def coordenadas_ETRS89(Longitud,Latitud):
+
+    #convertivos coordenadas en grados a coordenadas en decimal
+    signo=-1
+    #sustituir tanto en ingles como en español
+    if Latitud.find('N') > 0:
+        Latitud= Latitud.replace('N', '-')
+
+    else:
+        Latitud= Latitud.replace('S', '-')
+    
+    Latitud = Latitud[:5] + "-" + Latitud[5:]
+    Latitud= Latitud.replace(',', '.')
+
+
+    if Longitud.find('W') > 0:
+        Longitud= Longitud.replace('W', '-')
+
+    elif Longitud.find('O') > 0:
+        Longitud= Longitud.replace('O', '-')
+
+    elif Longitud.find('E') > 0:
+        Longitud= Longitud.replace('E', '-')
+        signo=1
+
+    
+    Longitud = Longitud[:5] + "-" + Longitud[5:]
+    Longitud= Longitud.replace(',', '.')
+
+
+    deg, minutes, seconds =  re.split('-', Latitud)
+    CoordenadaY= float(deg) + float(minutes)/60 + float(seconds)/(60*60)
+
+    deg, minutes, seconds =  re.split('-', Longitud)
+    CoordenadaX=(float(deg) + float(minutes)/60 + float(seconds)/(60*60))* signo
+
+
+    return (CoordenadaX,CoordenadaY)
+

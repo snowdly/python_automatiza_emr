@@ -6,11 +6,6 @@ import pandas as pd
 import rarfile
 import datetime
 
-log = pd.DataFrame(columns=('Etiqueta', 'Valor', 'OK_KO', 'Validacion', 'Fecha_Hora'))
-
-rootDir = 'D:/EMR_Auditorias_Python/'
-rootDirAuditoria = os.path.join(rootDir, 'Auditorias/')
-
 
 def audita_basi(rootDir):
     # leemos los zip del directorio
@@ -135,6 +130,8 @@ def audita_principal_old(rootDirAuditoria):
     return r
 
 def audita_principal():
+    log = pd.DataFrame(columns=('Etiqueta', 'Valor', 'OK_KO', 'Validacion', 'Fecha_Hora'))
+
     # Retorna resultado del proceso
     r = dict()
     r['Etapa_Validacion'] = 'Proceso de revisión de estructura de ficheros'

@@ -7,15 +7,16 @@ from principal import valida_xml_individual_base
 from principal import procesos_comunes
 
 # DECLARACION DE VARIABLES GLOBALES
-nameZip = ""
+#nameZip = ""
 #rootDir = "D:/EMR_Auditorias_Python/Auditorias/Resultado/Carpeta_de_Trabajo"
-rarfile.UNRAR_TOOL = 'D:/EMR_Auditorias_Python/Ficheros_Respaldo/UnRAR.exe'
+#rarfile.UNRAR_TOOL = 'D:/EMR_Auditorias_Python/Ficheros_Respaldo/UnRAR.exe'
 
+'''
 # Configura log
 rootLog = 'D:/EMR_Auditorias_Python/Logs/'
 logging.basicConfig(level=logging.DEBUG
                     , filename=os.path.join(rootLog, 'EMR_log.log'), filemode='w', format='%(asctime)s - %(levelname)s - %(message)s')
-
+'''
 
 def extrae_datos(rootDir):
     # procesos_comunes.crear_carpeta_fichero_trabajo(rootDir)
@@ -54,7 +55,8 @@ def extrae_datos_recursivo(rootDir, nivel):
             print("Finalizado por Carpeta")
 
 
-def descomprime_todos_ficheros(rootDir):
+def descomprime_todos_ficheros(rootDir, ruta_ficheros_respaldo):
+    rarfile.UNRAR_TOOL = os.path.join(ruta_ficheros_respaldo, 'UnRAR.exe')
     # Llamada principal
     r = dict()
     directories = os.listdir(rootDir)

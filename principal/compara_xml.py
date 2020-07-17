@@ -9,11 +9,13 @@ import logging
 #rootDir = "D:/EMR_Auditorias_Python/Auditorias/Resultado/Carpeta_de_Trabajo/"
 #nameFile = 'HX9419'
 #rootDirResultados = 'D:/EMR_Auditorias_Python/Auditorias/Resultado/Reporte_Estado_Auditoria/'
+'''
 # Configura log
 rootLog = 'D:/EMR_Auditorias_Python/Logs/'
 logging.basicConfig(level=logging.DEBUG
                     , filename=os.path.join(rootLog, 'EMR_log.log'), filemode='w',
                     format='%(asctime)s - %(levelname)s - %(message)s')
+'''
 lista_etiquetas = [
     './/Datos_Certificacion/Tipo_Certificacion'
     , './/Datos_Certificacion/Tipo_Solicitud'

@@ -1,9 +1,12 @@
 import re
 import datetime
 from principal import procesos_comunes
+from principal import listas_comunes
+import os
 
 
-def reglas_validacion_individual(etiqueta, regla, vdato, fichero_nombre):
+def reglas_validacion_individual(etiqueta, regla, vdato, fichero):
+    fichero_nombre, fichero_extension = os.path.splitext(os.path.basename(fichero))
     d = dict()
     V = []
     fichero_nombre_dividido = fichero_nombre.split('_')
@@ -57,9 +60,18 @@ def reglas_validacion_individual(etiqueta, regla, vdato, fichero_nombre):
         if vdato is None:
             d['OK_KO'] = 'KO'
             V.append('No existe valor')
-        if not re.match("DGZZ-1200436|DGZZ-1104544|M ZZ-0020004|DGZZ-1400353|DGZZ-1300380|DGZZ-1601470|DGZZ-1105021", vdato):
+
+        try:
+            #print(fichero_nombre_dividido[0][3])
+            for letra in listas_comunes.expediente_concesional:
+                if letra['LETRA'] == fichero_nombre_dividido[0][3]:
+                    if vdato != letra['EXPEDIENTE']:
+                        d['OK_KO'] = "KO"
+                        V.append('Valor debe ser igual a valores de tabla entregada')
+        except:
             d['OK_KO'] = "KO"
             V.append('Valor debe ser igual a valores de tabla entregada')
+
         d['Validacion'] = V
         d['Fecha_Hora'] = datetime.datetime.now()
         return d
@@ -321,10 +333,35 @@ def reglas_validacion_individual(etiqueta, regla, vdato, fichero_nombre):
             V.append('No existe valor')
         if not re.match("ER1|ER2|ER3|ER4|ER5", vdato):
             d['OK_KO'] = "KO"
-            V.append('Valor debe ser igual a ER1ER2|ER3|ER4|ER5')
+            V.append('Valor debe ser igual a ER1|ER2|ER3|ER4|ER5')
         d['Validacion'] = V
         d['Fecha_Hora'] = datetime.datetime.now()
         return d
+    elif regla == 'R_Estacion_Certificada_Datos_Estacion_Entorno_Sensible':
+        d['Etiqueta'] = etiqueta
+        d['Valor'] = vdato
+        d['OK_KO'] = 'OK'
+        d['Validacion'] = ''
+        if vdato is None:
+            d['OK_KO'] = 'KO'
+            V.append('No existe valor')
+        if not re.match("SI|NO", vdato):
+            d['OK_KO'] = "KO"
+            V.append('Valor debe ser igual a SI|NO')
+        c=procesos_comunes.cantidad_elementos_xml(fichero,
+                                                './/Informe_Medidas/Puntos_Medida/Punto_Medida/Punto_Sensible/Situacion')['Cantidad']
+        if c == 0:
+            if vdato != 'NO':
+                d['OK_KO'] = "KO"
+                V.append('El valor indica que NO existe entorno sensible, sin embargo SI existen datos para .//Informe_Medidas/Puntos_Medida/Punto_Medida/Punto_Sensible')
+        else:
+            if vdato != 'SI':
+                d['OK_KO'] = "KO"
+                V.append('El valor indica que SI existe entorno sensible, sin embargo NO existen datos para .//Informe_Medidas/Puntos_Medida/Punto_Medida/Punto_Sensible')
+        d['Validacion'] = V
+        d['Fecha_Hora'] = datetime.datetime.now()
+        return d
+
     elif regla == 'R_Estacion_Certificada_Datos_Estacion_Num_Sectores_Interiores':
         d['Etiqueta'] = etiqueta
         d['Valor'] = vdato
@@ -333,6 +370,20 @@ def reglas_validacion_individual(etiqueta, regla, vdato, fichero_nombre):
         if vdato is None:
             d['OK_KO'] = 'KO'
             V.append('No existe valor')
+        sector_interior = procesos_comunes.valor_elemento_xml(fichero,
+                                                    './/Estacion_Certificada/Datos_Estacion/Num_Sectores_Interiores')[
+            'Valor']
+        sector_exterior = procesos_comunes.valor_elemento_xml(fichero,
+                                                    './/Estacion_Certificada/Datos_Estacion/Num_Sectores_Exteriores')[
+            'Valor']
+        sectores = procesos_comunes.cantidad_elementos_xml(fichero,
+                                                    './/Estacion_Certificada/Datos_Estacion/Sectores/Sector/Tipo_Potencia_Radiada')[
+            'Cantidad']
+
+        if sectores != (int(sector_interior) + int(sector_exterior)):
+            d['OK_KO'] = "KO"
+            V.append(
+                'El valor de Num_Sectores_Interiores más Num_Sectores_Exteriores, es diferente a la cantidad de Sectores')
         d['Validacion'] = V
         d['Fecha_Hora'] = datetime.datetime.now()
         return d
@@ -344,6 +395,20 @@ def reglas_validacion_individual(etiqueta, regla, vdato, fichero_nombre):
         if vdato is None:
             d['OK_KO'] = 'KO'
             V.append('No existe valor')
+        sector_interior = procesos_comunes.valor_elemento_xml(fichero,
+                                                              './/Estacion_Certificada/Datos_Estacion/Num_Sectores_Interiores')[
+            'Valor']
+        sector_exterior = procesos_comunes.valor_elemento_xml(fichero,
+                                                              './/Estacion_Certificada/Datos_Estacion/Num_Sectores_Exteriores')[
+            'Valor']
+        sectores = procesos_comunes.cantidad_elementos_xml(fichero,
+                                                           './/Estacion_Certificada/Datos_Estacion/Sectores/Sector/Tipo_Potencia_Radiada')[
+            'Cantidad']
+
+        if sectores != (int(sector_interior) + int(sector_exterior)):
+            d['OK_KO'] = "KO"
+            V.append(
+                'El valor de Num_Sectores_Interiores más Num_Sectores_Exteriores, es diferente a la cantidad de Sectores')
         d['Validacion'] = V
         d['Fecha_Hora'] = datetime.datetime.now()
         return d
@@ -577,8 +642,13 @@ def reglas_validacion_individual(etiqueta, regla, vdato, fichero_nombre):
         if float(vdato.replace(',', '.')) < 1:
             d['OK_KO'] = 'KO'
             V.append('Deben ser 5 o más puntos')
+        c = procesos_comunes.cantidad_elementos_xml(fichero, './/Informe_Medidas/Puntos_Medida/Punto_Medida/IdPunto')
+        if c['Cantidad'] < 5:
+            d['OK_KO'] = 'KO'
+            V.append('Deben ser 5 o más puntos de medida')
         d['Validacion'] = V
         d['Fecha_Hora'] = datetime.datetime.now()
+
         return d
     elif regla == 'R_Informe_Medidas_Puntos_Medida_Punto_Medida_Distancia':
         d['Etiqueta'] = etiqueta
@@ -750,9 +820,11 @@ def reglas_validacion_individual(etiqueta, regla, vdato, fichero_nombre):
         d['Valor'] = vdato
         d['OK_KO'] = 'OK'
         d['Validacion'] = ''
+        '''
         if float(vdato.replace(',', '.')) < 0.2:
             d['OK_KO'] = 'KO'
             V.append('Toda señal que se haya calculado por debajo de 0,2, no se pone el valor, se pone menor que umbral')
+        '''
         d['Validacion'] = V
         d['Fecha_Hora'] = datetime.datetime.now()
         return d
@@ -841,6 +913,11 @@ def reglas_validacion_individual(etiqueta, regla, vdato, fichero_nombre):
         if vdato is None:
             d['OK_KO'] = 'KO'
             V.append('No existe valor')
+        c1 = procesos_comunes.cantidad_elementos_xml(fichero, './/Informe_Medidas/Puntos_Medida/Punto_Medida/IdPunto')
+        c2 = procesos_comunes.cantidad_elementos_xml(fichero, './/Informe_Medidas/Informe_Medidas_Fase1/Medicion_Fase1/Medida_Fase1/IdPunto')
+        if c1['Cantidad'] != c2['Cantidad']:
+            d['OK_KO'] = 'KO'
+            V.append('Cantidad de Puntos de Medida diferente a cantidad de Medidas')
         d['Validacion'] = V
         d['Fecha_Hora'] = datetime.datetime.now()
         return d
@@ -863,6 +940,10 @@ def reglas_validacion_individual(etiqueta, regla, vdato, fichero_nombre):
         if vdato is None:
             d['OK_KO'] = 'KO'
             V.append('No existe valor')
+        r = procesos_comunes.horas_medicion_diferencia(fichero, d['Etiqueta'])
+        if r['OK_KO'] == 'KO':
+            d['OK_KO'] = 'KO'
+            V.append(r['Comentario'])
         d['Validacion'] = V
         d['Fecha_Hora'] = datetime.datetime.now()
         return d

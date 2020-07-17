@@ -1,8 +1,4 @@
 from xml.etree import ElementTree
-import csv
-import xlsxwriter
-import shutil
-import zipfile
 import os
 from principal import reglas_validacion_new
 from principal import procesos_comunes
@@ -11,15 +7,9 @@ import datetime
 import logging
 import pandas as pd
 
-rootDir = 'D:/EMR_Auditorias_Python/Auditorias/LU7385/Carpeta_de_Trabajo/'
-rootResultados = 'D:/EMR_Auditorias_Python/Auditorias/LU7385/Reporte_Estado_Auditoria/'
-nameFile = 'LU7385'
-
-# Configura log
-rootLog = 'D:/EMR_Auditorias_Python/Logs/'
-logging.basicConfig(level=logging.DEBUG
-                    , filename=os.path.join(rootLog, 'EMR_log.log'), filemode='w',
-                    format='%(asctime)s - %(levelname)s - %(message)s')
+#rootDir = 'D:/EMR_Auditorias_Python/Auditorias/LU7385/Carpeta_de_Trabajo/'
+#rootResultados = 'D:/EMR_Auditorias_Python/Auditorias/LU7385/Reporte_Estado_Auditoria/'
+#nameFile = 'LU7385'
 
 
 def principal(rootDir, rootResultados, nameFile):
@@ -42,7 +32,7 @@ def principal(rootDir, rootResultados, nameFile):
                 # print(each.text)
                 dv = reglas_validacion_new.reglas_validacion_individual(e['Etiqueta'], e['Regla'],
                                                                         '' if each is None else each.text,
-                                                                        fichero_nombre)
+                                                                        fichero)
                 analisis = analisis.append(dv, ignore_index=True)
 
         writer = pd.ExcelWriter(

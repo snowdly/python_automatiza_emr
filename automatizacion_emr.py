@@ -5,78 +5,113 @@ from principal import procesos_comunes
 from principal import audita_comprimidos
 from principal import lee_directorio
 from principal import compara_xml
-from principal import valida_xml_individual
 from principal import valida_xml_entre
-from principal import valida_ine_bd
+from validacion_ine_bbdd import valida_ine_bd
 from principal import valida_fuentes_web
 from principal import valida_fuentes_pdf
 from principal import proceso_xml_individual
 
-rootDir = 'D:/EMR_Auditorias_Python/'
-rootDirAuditoria = os.path.join(rootDir, 'Auditorias/')
-rootDirResultados = 'D:/EMR_Auditorias_Python/Auditorias/Resultado/Reporte_Estado_Auditoria/'
-rootLog = os.path.join(rootDir, 'Logs/')
+# Asignación de variables
+print (os.path.dirname(os.path.abspath(__file__)))
+rutas_base = procesos_comunes.genera_rutas_trabajo()
+rootDir = rutas_base['ruta_base']
+rootDirAuditoria = rutas_base['ruta_auditoria']
+rootLog = rutas_base['ruta_logs']
 fichero_log = os.path.join(rootLog, 'EMR_log.log')
 print("Fichero log en ", fichero_log)
-
 
 # Configura log
 logging.basicConfig(level=logging.DEBUG
                     , filename=fichero_log, filemode='w', format='%(asctime)s - %(levelname)s - %(message)s')
 resumen = pd.DataFrame(columns=('Etapa_Validacion', 'Resultado', 'Fecha'))
 
+try:
+    logging.debug('Comienza el programa')
+    fichero_auditable = procesos_comunes.obtiene_fichero_auditable(rootDirAuditoria)
+    nameFile = os.path.splitext(fichero_auditable)[0]
+    rutas_trabajo = procesos_comunes.prepara_carpetas_trabajo(rootDirAuditoria)
+except:
+    logging.debug('Se ha producido un error obteniendo el entorno de ejecución')
+    exit()
 
-logging.debug('Comienza el programa')
-fichero_auditable = procesos_comunes.obtiene_fichero_auditable(rootDirAuditoria)
-nameFile = os.path.splitext(fichero_auditable)[0]
-rutas_trabajo = procesos_comunes.prepara_carpetas_trabajo(rootDirAuditoria)
+try:
+    logging.debug('Inicia: Descomprimir ficheros')
+    r = lee_directorio.descomprime_todos_ficheros(rutas_trabajo['ruta_auditoria_carpeta_trabajo'], rutas_base['ruta_ficheros_respaldo'])
+    resumen = resumen.append(r, ignore_index=True)
+    logging.debug('Finaliza: Descomprimir ficheros')
+except:
+    logging.debug('Se ha producido un error descomprimiento los ficheros')
+    exit()
 
+try:
+    logging.debug('Inicia: Audita estructura de ficheros')
+    r = audita_comprimidos.audita_principal()
+    resumen = resumen.append(r, ignore_index=True)
+    logging.debug('Finaliza: Finaliza estructura de ficheros')
+except:
+    r = procesos_comunes.estructura_respuesta_error('Proceso de revisión de estructura de ficheros')
+    resumen = resumen.append(r, ignore_index=True)
+    logging.debug('Se ha producido un error Proceso de revisión de estructura de ficheros')
 
+try:
+    logging.debug('Inicia: Compara XMLs')
+    r = compara_xml.compara_xml_principal(rutas_trabajo['ruta_auditoria_carpeta_trabajo'], rutas_trabajo['ruta_auditoria_carpeta_reporte'], nameFile)
+    resumen = resumen.append(r, ignore_index=True)
+    logging.debug('Finaliza: Compara XMLs')
+except:
+    r = procesos_comunes.estructura_respuesta_error('Proceso de comparación entre XML')
+    resumen = resumen.append(r, ignore_index=True)
+    logging.debug('Se ha producido un error Proceso de comparación entre XML')
 
-logging.debug('Inicia: Audita estructura de ficheros')
-r = audita_comprimidos.audita_principal()
-resumen = resumen.append(r, ignore_index=True)
-logging.debug('Finaliza: Finaliza estructura de ficheros')
+try:
+    logging.debug('Inicia: Validación de cada XML')
+    r = proceso_xml_individual.principal(rutas_trabajo['ruta_auditoria_carpeta_trabajo'], rutas_trabajo['ruta_auditoria_carpeta_reporte'], nameFile)
+    resumen = resumen.append(r, ignore_index=True)
+    logging.debug('Finaliza: Validación de cada XML')
+except:
+    r = procesos_comunes.estructura_respuesta_error('Proceso de validación de XML individual')
+    resumen = resumen.append(r, ignore_index=True)
+    logging.debug('Se ha producido un error Proceso de validación de XML individual')
 
+try:
+    logging.debug('Inicia: Proceso de revisión de valores entre etiquetas XML')
+    r = valida_xml_entre.principal()
+    resumen = resumen.append(r, ignore_index=True)
+    logging.debug('Finaliza: Proceso de revisión de valores entre etiquetas XML')
+except:
+    r = procesos_comunes.estructura_respuesta_error('Proceso de validación de XML grupal')
+    resumen = resumen.append(r, ignore_index=True)
+    logging.debug('Se ha producido un error Proceso de validación de XML grupal')
 
-logging.debug('Inicia: Descomprimir ficheros')
-r = lee_directorio.descomprime_todos_ficheros(rutas_trabajo['ruta_auditoria_carpeta_trabajo'])
-resumen = resumen.append(r, ignore_index=True)
-logging.debug('Finaliza: Descomprimir ficheros')
+try:
+    logging.debug('Inicia: Proceso de validación INE y Base de Datos')
+    r = valida_ine_bd.principal()
+    resumen = resumen.append(r, ignore_index=True)
+    logging.debug('Finaliza: Proceso de validación INE y Base de Datos')
+except:
+    r = procesos_comunes.estructura_respuesta_error('Proceso de validación contra INE y Base de Datos')
+    resumen = resumen.append(r, ignore_index=True)
+    logging.debug('Se ha producido un error Proceso de validación contra INE y Base de Datos')
 
+try:
+    logging.debug('Inicia: Proceso de validación con fuentes web')
+    r = valida_fuentes_web.principal(rutas_trabajo['ruta_auditoria_carpeta_trabajo'], rutas_base['ruta_ficheros_respaldo'], nameFile)
+    resumen = resumen.append(r, ignore_index=True)
+    logging.debug('Finaliza: Proceso de validación con fuentes web')
+except:
+    r = procesos_comunes.estructura_respuesta_error('Proceso de validación contra fuentes web')
+    resumen = resumen.append(r, ignore_index=True)
+    logging.debug('Se ha producido un error Proceso de validación contra fuentes web')
 
-logging.debug('Inicia: Compara XMLs')
-r = compara_xml.compara_xml_principal(rutas_trabajo['ruta_auditoria_carpeta_trabajo'], rutas_trabajo['ruta_auditoria_carpeta_reporte'], nameFile)
-resumen = resumen.append(r, ignore_index=True)
-logging.debug('Finaliza: Compara XMLs')
-
-
-logging.debug('Inicia: Validación de cada XML')
-#r = valida_xml_individual.principal(rutas_trabajo['ruta_auditoria_carpeta_trabajo'], rutas_trabajo['ruta_auditoria_carpeta_reporte'], nameZip=nameFile )
-r = proceso_xml_individual.principal(rutas_trabajo['ruta_auditoria_carpeta_trabajo'], rutas_trabajo['ruta_auditoria_carpeta_reporte'], nameFile)
-resumen = resumen.append(r, ignore_index=True)
-logging.debug('Finaliza: Validación de cada XML')
-
-logging.debug('Inicia: Proceso de revisión de valores entre etiquetas XML')
-r = valida_xml_entre.principal()
-resumen = resumen.append(r, ignore_index=True)
-logging.debug('Finaliza: Proceso de revisión de valores entre etiquetas XML')
-
-logging.debug('Inicia: Proceso de validación INE y Base de Datos')
-r = valida_ine_bd.principal()
-resumen = resumen.append(r, ignore_index=True)
-logging.debug('Finaliza: Proceso de validación INE y Base de Datos')
-
-logging.debug('Inicia: Proceso de validación con fuentes web')
-r = valida_fuentes_web.principal()
-resumen = resumen.append(r, ignore_index=True)
-logging.debug('Finaliza: Proceso de validación con fuentes web')
-
-logging.debug('Inicia: Proceso de validación con fuentes PDF')
-r = valida_fuentes_pdf.principal()
-resumen = resumen.append(r, ignore_index=True)
-logging.debug('Finaliza: Proceso de validación con fuentes PDF')
-
+try:
+    logging.debug('Inicia: Proceso de validación con fuentes PDF')
+    r = valida_fuentes_pdf.principal()
+    resumen = resumen.append(r, ignore_index=True)
+    logging.debug('Finaliza: Proceso de validación con fuentes PDF')
+except:
+    r = procesos_comunes.estructura_respuesta_error('Proceso de validación contra fuentes PDF')
+    resumen = resumen.append(r, ignore_index=True)
+    logging.debug('Se ha producido un error Proceso de validación contra fuentes PDF')
 
 # Genera resumen
 writer = pd.ExcelWriter(os.path.join(rutas_trabajo['ruta_auditoria_carpeta_reporte'],  nameFile+'_Resumen.xlsx'))

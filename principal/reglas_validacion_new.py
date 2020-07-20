@@ -130,6 +130,9 @@ def reglas_validacion_individual(etiqueta, regla, vdato, fichero):
         if vdato is None:
             d['OK_KO'] = 'KO'
             V.append('No existe valor')
+        if not re.match("((([X-Z])|([LM])){1}([-]?)((\d){7})([-]?)([A-Z]{1}))|((\d{8})([-]?)([A-Z]))", vdato):
+            d['OK_KO'] = "KO"
+            V.append('DNI o NIE no tiene el formato correcto')
         d['Validacion'] = V
         d['Fecha_Hora'] = datetime.datetime.now()
         return d
@@ -185,6 +188,9 @@ def reglas_validacion_individual(etiqueta, regla, vdato, fichero):
         if vdato is None:
             d['OK_KO'] = 'KO'
             V.append('No existe valor')
+        if not re.match("SI|NO", vdato):
+            d['OK_KO'] = "KO"
+            V.append('Valor debe ser igual a SI ó NO')
         d['Validacion'] = V
         d['Fecha_Hora'] = datetime.datetime.now()
         return d
@@ -290,6 +296,9 @@ def reglas_validacion_individual(etiqueta, regla, vdato, fichero):
         if vdato is None:
             d['OK_KO'] = 'KO'
             V.append('No existe valor')
+        if not re.match("AV|BU|CL|CM|CR|GL|PJ|PS|PZ|RB|RD|TR|VP", vdato):
+            d['OK_KO'] = "KO"
+            V.append('Valor debe ser igual a AV|BU|CL|CM|CR|GL|PJ|PS|PZ|RB|RD|TR|VP')
         d['Validacion'] = V
         d['Fecha_Hora'] = datetime.datetime.now()
         return d
@@ -309,9 +318,6 @@ def reglas_validacion_individual(etiqueta, regla, vdato, fichero):
         d['Valor'] = vdato
         d['OK_KO'] = 'OK'
         d['Validacion'] = ''
-        if vdato is None:
-            d['OK_KO'] = 'KO'
-            V.append('No existe valor')
         d['Validacion'] = V
         d['Fecha_Hora'] = datetime.datetime.now()
         return d
@@ -334,9 +340,9 @@ def reglas_validacion_individual(etiqueta, regla, vdato, fichero):
         if vdato is None:
             d['OK_KO'] = 'KO'
             V.append('No existe valor')
-        if not re.match("GSM|DCS|UMTS|LTE", vdato):
+        if not re.match("UMTS|GSM|DCS|RB|LTE|WIMAX|LMDS3.5", vdato):
             d['OK_KO'] = "KO"
-            V.append('Valor debe ser igual a GSM ó DCS ó UMTS ó LTE')
+            V.append('Valores UMTS|GSM|DCS|RB|LTE|WIMAX|LMDS3.5')
         d['Validacion'] = V
         d['Fecha_Hora'] = datetime.datetime.now()
         return d
@@ -451,6 +457,9 @@ def reglas_validacion_individual(etiqueta, regla, vdato, fichero):
         if vdato is None:
             d['OK_KO'] = 'KO'
             V.append('No existe valor')
+        if not re.match("\d{1,}\.\d{1,}", vdato):
+            d['OK_KO'] = 'KO'
+            V.append('Debe ser número')
         d['Validacion'] = V
         d['Fecha_Hora'] = datetime.datetime.now()
         return d
@@ -620,9 +629,9 @@ def reglas_validacion_individual(etiqueta, regla, vdato, fichero):
         if vdato is None:
             d['OK_KO'] = 'KO'
             V.append('No existe valor')
-        if not re.match("PARALELEPIPEDO", vdato):
+        if not re.match("ESFERA|CILINDRO|PARALELEPIPEDO|TOROIDE|OTRA", vdato):
             d['OK_KO'] = "KO"
-            V.append('Valor debe ser igual a PARALELEPIPEDO')
+            V.append('Valores ESFERA|CILINDRO|PARALELEPIPEDO|TOROIDE|OTRA')
         d['Validacion'] = V
         d['Fecha_Hora'] = datetime.datetime.now()
         return d
@@ -694,9 +703,6 @@ def reglas_validacion_individual(etiqueta, regla, vdato, fichero):
         d['Valor'] = vdato
         d['OK_KO'] = 'OK'
         d['Validacion'] = ''
-        if vdato is None:
-            d['OK_KO'] = 'KO'
-            V.append('No existe valor')
         d['Validacion'] = V
         d['Fecha_Hora'] = datetime.datetime.now()
         return d
@@ -708,6 +714,9 @@ def reglas_validacion_individual(etiqueta, regla, vdato, fichero):
         if vdato is None:
             d['OK_KO'] = 'KO'
             V.append('No existe valor')
+        if not re.match('HS|ES|PP|RA', vdato):
+            d['OK_KO'] = 'KO'
+            V.append('Valores HS|ES|PP|RA')
         d['Validacion'] = V
         d['Fecha_Hora'] = datetime.datetime.now()
         return d
@@ -719,6 +728,9 @@ def reglas_validacion_individual(etiqueta, regla, vdato, fichero):
         if vdato is None:
             d['OK_KO'] = 'KO'
             V.append('No existe valor')
+        if not re.match('AV|BU|CL|CM|CR|GL|PJ|PS|PZ|RB|RD|TR|VP', vdato):
+            d['OK_KO'] = 'KO'
+            V.append('Valores AV|BU|CL|CM|CR|GL|PJ|PS|PZ|RB|RD|TR|VP')
         d['Validacion'] = V
         d['Fecha_Hora'] = datetime.datetime.now()
         return d
@@ -741,6 +753,9 @@ def reglas_validacion_individual(etiqueta, regla, vdato, fichero):
         if vdato is None:
             d['OK_KO'] = 'KO'
             V.append('No existe valor')
+        if not(vdato == 'S/N' or vdato.isdigit()):
+            d['OK_KO'] = 'KO'
+            V.append('Debe ser número o S/N')
         d['Validacion'] = V
         d['Fecha_Hora'] = datetime.datetime.now()
         return d
@@ -752,6 +767,9 @@ def reglas_validacion_individual(etiqueta, regla, vdato, fichero):
         if vdato is None:
             d['OK_KO'] = 'KO'
             V.append('No existe valor')
+        if not(vdato.isdigit() and len(vdato) == 5):
+            d['OK_KO'] = 'KO'
+            V.append('Debe tener formato de 5 números')
         d['Validacion'] = V
         d['Fecha_Hora'] = datetime.datetime.now()
         return d
@@ -774,6 +792,12 @@ def reglas_validacion_individual(etiqueta, regla, vdato, fichero):
         if vdato is None:
             d['OK_KO'] = 'KO'
             V.append('No existe valor')
+        cod_provincia = procesos_comunes.valor_elemento_xml(fichero,
+                                                            './/Estacion_Certificada/Datos_Emplazamiento/Cod_INE_Provincia')
+        r = procesos_comunes.obtiene_datos_ine(fichero, vdato, cod_provincia['Valor'])
+        if r['Cod_Municipio_Ine'] != vdato:
+            d['OK_KO'] = 'KO'
+            V.append('El valor no coincide con la tabla de datos del INE')
         d['Validacion'] = V
         d['Fecha_Hora'] = datetime.datetime.now()
         return d
@@ -785,6 +809,12 @@ def reglas_validacion_individual(etiqueta, regla, vdato, fichero):
         if vdato is None:
             d['OK_KO'] = 'KO'
             V.append('No existe valor')
+        cod_municipio = procesos_comunes.valor_elemento_xml(fichero,
+                                                            './/Estacion_Certificada/Datos_Emplazamiento/Cod_INE_Termino_Municipal')
+        r = procesos_comunes.obtiene_datos_ine(fichero, cod_municipio['Valor'], vdato)
+        if r['Cod_Provincia_INE'] != vdato:
+            d['OK_KO'] = 'KO'
+            V.append('El valor no coincide con la tabla de datos del INE')
         d['Validacion'] = V
         d['Fecha_Hora'] = datetime.datetime.now()
         return d
@@ -796,6 +826,13 @@ def reglas_validacion_individual(etiqueta, regla, vdato, fichero):
         if vdato is None:
             d['OK_KO'] = 'KO'
             V.append('No existe valor')
+        nie = procesos_comunes.valor_elemento_xml(fichero,'.//Datos_Certificacion/Tecnico_Competente/NIF_NIE')['Valor']
+        t_nombre = procesos_comunes.valor_elemento_xml(fichero,'.//Datos_Certificacion/Tecnico_Competente/Nombre')['Valor']
+        t_apellido1 = procesos_comunes.valor_elemento_xml(fichero,'.//Datos_Certificacion/Tecnico_Competente/Apellido1')['Valor']
+        t_apellido2 = procesos_comunes.valor_elemento_xml(fichero,'.//Datos_Certificacion/Tecnico_Competente/Apellido2')['Valor']
+        if vdato != nie + ' ' + t_nombre + ' ' + t_apellido1 + ' ' + t_apellido2:
+            d['OK_KO'] = 'KO'
+            V.append('Datos no coinciden con datos de Tecnico Competente')
         d['Validacion'] = V
         d['Fecha_Hora'] = datetime.datetime.now()
         return d
@@ -1040,9 +1077,7 @@ def reglas_validacion_individual(etiqueta, regla, vdato, fichero):
         d['Valor'] = vdato
         d['OK_KO'] = 'OK'
         d['Validacion'] = ''
-        if vdato is None:
-            d['OK_KO'] = 'KO'
-            V.append('No existe valor')
+
         d['Validacion'] = V
         d['Fecha_Hora'] = datetime.datetime.now()
         return d
@@ -1051,9 +1086,7 @@ def reglas_validacion_individual(etiqueta, regla, vdato, fichero):
         d['Valor'] = vdato
         d['OK_KO'] = 'OK'
         d['Validacion'] = ''
-        if vdato is None:
-            d['OK_KO'] = 'KO'
-            V.append('No existe valor')
+
         d['Validacion'] = V
         d['Fecha_Hora'] = datetime.datetime.now()
         return d
@@ -1062,9 +1095,7 @@ def reglas_validacion_individual(etiqueta, regla, vdato, fichero):
         d['Valor'] = vdato
         d['OK_KO'] = 'OK'
         d['Validacion'] = ''
-        if vdato is None:
-            d['OK_KO'] = 'KO'
-            V.append('No existe valor')
+
         d['Validacion'] = V
         d['Fecha_Hora'] = datetime.datetime.now()
         return d
@@ -1073,9 +1104,7 @@ def reglas_validacion_individual(etiqueta, regla, vdato, fichero):
         d['Valor'] = vdato
         d['OK_KO'] = 'OK'
         d['Validacion'] = ''
-        if vdato is None:
-            d['OK_KO'] = 'KO'
-            V.append('No existe valor')
+
         d['Validacion'] = V
         d['Fecha_Hora'] = datetime.datetime.now()
         return d

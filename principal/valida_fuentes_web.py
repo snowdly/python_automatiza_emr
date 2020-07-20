@@ -17,10 +17,10 @@ def principal(rootDir, ficheros_respaldo):
     latitud = procesos_comunes.valor_elemento_xml(fichero, './/Estacion_Certificada/Datos_Emplazamiento/Latitud')['Valor']
     longitud = procesos_comunes.valor_elemento_xml(fichero, './/Estacion_Certificada/Datos_Emplazamiento/Longitud')['Valor']
     print(latitud, longitud)
-    infoantenas.obtiene_datos(longitud, latitud, ficheros_respaldo)
+    #infoantenas.obtiene_datos(longitud, latitud, ficheros_respaldo)
 
     # Llama a función para levantar todos las webs
-    Accesos_Web.consulta_webs(fichero, ficheros_respaldo)
+    #Accesos_Web.consulta_webs(fichero, ficheros_respaldo)
 
     # Retorna resultado del proceso
     r = dict()

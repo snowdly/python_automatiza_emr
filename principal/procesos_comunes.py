@@ -184,7 +184,7 @@ def horas_medicion_diferencia(fichero, etiqueta):
         datos_enteros.append(int(horas) * 60 + int(minutos))
 
     for a, b in itertools.combinations(datos_enteros, 2):
-        if b - a <= 7:
+        if b - a < 7:
             r['OK_KO'] = 'KO'
             r['Comentario'] = 'Medición con diferencia de menos de 7 minutos'
             break
@@ -407,8 +407,8 @@ def validaciones_real_medida_fase_etiqueta(fichero, etiqueta):
                 dr['Error'] = 'El Valor_Calculado_Vm NO puede ser ' \
                                   'inferior a Valor_Medido_Promediado_Vm '
         elif etiqueta == './/Informe_Medidas/Informe_Medidas_Fase1/Medicion_Fase1/Medida_Fase1/Diferencia_Vm':
-            if round(float(i['Diferencia_Vm']), 2) != (
-                    round(float(i['Nivel_Decision_Vm']), 2) - round(float(i['Valor_Calculado_Vm']), 2)):
+            diferencia = round(round(float(i['Nivel_Decision_Vm']), 2) - round(float(i['Valor_Calculado_Vm']), 2), 2)
+            if round(float(i['Diferencia_Vm']), 2) != diferencia:
                 dr['OK_KO'] = 'KO'
                 dr['Error'] = 'Debe ser el Nivel_Decision_Vm menos el Valor_Calculado_Vm'
         elif etiqueta == './/Informe_Medidas/Informe_Medidas_Fase1/Medicion_Fase1/Medida_Fase1' \

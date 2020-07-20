@@ -18,9 +18,9 @@ logging.basicConfig(level=logging.DEBUG
 '''
 lista_etiquetas = [
     './/Datos_Certificacion/Tipo_Certificacion'
-    , './/Datos_Certificacion/Tipo_Solicitud'
+    # , './/Datos_Certificacion/Tipo_Solicitud'
     , './/Datos_Certificacion/Titular_Nombre_Razon_Social'
-    , './/Datos_Certificacion/Expediente_Concesional' # NO
+    # , './/Datos_Certificacion/Expediente_Concesional' # NO
     , './/Datos_Certificacion/Datos_Visado/Numero_Visado'
     , './/Datos_Certificacion/Datos_Visado/Fecha_Visado'
     , './/Datos_Certificacion/Datos_Visado/Numero_Colegiado'
@@ -92,7 +92,7 @@ lista_etiquetas = [
     , './/Informe_Medidas/Informe_Medidas_Fase1/Equipos_Medida_Fase1/Equipo_Medida_Fase1/Medidor/Numero_Serie_Medidor'
     , './/Informe_Medidas/Informe_Medidas_Fase1/Equipos_Medida_Fase1/Equipo_Medida_Fase1/Antena/Marca_Antena'
     , './/Informe_Medidas/Informe_Medidas_Fase1/Equipos_Medida_Fase1/Equipo_Medida_Fase1/Antena/Modelo_Antena'
-    , './/Informe_Medidas/Informe_Medidas_Fase1/Equipos_Medida_Fase1/Equipo_Medida_Fase1/Antena/Numero_Serie_Antena'
+    # , './/Informe_Medidas/Informe_Medidas_Fase1/Equipos_Medida_Fase1/Equipo_Medida_Fase1/Antena/Numero_Serie_Antena'
 
     # , './/Informe_Medidas/Informe_Medidas_Fase1/Medicion_Fase1/Medida_Fase1/IdPunto'
     # , './/Informe_Medidas/Informe_Medidas_Fase1/Medicion_Fase1/Medida_Fase1/IdEquipo'
@@ -103,10 +103,10 @@ lista_etiquetas = [
     # , './/Informe_Medidas/Informe_Medidas_Fase1/Medicion_Fase1/Medida_Fase1/Valor_Calculado_Vm'
     # , './/Informe_Medidas/Informe_Medidas_Fase1/Medicion_Fase1/Medida_Fase1/Diferencia_Vm'
 
-    , './/Documentos/Informacion_Adicional/Documento/Nombre'
-    , './/Documentos/Informacion_Adicional/Documento/Extension'
-    , './/Documentos/Informacion_Adicional/Documento/Codificacion'
-    , './/Documentos/Informacion_Adicional/Documento/Contenido'
+    # , './/Documentos/Informacion_Adicional/Documento/Nombre'
+    # , './/Documentos/Informacion_Adicional/Documento/Extension'
+    # , './/Documentos/Informacion_Adicional/Documento/Codificacion'
+    # , './/Documentos/Informacion_Adicional/Documento/Contenido'
 
 ]
 

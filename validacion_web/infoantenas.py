@@ -69,16 +69,32 @@ def obtiene_datos(Longitud,Latitud,ficheros_respaldo):
 	#driver.get('https://geoportal.minetur.gob.es/VCTEL/infoantenasGeoJSON.do?bbox='+str(Punto1X)+'%2C'+str(Punto1Y)+'%2C'+str(Punto2X)+'%2C'+str(Punto2Y)+'&zoom=3')
 
 	#obtenemos los datos con la api
+	urls=[]
 	response = requests.get('https://geoportal.minetur.gob.es/VCTEL/infoantenasGeoJSON.do?bbox='+str(Punto1X)+'%2C'+str(Punto1Y)+'%2C'+str(Punto2X)+'%2C'+str(Punto2Y)+'&zoom=3')
+
+	pestana = 0
+	driver = webdriver.Firefox(executable_path=os.path.join(ficheros_respaldo, 'geckodriver.exe'))
 	for feature in response.json()['features']:
 		print(feature)
 		print(feature['properties']['Detalle'].replace('@@<url-aplicacion>', ''))
 		Url_Estacion = feature['properties']['Detalle'].replace('@@<url-aplicacion>', '')
-		# abrir firefox
-		driver =webdriver.Firefox(executable_path= os.path.join(ficheros_respaldo, 'geckodriver.exe'))
-		driver.maximize_window()
-		##driver.get('https://geoportal.minetur.gob.es/VCTEL/infoantenasGeoJSON.do?bbox='+str(Punto1X)+'%2C'+str(Punto1Y)+'%2C'+str(Punto2X)+'%2C'+str(Punto2Y)+'&zoom=3')
-		driver.get('https://geoportal.minetur.gob.es/VCTEL/' + Url_Estacion)
+
+		if pestana == 0:
+			# abrir firefox
+			#driver.maximize_window()
+			driver.get('https://geoportal.minetur.gob.es/VCTEL/' + Url_Estacion)
+		else:
+			#abre demas links
+			# Opens a new tab
+			driver.execute_script("window.open()")
+			# Switch to the newly opened tab
+			driver.switch_to.window(driver.window_handles[pestana])
+			# Navigate to new URL in new tab
+			driver.get('https://geoportal.minetur.gob.es/VCTEL/' + Url_Estacion)
+		pestana = pestana + 1
+
+
+
 
 #al poner las coordenadas separar minutos de segundos con un  espacio
 #infoantenas(longitud','latitud','json')

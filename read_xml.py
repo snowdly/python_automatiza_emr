@@ -2,92 +2,127 @@ import xml.etree.ElementTree as ET
 import csv
 from datetime import date
 import xlsxwriter
-
+import shutil
+import zipfile
+import os
+from principal import reglas_validacion
 
 # DECLARACION DE VARIABLES GLOBALES
-rootDir = "D:\OCAMPOS\PYTHON_AUTOMATIZACION\\"
+nameZip = "BX0309"
+rootDir = "D:\EMR_Auditorias_Python\Auditorias\Resultado\Temporal\\"
 nameFile = "CATT0309Z_CATR0309Z_ER1_A_ARCA_103945_1"
+correctosDir = "D:\EMR_Auditorias_Python\Auditorias\Resultado\Correctos\\"
+rechazosDir = "D:\EMR_Auditorias_Python\Auditorias\Resultado\Rechazos\\"
+reparosDir = "D:\EMR_Auditorias_Python\Auditorias\Resultado\Reparos\\"
+bandera_mover = 1
+vOK_KO = "KO"
+vValidacion = ""
+
+
+# DECOMPRIMIR PRIMER ZIP
+shutil.copyfile("D:\OCAMPOS\PYTHON_AUTOMATIZACION\BX0309.zip", rootDir + nameZip + ".zip")
+filename = os.path.basename("D:\OCAMPOS\PYTHON_AUTOMATIZACION\BX0309.zip")
+(carpeta, ext) = os.path.splitext(filename)
+with zipfile.ZipFile("D:\OCAMPOS\PYTHON_AUTOMATIZACION\BX0309.zip", 'r') as zip_ref:
+    zip_ref.extractall(rootDir + carpeta)
+
+
+# LISTAR Y DESCOMPRIMIR SEGUNDO ZIP
+directories = os.listdir(rootDir + carpeta)
+for file in directories:
+    if file.endswith("zip"):
+        print(file)
+        with zipfile.ZipFile(rootDir + carpeta + "\\" + file, 'r') as zip_ref:
+            zip_ref.extractall(rootDir + carpeta)
+
+
+# OBTENER NOMBRE FICHERO XML
+directories = os.listdir(rootDir + carpeta)
+for file in directories:
+    if file.endswith("xml"):
+        nameFile = file
+        print(nameFile)
+
 
 # OBTIENE FICHERO XML
-tree = ET.parse(rootDir + nameFile+'.xml')
+tree = ET.parse(rootDir + carpeta + "\\" + nameFile)
 root = tree.getroot()
 
 # CREACION DE FICHERO DE VALIDACION CSV
-with open(rootDir + nameFile + '.csv', 'w', newline='') as csvfile:
+with open(rootDir + nameZip + '.csv', 'w', newline='') as csvfile:
     validacsv = csv.writer(csvfile, delimiter=';',
-                            quotechar='|', quoting=csv.QUOTE_MINIMAL)
+                           quotechar='|', quoting=csv.QUOTE_MINIMAL)
     validacsv = csv.writer(csvfile, delimiter=';', quotechar='|', quoting=csv.QUOTE_MINIMAL)
     validacsv.writerow(['Etiqueta', 'Valor', 'OK_KO', 'Validacion', 'Fecha_Hora'])
-
 
     # VALIDACIÓN Y ESCRITURA PARA CADA ETIQUETA DEL XML
     for each in root.findall('.//Datos_Certificacion'):
         dato_Tipo_Certificacion = each.find('.//Tipo_Certificacion')
         print('' if dato_Tipo_Certificacion is None else dato_Tipo_Certificacion.text)
-        validacsv.writerow(['Datos_Certificacion', dato_Tipo_Certificacion.text, '', '', date.today()])
+        validacsv.writerow(['Datos_Certificacion', dato_Tipo_Certificacion.text, reglas_validacion.R_Tipo_Certificacion(dato_Tipo_Certificacion.text).get("OK_KO"), reglas_validacion.R_Tipo_Certificacion(dato_Tipo_Certificacion.text).get("Validacion"), date.today()])
 
         dato_Tipo_Solicitud = each.find('.//Tipo_Solicitud')
         print('' if dato_Tipo_Solicitud is None else dato_Tipo_Solicitud.text)
-        validacsv.writerow(['Tipo_Solicitud', dato_Tipo_Solicitud.text, '', '', date.today()])
+        validacsv.writerow(['Tipo_Solicitud', dato_Tipo_Solicitud.text, reglas_validacion.R_Tipo_Solicitud(dato_Tipo_Solicitud.text).get("OK_KO"), reglas_validacion.R_Tipo_Solicitud(dato_Tipo_Solicitud.text).get("Validacion"), date.today()])
 
         dato_Titular_Nombre_Razon_Social = each.find('.//Titular_Nombre_Razon_Social')
         print('' if dato_Titular_Nombre_Razon_Social is None else dato_Titular_Nombre_Razon_Social.text)
-        validacsv.writerow(['Titular_Nombre_Razon_Social', dato_Titular_Nombre_Razon_Social.text, '', '', date.today()])
+        validacsv.writerow(['Titular_Nombre_Razon_Social', dato_Titular_Nombre_Razon_Social.text, reglas_validacion.R_Titular_Nombre_Razon_Social(dato_Titular_Nombre_Razon_Social.text).get("OK_KO"), reglas_validacion.R_Titular_Nombre_Razon_Social(dato_Titular_Nombre_Razon_Social.text).get("Validacion"), date.today()])
 
         dato_Expediente_Concesional = each.find('.//Expediente_Concesional')
         print('' if dato_Expediente_Concesional is None else dato_Expediente_Concesional.text)
-        validacsv.writerow(['Expediente_Concesional', dato_Expediente_Concesional.text, '', '', date.today()])
+        validacsv.writerow(['Expediente_Concesional', dato_Expediente_Concesional.text, reglas_validacion.debe_estar_lleno(dato_Expediente_Concesional.text).get("OK_KO"), reglas_validacion.debe_estar_lleno(dato_Expediente_Concesional.text).get("Validacion"), date.today()])
 
     for each in root.findall('.//Datos_Visado'):
         dato_Numero_Visado = each.find('.//Numero_Visado')
         print('' if dato_Numero_Visado is None else dato_Numero_Visado.text)
-        validacsv.writerow(['Numero_Visado', dato_Numero_Visado.text, '', '', date.today()])
+        validacsv.writerow(['Numero_Visado', dato_Numero_Visado.text, reglas_validacion.debe_estar_lleno(dato_Numero_Visado.text).get("OK_KO"), reglas_validacion.debe_estar_lleno(dato_Numero_Visado.text).get("Validacion"), date.today()])
 
         dato_Fecha_Visado = each.find('.//Fecha_Visado')
         print('' if dato_Fecha_Visado is None else dato_Fecha_Visado.text)
-        validacsv.writerow(['Fecha_Visado', dato_Fecha_Visado.text, '', '', date.today()])
+        validacsv.writerow(['Fecha_Visado', dato_Fecha_Visado.text, reglas_validacion.debe_estar_lleno(dato_Fecha_Visado.text).get("OK_KO"), reglas_validacion.debe_estar_lleno(dato_Fecha_Visado.text).get("Validacion"), date.today()])
 
         dato_Numero_Colegiado = each.find('.//Numero_Colegiado')
         print('' if dato_Numero_Colegiado is None else dato_Numero_Colegiado.text)
-        validacsv.writerow(['Numero_Colegiado', dato_Numero_Colegiado.text, '', '', date.today()])
+        validacsv.writerow(['Numero_Colegiado', dato_Numero_Colegiado.text, reglas_validacion.debe_estar_lleno(dato_Numero_Colegiado.text).get("OK_KO"), reglas_validacion.debe_estar_lleno(dato_Numero_Colegiado.text).get("Validacion"), date.today()])
 
         dato_Colegio_Profesional = each.find('.//Colegio_Profesional')
         print('' if dato_Colegio_Profesional is None else dato_Colegio_Profesional.text)
-        validacsv.writerow(['Colegio_Profesional', dato_Colegio_Profesional.text, '', '', date.today()])
+        validacsv.writerow(['Colegio_Profesional', dato_Colegio_Profesional.text, reglas_validacion.R_Colegio_Profesional(dato_Numero_Colegiado.text).get("OK_KO"), reglas_validacion.R_Colegio_Profesional(dato_Numero_Colegiado.text).get("Validacion"), date.today()])
 
     for each in root.findall('.//Tecnico_Competente'):
         dato_NIF_NIE = each.find('.//NIF_NIE')
         print('' if dato_NIF_NIE is None else dato_NIF_NIE.text)
-        validacsv.writerow(['NIF_NIE', dato_NIF_NIE.text, '', '', date.today()])
+        validacsv.writerow(['NIF_NIE', dato_NIF_NIE.text, reglas_validacion.R_NIF_NIE(dato_NIF_NIE.text).get("OK_KO"), reglas_validacion.R_NIF_NIE(dato_NIF_NIE.text).get("Validacion"), date.today()])
 
         dato_Nombre = each.find('.//Nombre')
         print('' if dato_Nombre is None else dato_Nombre.text)
-        validacsv.writerow(['Nombre', dato_Nombre.text, '', '', date.today()])
+        validacsv.writerow(['Nombre', dato_Nombre.text, reglas_validacion.debe_estar_lleno(dato_Nombre.text).get("OK_KO"), reglas_validacion.debe_estar_lleno(dato_Nombre.text).get("Validacion"), date.today()])
 
         dato_Apellido1 = each.find('.//Apellido1')
         print('' if dato_Apellido1 is None else dato_Apellido1.text)
-        validacsv.writerow(['Apellido1', dato_Apellido1.text, '', '', date.today()])
+        validacsv.writerow(['Apellido1', dato_Apellido1.text, reglas_validacion.debe_estar_lleno(dato_Apellido1.text).get("OK_KO"), reglas_validacion.debe_estar_lleno(dato_Apellido1.text).get("Validacion"), date.today()])
 
         dato_Apellido2 = each.find('.//Apellido2')
         print('' if dato_Apellido2 is None else dato_Apellido2.text)
-        validacsv.writerow(['Apellido2', dato_Apellido2.text, '', '', date.today()])
+        validacsv.writerow(['Apellido2', dato_Apellido2.text, reglas_validacion.debe_estar_lleno(dato_Apellido2.text).get("OK_KO"), reglas_validacion.debe_estar_lleno(dato_Apellido2.text).get("Validacion"), date.today()])
 
     for each in root.findall('.//Datos_Emplazamiento'):
         dato_Codigo_Emplazamiento = each.find('.//Codigo_Emplazamiento')
         print('' if dato_Codigo_Emplazamiento is None else dato_Codigo_Emplazamiento.text)
-        validacsv.writerow(['Codigo_Emplazamiento', dato_Codigo_Emplazamiento.text, '', '', date.today()])
+        validacsv.writerow(['Codigo_Emplazamiento', dato_Codigo_Emplazamiento.text, reglas_validacion.debe_estar_lleno(dato_Codigo_Emplazamiento.text).get("OK_KO"), reglas_validacion.debe_estar_lleno(dato_Codigo_Emplazamiento.text).get("Validacion"), date.today()])
 
         dato_Emplazamiento_Compartido = each.find('.//Emplazamiento_Compartido')
         print('' if dato_Emplazamiento_Compartido is None else dato_Emplazamiento_Compartido.text)
-        validacsv.writerow(['Emplazamiento_Compartido', dato_Emplazamiento_Compartido.text, '', '', date.today()])
+        validacsv.writerow(['Emplazamiento_Compartido', dato_Emplazamiento_Compartido.text, reglas_validacion.debe_estar_lleno(dato_Emplazamiento_Compartido.text).get("OK_KO"), reglas_validacion.debe_estar_lleno(dato_Emplazamiento_Compartido.text).get("Validacion"), date.today()])
 
         dato_Cod_INE_Termino_Municipal = each.find('.//Cod_INE_Termino_Municipal')
         print('' if dato_Cod_INE_Termino_Municipal is None else dato_Cod_INE_Termino_Municipal.text)
-        validacsv.writerow(['Cod_INE_Termino_Municipal', dato_Cod_INE_Termino_Municipal.text, '', '', date.today()])
+        validacsv.writerow(['Cod_INE_Termino_Municipal', dato_Cod_INE_Termino_Municipal.text, reglas_validacion.debe_estar_lleno(dato_Cod_INE_Termino_Municipal.text).get("OK_KO"), reglas_validacion.debe_estar_lleno(dato_Cod_INE_Termino_Municipal.text).get("Validacion"), date.today()])
 
         dato_Cod_INE_Provincia = each.find('.//Cod_INE_Provincia')
         print('' if dato_Cod_INE_Provincia is None else dato_Cod_INE_Provincia.text)
-        validacsv.writerow(['Cod_INE_Provincia', dato_Cod_INE_Provincia.text, '', '', date.today()])
+        validacsv.writerow(['Cod_INE_Provincia', dato_Cod_INE_Provincia.text, reglas_validacion.debe_estar_lleno(dato_Cod_INE_Provincia.text).get("OK_KO"), reglas_validacion.debe_estar_lleno(dato_Cod_INE_Provincia.text).get("Validacion"), date.today()])
 
         dato_Latitud = each.find('.//Latitud')
         print('' if dato_Latitud is None else dato_Latitud.text)
@@ -111,7 +146,8 @@ with open(rootDir + nameFile + '.csv', 'w', newline='') as csvfile:
 
         dato_Cota_Terreno_Sobre_Nivel_Mar = each.find('.//Cota_Terreno_Sobre_Nivel_Mar')
         print('' if dato_Cota_Terreno_Sobre_Nivel_Mar is None else dato_Cota_Terreno_Sobre_Nivel_Mar.text)
-        validacsv.writerow(['Cota_Terreno_Sobre_Nivel_Mar', dato_Cota_Terreno_Sobre_Nivel_Mar.text, '', '', date.today()])
+        validacsv.writerow(
+            ['Cota_Terreno_Sobre_Nivel_Mar', dato_Cota_Terreno_Sobre_Nivel_Mar.text, '', '', date.today()])
 
     for each in root.findall('.//Calle'):
         dato_Poblacion = each.find('.//Poblacion')
@@ -174,7 +210,8 @@ with open(rootDir + nameFile + '.csv', 'w', newline='') as csvfile:
 
         dato_Unidad_Potencia_Maxima_Total = each.find('.//Unidad_Potencia_Maxima_Total')
         print('' if dato_Unidad_Potencia_Maxima_Total is None else dato_Unidad_Potencia_Maxima_Total.text)
-        validacsv.writerow(['Unidad_Potencia_Maxima_Total', dato_Unidad_Potencia_Maxima_Total.text, '', '', date.today()])
+        validacsv.writerow(
+            ['Unidad_Potencia_Maxima_Total', dato_Unidad_Potencia_Maxima_Total.text, '', '', date.today()])
 
         dato_Localizacion_Antena = each.find('.//Localizacion_Antena')
         print('' if dato_Localizacion_Antena is None else dato_Localizacion_Antena.text)
@@ -194,7 +231,8 @@ with open(rootDir + nameFile + '.csv', 'w', newline='') as csvfile:
 
         dato_Inclinacion_Haz_Sobre_Horizontal = each.find('.//Inclinacion_Haz_Sobre_Horizontal')
         print('' if dato_Inclinacion_Haz_Sobre_Horizontal is None else dato_Inclinacion_Haz_Sobre_Horizontal.text)
-        validacsv.writerow(['Inclinacion_Haz_Sobre_Horizontal', dato_Inclinacion_Haz_Sobre_Horizontal.text, '', '', date.today()])
+        validacsv.writerow(
+            ['Inclinacion_Haz_Sobre_Horizontal', dato_Inclinacion_Haz_Sobre_Horizontal.text, '', '', date.today()])
 
     for each in root.findall('.//Antena_Directiva'):
         dato_Tipo_Ganancia = each.find('.//Tipo_Ganancia')
@@ -383,13 +421,29 @@ with open(rootDir + nameFile + '.csv', 'w', newline='') as csvfile:
         validacsv.writerow(['Contenido', dato_Contenido.text, '', '', date.today()])
 
 # GRABACION EN DOCUMENTO EXCEL
-wb = xlsxwriter.Workbook(rootDir + nameFile + '.xlsx')
+wb = xlsxwriter.Workbook(rootDir + nameZip + '.xlsx')
 sh = wb.add_worksheet('gkz')
 
-with open(rootDir + nameFile + '.csv', 'r') as f:
-    reader = csv.reader(f, delimiter=';' ,quotechar='|')
+with open(rootDir + nameZip + '.csv', 'r') as f:
+    reader = csv.reader(f, delimiter=';', quotechar='|')
     for r, row in enumerate(reader):
         for c, val in enumerate(row):
             sh.write(r, c, val)
 
 wb.close()
+
+# MOVER FICHEROS
+if bandera_mover == 0:  # No existen errores
+    shutil.move(rootDir + nameZip + ".zip", correctosDir + nameZip + ".zip")
+elif bandera_mover == 1:    # Existen reparos
+    shutil.move(rootDir + nameZip + ".csv", reparosDir + nameZip + ".csv")
+    shutil.move(rootDir + nameZip + ".xlsx", reparosDir + nameZip + ".xlsx")
+    shutil.move(rootDir + nameZip + ".zip", reparosDir + nameZip + ".zip")
+elif bandera_mover == 2:    # Existen rechazos
+    shutil.move(rootDir + nameZip + ".csv", rechazosDir + nameZip + ".csv")
+    shutil.move(rootDir + nameZip + ".xlsx", rechazosDir + nameZip + ".xlsx")
+    shutil.move(rootDir + nameZip + ".zip", rechazosDir + nameZip + ".zip")
+
+# ELIMINAR TEMPORALES
+shutil.rmtree(rootDir + carpeta)
+

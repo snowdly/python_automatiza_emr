@@ -8,7 +8,7 @@ import pandas as pd
 
 
 
-
+'''
 # DECLARACION DE VARIABLES
 
 rootDir = "D:\EMR_Auditorias_Python\Auditorias\ANDE6887A_ANDR6887A_ER1_A_ARCA_117274_1.xml"
@@ -103,6 +103,6 @@ def codigo_ine(rootDir):
 
 		
 
-
+'''
 
    

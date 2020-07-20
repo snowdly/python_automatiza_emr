@@ -52,7 +52,7 @@ def obtiene_datos(Longitud,Latitud,ficheros_respaldo):
 	#calculamos los puntos de la diagonal
 	#factor 0.0005 equivale a 5 segundos, la diagonal sera de 10 segundos en total
 	# si se pone 2 segundos de factor no trae datos en el ejemplo
-	factor=0.0005
+	factor=0.0003
 	Punto1X=CoordenadaX-factor#mayorX
 	Punto1Y=CoordenadaY-factor#menorY
 

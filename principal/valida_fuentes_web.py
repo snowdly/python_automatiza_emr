@@ -25,5 +25,7 @@ def principal(rootDir, rootResultados, nameFile):
     return r
 
 
-principal('D:/EMR_Auditorias_Python/Auditorias/PO6100/Carpeta_de_Trabajo/',
-          'D:/EMR_Auditorias_Python/Auditorias/PO6100/Reporte_Estado_Auditoria/', 'GALB6100E_GALR6100E_ER1_M_ARCA_112601_1')
+#principal('D:/EMR_Auditorias_Python/Auditorias/PO6100/Carpeta_de_Trabajo/',
+#          'D:/EMR_Auditorias_Python/Auditorias/PO6100/Reporte_Estado_Auditoria/', 'GALB6100E_GALR6100E_ER1_M_ARCA_112601_1')
+
+principal('D:/EMR_Auditorias_Python/Auditorias/PO6100/Carpeta_de_Trabajo/', '', '')

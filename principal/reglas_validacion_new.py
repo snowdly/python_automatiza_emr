@@ -196,6 +196,11 @@ def reglas_validacion_individual(etiqueta, regla, vdato, fichero):
         if vdato is None:
             d['OK_KO'] = 'KO'
             V.append('No existe valor')
+        cod_provincia = procesos_comunes.valor_elemento_xml(fichero, './/Estacion_Certificada/Datos_Emplazamiento/Cod_INE_Provincia')
+        r= procesos_comunes.obtiene_datos_ine(fichero, vdato, cod_provincia['Valor'])
+        if r['Cod_Municipio_Ine'] != vdato:
+            d['OK_KO'] = 'KO'
+            V.append('El valor no coincide con la tabla de datos del INE')
         d['Validacion'] = V
         d['Fecha_Hora'] = datetime.datetime.now()
         return d
@@ -207,6 +212,11 @@ def reglas_validacion_individual(etiqueta, regla, vdato, fichero):
         if vdato is None:
             d['OK_KO'] = 'KO'
             V.append('No existe valor')
+        cod_municipio = procesos_comunes.valor_elemento_xml(fichero, './/Estacion_Certificada/Datos_Emplazamiento/Cod_INE_Termino_Municipal')
+        r = procesos_comunes.obtiene_datos_ine(fichero, cod_municipio['Valor'], vdato)
+        if r['Cod_Provincia_INE'] != vdato:
+            d['OK_KO'] = 'KO'
+            V.append('El valor no coincide con la tabla de datos del INE')
         d['Validacion'] = V
         d['Fecha_Hora'] = datetime.datetime.now()
         return d
@@ -262,6 +272,13 @@ def reglas_validacion_individual(etiqueta, regla, vdato, fichero):
         if vdato is None:
             d['OK_KO'] = 'KO'
             V.append('No existe valor')
+        cod_municipio = procesos_comunes.valor_elemento_xml(fichero,
+                                                            './/Estacion_Certificada/Datos_Emplazamiento/Cod_INE_Termino_Municipal')
+        cod_provincia = procesos_comunes.valor_elemento_xml(fichero, './/Estacion_Certificada/Datos_Emplazamiento/Cod_INE_Provincia')
+        r = procesos_comunes.obtiene_datos_ine(fichero, cod_municipio['Valor'], cod_provincia['Valor'])
+        if r['Nombre_Municipio_Catastro'].strip().upper() != str(vdato).strip().upper():
+            d['OK_KO'] = 'KO'
+            V.append('El valor no coincide con la tabla de datos del INE')
         d['Validacion'] = V
         d['Fecha_Hora'] = datetime.datetime.now()
         return d
@@ -966,6 +983,10 @@ def reglas_validacion_individual(etiqueta, regla, vdato, fichero):
         if vdato is None:
             d['OK_KO'] = 'KO'
             V.append('No existe valor')
+        dr = procesos_comunes.validaciones_real_medida_fase_etiqueta(fichero, d['Etiqueta'])
+        if dr['OK_KO'] == 'KO':
+            d['OK_KO'] = 'KO'
+            V.append(dr['Error'])
         d['Validacion'] = V
         d['Fecha_Hora'] = datetime.datetime.now()
         return d
@@ -977,6 +998,10 @@ def reglas_validacion_individual(etiqueta, regla, vdato, fichero):
         if vdato is None:
             d['OK_KO'] = 'KO'
             V.append('No existe valor')
+        dr = procesos_comunes.validaciones_real_medida_fase_etiqueta(fichero, d['Etiqueta'])
+        if dr['OK_KO'] == 'KO':
+            d['OK_KO'] = 'KO'
+            V.append(dr['Error'])
         d['Validacion'] = V
         d['Fecha_Hora'] = datetime.datetime.now()
         return d
@@ -988,6 +1013,10 @@ def reglas_validacion_individual(etiqueta, regla, vdato, fichero):
         if vdato is None:
             d['OK_KO'] = 'KO'
             V.append('No existe valor')
+        dr = procesos_comunes.validaciones_real_medida_fase_etiqueta(fichero, d['Etiqueta'])
+        if dr['OK_KO'] == 'KO':
+            d['OK_KO'] = 'KO'
+            V.append(dr['Error'])
         d['Validacion'] = V
         d['Fecha_Hora'] = datetime.datetime.now()
         return d
@@ -999,6 +1028,10 @@ def reglas_validacion_individual(etiqueta, regla, vdato, fichero):
         if vdato is None:
             d['OK_KO'] = 'KO'
             V.append('No existe valor')
+        dr = procesos_comunes.validaciones_real_medida_fase_etiqueta(fichero, d['Etiqueta'])
+        if dr['OK_KO'] == 'KO':
+            d['OK_KO'] = 'KO'
+            V.append(dr['Error'])
         d['Validacion'] = V
         d['Fecha_Hora'] = datetime.datetime.now()
         return d

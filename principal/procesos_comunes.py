@@ -7,6 +7,8 @@ import calendar
 import sys
 from xml.etree import ElementTree
 import itertools
+import pandas as pd
+import xlrd
 
 # rootDir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 # print(rootDir)
@@ -260,6 +262,44 @@ def validaciones_medida_fase(fichero, etiqueta):
             medidas = dict()
     return grupo_medidas
 
+# Validaciones de Medida Fase
+def validaciones_real_medida_fase(fichero, etiqueta):
+    valor_umbral = valor_elemento_xml(fichero, './/Informe_Medidas/Informe_Medidas_Fase1/Equipos_Medida_Fase1'
+                                               '/Equipo_Medida_Fase1/Umbral_Deteccion_Vm')
+    try:
+        vu = valor_umbral['Valor']
+    except:
+        vu = 0.0
+    tree = ElementTree.parse(fichero)
+    root = tree.getroot()
+    grupo_r =[]
+    r = dict()
+    r['Fichero'] = fichero
+    r['Etiqueta'] = etiqueta
+    r['Child'] = ''
+    r['OK_KO'] = 'OK'
+    r['Comentario'] = ''
+    medidas = dict()
+    grupo_medidas = []
+    cantidad = 0
+
+    try:
+        c = cantidad_elementos_xml(fichero, etiqueta)
+        d = cantidad_elementos_xml(fichero, etiqueta + 'IdPunto/')
+        calculo = c['Cantidad'] / d['Cantidad']
+    except:
+        calculo = 8
+    for each in root.findall(etiqueta):
+        cantidad = cantidad + 1
+        medidas[each.tag] = each.text
+        if cantidad == calculo:
+            grupo_medidas.append(medidas)
+
+
+            cantidad = 0
+            medidas = dict()
+    return grupo_medidas
+
 
 # Retona estructura de error
 def estructura_respuesta_error(etapa):
@@ -269,7 +309,7 @@ def estructura_respuesta_error(etapa):
     r['Fecha'] = datetime.datetime.now()
     return r
 
-
+# Convierte coordenadas ETRS89 en UTM
 def coordenadas_ETRS89(Longitud,Latitud):
 
     #convertivos coordenadas en grados a coordenadas en decimal
@@ -309,3 +349,79 @@ def coordenadas_ETRS89(Longitud,Latitud):
 
     return (CoordenadaX,CoordenadaY)
 
+#Obtiene datos de INE
+def obtiene_datos_ine(fichero, Cod_Municipio_Ine, Cod_Provincia_INE):
+    r = dict()
+    df_sheet = pd.read_excel('D:/EMR_Auditorias_Python/Ficheros_Respaldo/cod_provincia.xlsx', sheet_name='Hoja1')
+    cod_provincia = df_sheet['Cod_Provincia_INE'] == int(Cod_Provincia_INE)
+    cod_municipio = df_sheet['Cod_Municipio_Ine'] == Cod_Municipio_Ine
+    df_encontrado = df_sheet[cod_provincia & cod_municipio]
+    #print(df_sheet[cod_provincia & cod_municipio])
+    r['Fichero'] = fichero
+    r['Cod_Provincia_INE'] = df_encontrado['Cod_Provincia_INE'].to_string(index=False).strip()
+    r['Cod_Municipio_Ine'] = df_encontrado['Cod_Municipio_Ine'].to_string(index=False).strip()
+    r['Nombre_Municipio_Catastro'] = df_encontrado['Nombre Municipio_Catastro'].to_string(index=False).strip()
+
+    return r
+
+def obtiene_datos_antenas(fichero, Cod_Municipio_Ine, Cod_Provincia_INE):
+    r = dict()
+    df_sheet = pd.read_excel('D:/EMR_Auditorias_Python/Ficheros_Respaldo/cod_provincia.xlsx', sheet_name='Hoja1')
+    #print(df_sheet_index.where(df_sheet_index['Cod_Provincia_INE']==36))
+    cod_provincia = df_sheet['Cod_Provincia_INE'] == int(Cod_Provincia_INE)
+    cod_municipio = df_sheet['Cod_Municipio_Ine'] == Cod_Municipio_Ine
+    df_encontrado = df_sheet[cod_provincia & cod_municipio]
+    print(df_sheet[cod_provincia & cod_municipio])
+    r['Fichero'] = fichero
+    r['Cod_Provincia_INE'] = df_encontrado['Cod_Provincia_INE'].to_string(index=False).strip()
+    r['Cod_Municipio_Ine'] = df_encontrado['Cod_Municipio_Ine'].to_string(index=False).strip()
+    r['Nombre Municipio_Catastro'] = df_encontrado['Nombre Municipio_Catastro'].to_string(index=False).strip()
+
+    return r
+
+
+#Validacion de Medida Fase por etiqueta
+def validaciones_real_medida_fase_etiqueta(fichero, etiqueta):
+
+    #fichero='D:/EMR_Auditorias_Python/Auditorias/PO6100/Carpeta_de_Trabajo/23207/GALN6100E_GALR6100E_ER1_M_ARCA_112601_1' \
+    #        '.xml '
+    dr = dict()
+    dr['OK_KO'] = 'OK'
+    dr['Error'] = ''
+
+    #etiqueta = './/Informe_Medidas/Informe_Medidas_Fase1/Medicion_Fase1/Medida_Fase1/Nivel_Referencia_Vm'
+    r=validaciones_real_medida_fase(fichero,
+                               './/Informe_Medidas/Informe_Medidas_Fase1/Medicion_Fase1/Medida_Fase1/',)
+    for i in r:
+        #print(i)
+        if etiqueta == './/Informe_Medidas/Informe_Medidas_Fase1/Medicion_Fase1/Medida_Fase1/Nivel_Decision_Vm':
+            if round((float(i['Nivel_Referencia_Vm']) / 2), 2) != round(float(i['Nivel_Decision_Vm']), 2):
+                dr['OK_KO'] ='KO'
+                dr['Error'] = 'Nivel de Decision NO es la mitad del Nivel de Referencia'
+        elif etiqueta == './/Informe_Medidas/Informe_Medidas_Fase1/Medicion_Fase1/Medida_Fase1/Valor_Calculado_Vm':
+            if round(float(i['Valor_Calculado_Vm']), 2) < round(float(i['Valor_Medido_Promediado_Vm']), 2):
+                dr['OK_KO'] = 'KO'
+                dr['Error'] = 'El Valor_Calculado_Vm NO puede ser ' \
+                                  'inferior a Valor_Medido_Promediado_Vm '
+        elif etiqueta == './/Informe_Medidas/Informe_Medidas_Fase1/Medicion_Fase1/Medida_Fase1/Diferencia_Vm':
+            if round(float(i['Diferencia_Vm']), 2) != (
+                    round(float(i['Nivel_Decision_Vm']), 2) - round(float(i['Valor_Calculado_Vm']), 2)):
+                dr['OK_KO'] = 'KO'
+                dr['Error'] = 'Debe ser el Nivel_Decision_Vm menos el Valor_Calculado_Vm'
+        elif etiqueta == './/Informe_Medidas/Informe_Medidas_Fase1/Medicion_Fase1/Medida_Fase1' \
+                                 '/Valor_Medido_Promediado_Vm':
+            valor_umbral = valor_elemento_xml(fichero, './/Informe_Medidas/Informe_Medidas_Fase1/Equipos_Medida_Fase1'
+                                                       '/Equipo_Medida_Fase1/Umbral_Deteccion_Vm')
+            try:
+                vu = valor_umbral['Valor']
+            except:
+                vu = 0.0
+            try:
+                vp = round(float(i['Valor_Medido_Promediado_Vm']), 2)
+                if vp < float(vu):
+                    dr['OK_KO'] = 'KO'
+                    dr['Error'] = ' Debe ponerse <U'
+            except:
+                vp = 0
+
+    return dr

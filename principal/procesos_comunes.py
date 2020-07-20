@@ -361,6 +361,9 @@ def obtiene_datos_ine(fichero, Cod_Municipio_Ine, Cod_Provincia_INE):
     r['Cod_Provincia_INE'] = df_encontrado['Cod_Provincia_INE'].to_string(index=False).strip()
     r['Cod_Municipio_Ine'] = df_encontrado['Cod_Municipio_Ine'].to_string(index=False).strip()
     r['Nombre_Municipio_Catastro'] = df_encontrado['Nombre Municipio_Catastro'].to_string(index=False).strip()
+    r['Cod_Municipio_Catastro'] = df_encontrado['Cod_Municipio_Catastro'].to_string(index=False).strip()
+    r['Cod_Provincia_Catastro'] = df_encontrado['Cod_Provincia_Catastro'].to_string(index=False).strip()
+    r['Nombre_Provincia'] = df_encontrado['Nombre Provincia'].to_string(index=False).strip()
 
     return r
 

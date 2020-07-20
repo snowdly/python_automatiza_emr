@@ -95,7 +95,7 @@ except:
 
 try:
     logging.debug('Inicia: Proceso de validación con fuentes web')
-    r = valida_fuentes_web.principal(rutas_trabajo['ruta_auditoria_carpeta_trabajo'], rutas_base['ruta_ficheros_respaldo'], nameFile)
+    r = valida_fuentes_web.principal(rutas_trabajo['ruta_auditoria_carpeta_trabajo'], rutas_base['ruta_ficheros_respaldo'])
     resumen = resumen.append(r, ignore_index=True)
     logging.debug('Finaliza: Proceso de validación con fuentes web')
 except:

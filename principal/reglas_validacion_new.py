@@ -174,9 +174,9 @@ def reglas_validacion_individual(etiqueta, regla, vdato, fichero):
         d['Valor'] = vdato
         d['OK_KO'] = 'OK'
         d['Validacion'] = ''
-        if vdato != fichero_nombre_dividido[1]:
+        if vdato is None:
             d['OK_KO'] = 'KO'
-            V.append('El valor debe ser igual ala segunda parte del nombre del fichero xml')
+            V.append('No existe valor')
         d['Validacion'] = V
         d['Fecha_Hora'] = datetime.datetime.now()
         return d
@@ -259,6 +259,17 @@ def reglas_validacion_individual(etiqueta, regla, vdato, fichero):
         d['Validacion'] = V
         d['Fecha_Hora'] = datetime.datetime.now()
         return d
+    elif regla == 'R_Estacion_Certificada_Datos_Emplazamiento_Referencia_Catastral':
+        d['Etiqueta'] = etiqueta
+        d['Valor'] = vdato
+        d['OK_KO'] = 'OK'
+        d['Validacion'] = ''
+        if vdato is None:
+            d['OK_KO'] = 'KO'
+            V.append('No existe valor')
+        d['Validacion'] = V
+        d['Fecha_Hora'] = datetime.datetime.now()
+        return d
     elif regla == 'R_Estacion_Certificada_Datos_Emplazamiento_Cota_Terreno_Sobre_Nivel_Mar':
         d['Etiqueta'] = etiqueta
         d['Valor'] = vdato
@@ -326,9 +337,22 @@ def reglas_validacion_individual(etiqueta, regla, vdato, fichero):
         d['Valor'] = vdato
         d['OK_KO'] = 'OK'
         d['Validacion'] = ''
-        if vdato != fichero_nombre_dividido[0]:
+        codigo_emplazamiento = procesos_comunes.valor_elemento_xml(fichero, './/Estacion_Certificada/Datos_Estacion'
+                                                                            '/Codigo_Estacion')['Valor']
+
+        lr = procesos_comunes.obtine_letra_expediente_concesional(fichero)
+        if lr['OK_KO'] == 'OK':
+            codigo_cambiado = codigo_emplazamiento[0:3] + lr['Letra'] + codigo_emplazamiento[4:]
+            if vdato != codigo_cambiado:
+                d['OK_KO'] = 'KO'
+                V.append('Debe tener el mismo código que el parámetro codigo emplazamiento salvo la letra que ocupa el 4 '
+                         'lugar, en vez de una R debe ser la letra correspondiente a la tecnología del certificado '
+                         'radioeléctrico.')
+        else:
             d['OK_KO'] = 'KO'
-            V.append('El valor debe ser igual ala primera parte del nombre del fichero xml')
+            V.append('No ha sido posible verificar la letra del expediente consecional, revise si el nombre del xml es correcto')
+
+
         d['Validacion'] = V
         d['Fecha_Hora'] = datetime.datetime.now()
         return d
@@ -457,7 +481,7 @@ def reglas_validacion_individual(etiqueta, regla, vdato, fichero):
         if vdato is None:
             d['OK_KO'] = 'KO'
             V.append('No existe valor')
-        if not re.match("\d{1,}\.\d{1,}", vdato):
+        if not re.match("\d{1,}\.{0,1}\d{1,}", vdato):
             d['OK_KO'] = 'KO'
             V.append('Debe ser número')
         d['Validacion'] = V

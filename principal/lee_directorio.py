@@ -5,6 +5,7 @@ import logging
 import datetime
 from principal import valida_xml_individual_base
 from principal import procesos_comunes
+from pyunpack import Archive
 
 # DECLARACION DE VARIABLES GLOBALES
 #nameZip = ""
@@ -33,19 +34,22 @@ def extrae_datos(rootDir):
             rootDir_sub = rootDir_sub + "/" + file
             extrae_datos(rootDir_sub)
         else:
-            if file.endswith("zip"):
+            if file.endswith(".zip"):
                 logging.debug("Es un zip: " + rootDir + '/' + file)
                 #print("Es un zip: " + rootDir + '/' + file)
                 (carpeta_zip, ext_zip) = os.path.splitext(file)
                 with zipfile.ZipFile(rootDir + '/' + file, 'r') as zip_ref_zip:
                     zip_ref_zip.extractall(rootCarpetaTrabajo)
-            elif file.endswith("rar"):
+            elif file.endswith(".rar"):
                 logging.debug("Es un rar: " + rootDir + '/' + file)
                 (carpeta_rar, ext_rar) = os.path.splitext(file)
                 r = rarfile.RarFile(rootDir + '/' + file)
                 r.extractall(rootCarpetaTrabajo)
                 r.close()
-
+            elif file.endswith(".7z"):
+                logging.debug("Es un 7z: " + rootDir + '/' + file)
+                (carpeta_7z, ext_7z) = os.path.splitext(file)
+                Archive(rootDir + '/' + file).extractall(rootCarpetaTrabajo)
 
 def extrae_datos_recursivo(rootDir, nivel):
     for i in range(nivel):

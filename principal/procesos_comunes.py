@@ -9,6 +9,7 @@ from xml.etree import ElementTree
 import itertools
 import pandas as pd
 import xlrd
+from principal import listas_comunes
 
 # rootDir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 # print(rootDir)
@@ -428,3 +429,21 @@ def validaciones_real_medida_fase_etiqueta(fichero, etiqueta):
                 vp = 0
 
     return dr
+
+
+def obtine_letra_expediente_concesional(fichero):
+    fichero_nombre, fichero_extension = os.path.splitext(os.path.basename(fichero))
+    fichero_nombre_dividido = fichero_nombre.split('_')
+    r = dict()
+    r['Letra'] = ''
+    r['OK_KO'] = 'KO'
+    try:
+        # print(fichero_nombre_dividido[0][3])
+        for letra in listas_comunes.expediente_concesional:
+            if letra['LETRA'] == fichero_nombre_dividido[0][3]:
+                r['Letra'] = letra['LETRA']
+                r['OK_KO'] = 'OK'
+    except:
+        r['Letra'] = ''
+        r['OK_KO'] = 'KO'
+    return r

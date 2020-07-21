@@ -202,7 +202,7 @@ def validaciones_medida_fase(fichero, etiqueta):
         vu = 0.0
     tree = ElementTree.parse(fichero)
     root = tree.getroot()
-    grupo_r =[]
+    grupo_r = []
     r = dict()
     r['Fichero'] = fichero
     r['Etiqueta'] = etiqueta
@@ -234,10 +234,11 @@ def validaciones_medida_fase(fichero, etiqueta):
 
             # Validacion de Valor_Calculado_Vm
             if round(float(medidas['Valor_Calculado_Vm']), 2) < round(float(medidas['Valor_Medido_Promediado_Vm']), 2):
-                r['Child'] = './/Informe_Medidas/Informe_Medidas_Fase1/Medicion_Fase1/Medida_Fase1/Valor_Medido_Promediado_Vm'
+                r[
+                    'Child'] = './/Informe_Medidas/Informe_Medidas_Fase1/Medicion_Fase1/Medida_Fase1/Valor_Medido_Promediado_Vm'
                 r['OK_KO'] = 'KO'
                 r['Comentario'] = 'El Valor_Calculado_Vm NO puede ser ' \
-                                                                            'inferior a Valor_Medido_Promediado_Vm '
+                                  'inferior a Valor_Medido_Promediado_Vm '
                 grupo_r.append(r)
 
             # Validacion Diferencia_Vm
@@ -263,6 +264,7 @@ def validaciones_medida_fase(fichero, etiqueta):
             medidas = dict()
     return grupo_medidas
 
+
 # Validaciones de Medida Fase
 def validaciones_real_medida_fase(fichero, etiqueta):
     valor_umbral = valor_elemento_xml(fichero, './/Informe_Medidas/Informe_Medidas_Fase1/Equipos_Medida_Fase1'
@@ -273,7 +275,7 @@ def validaciones_real_medida_fase(fichero, etiqueta):
         vu = 0.0
     tree = ElementTree.parse(fichero)
     root = tree.getroot()
-    grupo_r =[]
+    grupo_r = []
     r = dict()
     r['Fichero'] = fichero
     r['Etiqueta'] = etiqueta
@@ -296,7 +298,6 @@ def validaciones_real_medida_fase(fichero, etiqueta):
         if cantidad == calculo:
             grupo_medidas.append(medidas)
 
-
             cantidad = 0
             medidas = dict()
     return grupo_medidas
@@ -310,54 +311,51 @@ def estructura_respuesta_error(etapa):
     r['Fecha'] = datetime.datetime.now()
     return r
 
-# Convierte coordenadas ETRS89 en UTM
-def coordenadas_ETRS89(Longitud,Latitud):
 
-    #convertivos coordenadas en grados a coordenadas en decimal
-    signo=-1
-    #sustituir tanto en ingles como en español
+# Convierte coordenadas ETRS89 en UTM
+def coordenadas_ETRS89(Longitud, Latitud):
+    # convertivos coordenadas en grados a coordenadas en decimal
+    signo = -1
+    # sustituir tanto en ingles como en español
     if Latitud.find('N') > 0:
-        Latitud= Latitud.replace('N', '-')
+        Latitud = Latitud.replace('N', '-')
 
     else:
-        Latitud= Latitud.replace('S', '-')
-    
-    Latitud = Latitud[:5] + "-" + Latitud[5:]
-    Latitud= Latitud.replace(',', '.')
+        Latitud = Latitud.replace('S', '-')
 
+    Latitud = Latitud[:5] + "-" + Latitud[5:]
+    Latitud = Latitud.replace(',', '.')
 
     if Longitud.find('W') > 0:
-        Longitud= Longitud.replace('W', '-')
+        Longitud = Longitud.replace('W', '-')
 
     elif Longitud.find('O') > 0:
-        Longitud= Longitud.replace('O', '-')
+        Longitud = Longitud.replace('O', '-')
 
     elif Longitud.find('E') > 0:
-        Longitud= Longitud.replace('E', '-')
-        signo=1
+        Longitud = Longitud.replace('E', '-')
+        signo = 1
 
-    
     Longitud = Longitud[:5] + "-" + Longitud[5:]
-    Longitud= Longitud.replace(',', '.')
+    Longitud = Longitud.replace(',', '.')
+
+    deg, minutes, seconds = re.split('-', Latitud)
+    CoordenadaY = float(deg) + float(minutes) / 60 + float(seconds) / (60 * 60)
+
+    deg, minutes, seconds = re.split('-', Longitud)
+    CoordenadaX = (float(deg) + float(minutes) / 60 + float(seconds) / (60 * 60)) * signo
+
+    return (CoordenadaX, CoordenadaY)
 
 
-    deg, minutes, seconds =  re.split('-', Latitud)
-    CoordenadaY= float(deg) + float(minutes)/60 + float(seconds)/(60*60)
-
-    deg, minutes, seconds =  re.split('-', Longitud)
-    CoordenadaX=(float(deg) + float(minutes)/60 + float(seconds)/(60*60))* signo
-
-
-    return (CoordenadaX,CoordenadaY)
-
-#Obtiene datos de INE
-def obtiene_datos_ine(fichero, Cod_Municipio_Ine, Cod_Provincia_INE):
+# Obtiene datos de INE
+def obtiene_datos_ine(fichero, Cod_Municipio_Ine, Cod_Provincia_INE, ficheros_respaldo):
     r = dict()
-    df_sheet = pd.read_excel('D:/EMR_Auditorias_Python/Ficheros_Respaldo/cod_provincia.xlsx', sheet_name='Hoja1')
+    df_sheet = pd.read_excel(os.path.join(ficheros_respaldo, 'cod_provincia.xlsx' ), sheet_name='Hoja1')
     cod_provincia = df_sheet['Cod_Provincia_INE'] == int(Cod_Provincia_INE)
     cod_municipio = df_sheet['Cod_Municipio_Ine'] == Cod_Municipio_Ine
     df_encontrado = df_sheet[cod_provincia & cod_municipio]
-    #print(df_sheet[cod_provincia & cod_municipio])
+    # print(df_sheet[cod_provincia & cod_municipio])
     r['Fichero'] = fichero
     r['Cod_Provincia_INE'] = df_encontrado['Cod_Provincia_INE'].to_string(index=False).strip()
     r['Cod_Municipio_Ine'] = df_encontrado['Cod_Municipio_Ine'].to_string(index=False).strip()
@@ -368,10 +366,11 @@ def obtiene_datos_ine(fichero, Cod_Municipio_Ine, Cod_Provincia_INE):
 
     return r
 
+
 def obtiene_datos_antenas(fichero, Cod_Municipio_Ine, Cod_Provincia_INE):
     r = dict()
     df_sheet = pd.read_excel('D:/EMR_Auditorias_Python/Ficheros_Respaldo/cod_provincia.xlsx', sheet_name='Hoja1')
-    #print(df_sheet_index.where(df_sheet_index['Cod_Provincia_INE']==36))
+    # print(df_sheet_index.where(df_sheet_index['Cod_Provincia_INE']==36))
     cod_provincia = df_sheet['Cod_Provincia_INE'] == int(Cod_Provincia_INE)
     cod_municipio = df_sheet['Cod_Municipio_Ine'] == Cod_Municipio_Ine
     df_encontrado = df_sheet[cod_provincia & cod_municipio]
@@ -384,36 +383,35 @@ def obtiene_datos_antenas(fichero, Cod_Municipio_Ine, Cod_Provincia_INE):
     return r
 
 
-#Validacion de Medida Fase por etiqueta
+# Validacion de Medida Fase por etiqueta
 def validaciones_real_medida_fase_etiqueta(fichero, etiqueta):
-
-    #fichero='D:/EMR_Auditorias_Python/Auditorias/PO6100/Carpeta_de_Trabajo/23207/GALN6100E_GALR6100E_ER1_M_ARCA_112601_1' \
+    # fichero='D:/EMR_Auditorias_Python/Auditorias/PO6100/Carpeta_de_Trabajo/23207/GALN6100E_GALR6100E_ER1_M_ARCA_112601_1' \
     #        '.xml '
     dr = dict()
     dr['OK_KO'] = 'OK'
     dr['Error'] = ''
 
-    #etiqueta = './/Informe_Medidas/Informe_Medidas_Fase1/Medicion_Fase1/Medida_Fase1/Nivel_Referencia_Vm'
-    r=validaciones_real_medida_fase(fichero,
-                               './/Informe_Medidas/Informe_Medidas_Fase1/Medicion_Fase1/Medida_Fase1/',)
+    # etiqueta = './/Informe_Medidas/Informe_Medidas_Fase1/Medicion_Fase1/Medida_Fase1/Nivel_Referencia_Vm'
+    r = validaciones_real_medida_fase(fichero,
+                                      './/Informe_Medidas/Informe_Medidas_Fase1/Medicion_Fase1/Medida_Fase1/', )
     for i in r:
-        #print(i)
+        # print(i)
         if etiqueta == './/Informe_Medidas/Informe_Medidas_Fase1/Medicion_Fase1/Medida_Fase1/Nivel_Decision_Vm':
             if round((float(i['Nivel_Referencia_Vm']) / 2), 2) != round(float(i['Nivel_Decision_Vm']), 2):
-                dr['OK_KO'] ='KO'
+                dr['OK_KO'] = 'KO'
                 dr['Error'] = 'Nivel de Decision NO es la mitad del Nivel de Referencia'
         elif etiqueta == './/Informe_Medidas/Informe_Medidas_Fase1/Medicion_Fase1/Medida_Fase1/Valor_Calculado_Vm':
             if round(float(i['Valor_Calculado_Vm']), 2) < round(float(i['Valor_Medido_Promediado_Vm']), 2):
                 dr['OK_KO'] = 'KO'
                 dr['Error'] = 'El Valor_Calculado_Vm NO puede ser ' \
-                                  'inferior a Valor_Medido_Promediado_Vm '
+                              'inferior a Valor_Medido_Promediado_Vm '
         elif etiqueta == './/Informe_Medidas/Informe_Medidas_Fase1/Medicion_Fase1/Medida_Fase1/Diferencia_Vm':
             diferencia = round(round(float(i['Nivel_Decision_Vm']), 2) - round(float(i['Valor_Calculado_Vm']), 2), 2)
             if round(float(i['Diferencia_Vm']), 2) != diferencia:
                 dr['OK_KO'] = 'KO'
                 dr['Error'] = 'Debe ser el Nivel_Decision_Vm menos el Valor_Calculado_Vm'
         elif etiqueta == './/Informe_Medidas/Informe_Medidas_Fase1/Medicion_Fase1/Medida_Fase1' \
-                                 '/Valor_Medido_Promediado_Vm':
+                         '/Valor_Medido_Promediado_Vm':
             valor_umbral = valor_elemento_xml(fichero, './/Informe_Medidas/Informe_Medidas_Fase1/Equipos_Medida_Fase1'
                                                        '/Equipo_Medida_Fase1/Umbral_Deteccion_Vm')
             try:
@@ -445,5 +443,22 @@ def obtine_letra_expediente_concesional(fichero):
                 r['OK_KO'] = 'OK'
     except:
         r['Letra'] = ''
+        r['OK_KO'] = 'KO'
+    return r
+
+
+def obtiene_primer_xml(rootDir):
+    r = dict()
+    r['Fichero'] = ''
+    r['OK_KO'] = 'KO'
+    fichero = ''
+    for fichero_obtenido in lista_xml(rootDir):
+        fichero = fichero_obtenido
+        break
+    if fichero != '':
+        r['Fichero'] = fichero
+        r['OK_KO'] = 'OK'
+    else:
+        r['Fichero'] = ''
         r['OK_KO'] = 'KO'
     return r

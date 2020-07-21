@@ -5,7 +5,7 @@ from principal import listas_comunes
 import os
 
 
-def reglas_validacion_individual(etiqueta, regla, vdato, fichero):
+def reglas_validacion_individual(etiqueta, regla, vdato, fichero, ficheros_respaldo):
     fichero_nombre, fichero_extension = os.path.splitext(os.path.basename(fichero))
     d = dict()
     V = []
@@ -203,7 +203,7 @@ def reglas_validacion_individual(etiqueta, regla, vdato, fichero):
             d['OK_KO'] = 'KO'
             V.append('No existe valor')
         cod_provincia = procesos_comunes.valor_elemento_xml(fichero, './/Estacion_Certificada/Datos_Emplazamiento/Cod_INE_Provincia')
-        r= procesos_comunes.obtiene_datos_ine(fichero, vdato, cod_provincia['Valor'])
+        r= procesos_comunes.obtiene_datos_ine(fichero, vdato, cod_provincia['Valor'], ficheros_respaldo)
         if r['Cod_Municipio_Ine'] != vdato:
             d['OK_KO'] = 'KO'
             V.append('El valor no coincide con la tabla de datos del INE')
@@ -219,7 +219,7 @@ def reglas_validacion_individual(etiqueta, regla, vdato, fichero):
             d['OK_KO'] = 'KO'
             V.append('No existe valor')
         cod_municipio = procesos_comunes.valor_elemento_xml(fichero, './/Estacion_Certificada/Datos_Emplazamiento/Cod_INE_Termino_Municipal')
-        r = procesos_comunes.obtiene_datos_ine(fichero, cod_municipio['Valor'], vdato)
+        r = procesos_comunes.obtiene_datos_ine(fichero, cod_municipio['Valor'], vdato, ficheros_respaldo)
         if r['Cod_Provincia_INE'] != vdato:
             d['OK_KO'] = 'KO'
             V.append('El valor no coincide con la tabla de datos del INE')
@@ -292,7 +292,7 @@ def reglas_validacion_individual(etiqueta, regla, vdato, fichero):
         cod_municipio = procesos_comunes.valor_elemento_xml(fichero,
                                                             './/Estacion_Certificada/Datos_Emplazamiento/Cod_INE_Termino_Municipal')
         cod_provincia = procesos_comunes.valor_elemento_xml(fichero, './/Estacion_Certificada/Datos_Emplazamiento/Cod_INE_Provincia')
-        r = procesos_comunes.obtiene_datos_ine(fichero, cod_municipio['Valor'], cod_provincia['Valor'])
+        r = procesos_comunes.obtiene_datos_ine(fichero, cod_municipio['Valor'], cod_provincia['Valor'], ficheros_respaldo)
         if r['Nombre_Municipio_Catastro'].strip().upper() != str(vdato).strip().upper():
             d['OK_KO'] = 'KO'
             V.append('El valor no coincide con la tabla de datos del INE')
@@ -777,7 +777,7 @@ def reglas_validacion_individual(etiqueta, regla, vdato, fichero):
         if vdato is None:
             d['OK_KO'] = 'KO'
             V.append('No existe valor')
-        if not(vdato == 'S/N' or vdato.isdigit()):
+        if not(vdato == 'S/N' or vdato.isdigit() or vdato == 'SN'):
             d['OK_KO'] = 'KO'
             V.append('Debe ser número o S/N')
         d['Validacion'] = V
@@ -818,7 +818,7 @@ def reglas_validacion_individual(etiqueta, regla, vdato, fichero):
             V.append('No existe valor')
         cod_provincia = procesos_comunes.valor_elemento_xml(fichero,
                                                             './/Estacion_Certificada/Datos_Emplazamiento/Cod_INE_Provincia')
-        r = procesos_comunes.obtiene_datos_ine(fichero, vdato, cod_provincia['Valor'])
+        r = procesos_comunes.obtiene_datos_ine(fichero, vdato, cod_provincia['Valor'], ficheros_respaldo)
         if r['Cod_Municipio_Ine'] != vdato:
             d['OK_KO'] = 'KO'
             V.append('El valor no coincide con la tabla de datos del INE')
@@ -835,7 +835,7 @@ def reglas_validacion_individual(etiqueta, regla, vdato, fichero):
             V.append('No existe valor')
         cod_municipio = procesos_comunes.valor_elemento_xml(fichero,
                                                             './/Estacion_Certificada/Datos_Emplazamiento/Cod_INE_Termino_Municipal')
-        r = procesos_comunes.obtiene_datos_ine(fichero, cod_municipio['Valor'], vdato)
+        r = procesos_comunes.obtiene_datos_ine(fichero, cod_municipio['Valor'], vdato, ficheros_respaldo)
         if r['Cod_Provincia_INE'] != vdato:
             d['OK_KO'] = 'KO'
             V.append('El valor no coincide con la tabla de datos del INE')

@@ -12,7 +12,7 @@ import pandas as pd
 #nameFile = 'LU7385'
 
 
-def principal(rootDir, rootResultados, nameFile):
+def principal(rootDir, rootResultados, nameFile, ficheros_respaldo):
     d = dict()
 
     for fichero in procesos_comunes.lista_xml(rootDir):
@@ -32,7 +32,7 @@ def principal(rootDir, rootResultados, nameFile):
                 # print(each.text)
                 dv = reglas_validacion_new.reglas_validacion_individual(e['Etiqueta'], e['Regla'],
                                                                         '' if each is None else each.text,
-                                                                        fichero)
+                                                                        fichero, ficheros_respaldo)
                 analisis = analisis.append(dv, ignore_index=True)
 
         writer = pd.ExcelWriter(

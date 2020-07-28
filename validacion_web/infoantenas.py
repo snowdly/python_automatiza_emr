@@ -72,13 +72,21 @@ def obtiene_datos(Longitud,Latitud,ficheros_respaldo):
 	urls=[]
 	response = requests.get('https://geoportal.minetur.gob.es/VCTEL/infoantenasGeoJSON.do?bbox='+str(Punto1X)+'%2C'+str(Punto1Y)+'%2C'+str(Punto2X)+'%2C'+str(Punto2Y)+'&zoom=3')
 
-	pestana = 0
-	driver = webdriver.Firefox(executable_path=os.path.join(ficheros_respaldo, 'geckodriver.exe'))
+
 	for feature in response.json()['features']:
 		print(feature)
+		print('')
+		print(feature['properties']['Dirección'])
+		situacion= feature['properties']['Dirección'].split(".")
+		situacion=situacion[1].split(",")
+		municipio=situacion[0].strip()
+		provincia=situacion[1].strip()
+		print('')
 		print(feature['properties']['Detalle'].replace('@@<url-aplicacion>', ''))
 		Url_Estacion = feature['properties']['Detalle'].replace('@@<url-aplicacion>', '')
-
+		"""
+		pestana = 0
+		driver = webdriver.Firefox(executable_path=os.path.join(ficheros_respaldo, 'geckodriver.exe'))
 		if pestana == 0:
 			# abrir firefox
 			#driver.maximize_window()
@@ -92,6 +100,8 @@ def obtiene_datos(Longitud,Latitud,ficheros_respaldo):
 			# Navigate to new URL in new tab
 			driver.get('https://geoportal.minetur.gob.es/VCTEL/' + Url_Estacion)
 		pestana = pestana + 1
+		"""
+	return (municipio, provincia)
 
 
 
@@ -102,3 +112,4 @@ def obtiene_datos(Longitud,Latitud,ficheros_respaldo):
 #infoantenas('04W54 53,63','37N51 01,13','{"type":"FeatureCollection","features":[{"type":"Feature","geometry":{"type":"Point","coordinates":[-4.914917,37.850277]},"properties":{"Gis_Latitud":"37.850278","Gis_Longitud":"-4.914917","Gis_ID":"001736","Gis_Etiqueta":"Estación de telefonía móvil","Gis_Estilo":"vcne.estaciones","Gis_Codigo":"VODAFONE ESPAÑA, S.A. - 001736","Tipo":"Estación de telefonía móvil","Código":"VODAFONE ESPAÑA, S.A. - 001736","Dirección":"CL carretera Palma del rio A-431 Km 11,5, s\/n. CÓRDOBA, CÓRDOBA","Detalle":"@@<url-aplicacion>\/detalleEstacion.do?emplazamiento=001736"},"id":"001736"},{"type":"Feature","geometry":{"type":"Point","coordinates":[-4.912792,37.850864]},"properties":{"Gis_Latitud":"37.850864","Gis_Longitud":"-4.912792","Gis_ID":"01736","Gis_Etiqueta":"Estación de telefonía móvil","Gis_Estilo":"vcne.estaciones","Gis_Codigo":"VODAFONE ESPAÑA, S.A. - 01736","Tipo":"Estación de telefonía móvil","Código":"VODAFONE ESPAÑA, S.A. - 01736","Dirección":"CR A-431 CO-PALMA DEL RIO (VILLARRUBIA), 12. CÓRDOBA, CÓRDOBA","Detalle":"@@<url-aplicacion>\/detalleEstacion.do?emplazamiento=01736"},"id":"01736"},{"type":"Feature","geometry":{"type":"Point","coordinates":[-4.9149,37.850323]},"properties":{"Gis_Latitud":"37.850322","Gis_Longitud":"-4.914900","Gis_ID":"1400453","Gis_Etiqueta":"Estación de telefonía móvil","Gis_Estilo":"vcne.estaciones","Gis_Codigo":"TELEFONICA MOVILES ESPAÑA, S.A.U. - 1400453","Tipo":"Estación de telefonía móvil","Código":"TELEFONICA MOVILES ESPAÑA, S.A.U. - 1400453","Dirección":"VP Villarrubia, S\/N. CÓRDOBA, CÓRDOBA","Detalle":"@@<url-aplicacion>\/detalleEstacion.do?emplazamiento=1400453"},"id":"1400453"},{"type":"Feature","geometry":{"type":"Point","coordinates":[-4.9149,37.850323]},"properties":{"Gis_Latitud":"37.850322","Gis_Longitud":"-4.914900","Gis_ID":"1736","Gis_Etiqueta":"Estación de telefonía móvil","Gis_Estilo":"vcne.estaciones","Gis_Codigo":"VODAFONE ESPAÑA, S.A. - 1736","Tipo":"Estación de telefonía móvil","Código":"VODAFONE ESPAÑA, S.A. - 1736","Dirección":"CR PALMA DEL RIO, 12. CÓRDOBA, CÓRDOBA","Detalle":"@@<url-aplicacion>\/detalleEstacion.do?emplazamiento=1736"},"id":"1736"},{"type":"Feature","geometry":{"type":"Point","coordinates":[-4.9149,37.850323]},"properties":{"Gis_Latitud":"37.850322","Gis_Longitud":"-4.914900","Gis_ID":"1B5CO2738","Gis_Etiqueta":"Estación de telefonía móvil","Gis_Estilo":"vcne.estaciones","Gis_Codigo":"XFERA MOVILES, S.A. - 1B5CO2738","Tipo":"Estación de telefonía móvil","Código":"XFERA MOVILES, S.A. - 1B5CO2738","Dirección":"CR PALMA DEL RIO, 12(K). CÓRDOBA, CÓRDOBA","Detalle":"@@<url-aplicacion>\/detalleEstacion.do?emplazamiento=1B5CO2738"},"id":"1B5CO2738"},{"type":"Feature","geometry":{"type":"Point","coordinates":[-4.9235,37.843552]},"properties":{"Gis_Latitud":"37.843553","Gis_Longitud":"-4.923500","Gis_ID":"ANDR6803B","Gis_Etiqueta":"Estación de telefonía móvil","Gis_Estilo":"vcne.estaciones","Gis_Codigo":"ORANGE ESPAGNE, SAU - ANDR6803B","Tipo":"Estación de telefonía móvil","Código":"ORANGE ESPAGNE, SAU - ANDR6803B","Dirección":"CL H PP-V.1 222(M) Suelo PP V1 M222 VPO, S\/N. CÓRDOBA, CÓRDOBA","Detalle":"@@<url-aplicacion>\/detalleEstacion.do?emplazamiento=ANDR6803B"},"id":"ANDR6803B"}]}',)
 
 #obtiene_datos('02E0851,63','41N2229,75','{"type":"Feature","geometry":{"type":"Point","coordinates":[2.144789,41.375168]},"properties":{"Gis_Latitud":"41.375167","Gis_Longitud":"2.144789","Gis_ID":"0801040","Gis_Etiqueta":"Estación de telefonía móvil","Gis_Estilo":"vcne.estaciones","Gis_Codigo":"TELEFONICA MOVILES ESPAÑA, S.A.U. - 0801040","Tipo":"Estación de telefonía móvil","Código":"TELEFONICA MOVILES ESPAÑA, S.A.U. - 0801040","Dirección":"CL Creu Coberta, 83. BARCELONA, BARCELONA","Detalle":"@@<url-aplicacion>\/detalleEstacion.do?emplazamiento=0801040"},"id":"0801040"')
+#obtiene_datos('02E0851,63','41N2229,75','D:\desarrollo\python_automatiza_emr-master\Ficheros_Respaldo')

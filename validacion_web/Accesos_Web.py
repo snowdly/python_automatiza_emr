@@ -25,7 +25,7 @@ Ficheros_Respaldo = 'D:/EMR_Auditorias_Python/Ficheros_Respaldo'
 
 
 
-def consulta_webs(fichero, ficheros_respaldo):
+def consulta_webs(fichero, ficheros_respaldo, municipio, provincia):
     #obtiene datos de ine
     cod_municipio = procesos_comunes.valor_elemento_xml(fichero,
                                                         './/Estacion_Certificada/Datos_Emplazamiento/Cod_INE_Termino_Municipal')
@@ -38,6 +38,10 @@ def consulta_webs(fichero, ficheros_respaldo):
     tipo_via = procesos_comunes.valor_elemento_xml(fichero,
                                                    './/Estacion_Certificada/Datos_Emplazamiento/Calle/Tipo_Via')[
         'Valor']
+
+    nombre_via = procesos_comunes.valor_elemento_xml(fichero,
+                                                        './/Estacion_Certificada/Datos_Emplazamiento/Calle/Nombre_Via')['Valor']
+
     numero_portal = procesos_comunes.valor_elemento_xml(fichero,
                                                         './/Estacion_Certificada/Datos_Emplazamiento/Calle/Numero_Portal')[
         'Valor']
@@ -88,11 +92,11 @@ def consulta_webs(fichero, ficheros_respaldo):
     # sacamos provincia
     try:
         select = Select(driver.find_element_by_id('lstProvincias'))
-        select.select_by_visible_text(ine['Nombre_Provincia'])
+        select.select_by_visible_text(provincia)
 
         # BUSCAMOS MUNICIPIO
         select = Select(driver.find_element_by_id('listmuni'))
-        select.select_by_visible_text(ine['Nombre_Municipio_Catastro'])
+        select.select_by_visible_text(municipio)
         print("OK municipio  coincide con combo infoantenas")
     except:
         print("ERROR datos de municipio no coincide con combo infoantenas")
@@ -100,18 +104,26 @@ def consulta_webs(fichero, ficheros_respaldo):
 
     try:
         # BUSCAMOS CALLE
-        nombre_via = procesos_comunes.valor_elemento_xml(fichero,
-                                                        './/Estacion_Certificada/Datos_Emplazamiento/Calle/Nombre_Via')['Valor']
-        select = driver.find_element_by_id('nom_calle')
 
-        select.send_keys(nombre_via.text)
-        select.send_keys(Keys.RETURN)
+        print("nombre de calle   ",nombre_via)
+
+        select = driver.find_element_by_xpath('//*[@id="nom_calle"]')
+        select.send_keys(nombre_via)
+
+ 
 
         print("Busqueda de la calle oK ")
     except:
         print("ERROR al realizar la busqueda de la calle")
         pass
+    try:
+        driver.find_element_by_xpath('/html/body/table/tbody/tr[2]/td[2]/div/form/table/tbody/tr[3]/td/div[1]/table/tbody/tr[11]/td/input[1]').click()
 
+        #select.send_keys(Keys.RETURN)    
+    except:
+
+        print("ERROR al realizar la busqueda")
+        pass  
     try:
         # METEMS ZOOM A MAPA
         time.sleep(2)

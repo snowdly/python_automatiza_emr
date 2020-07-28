@@ -14,14 +14,14 @@ def principal(rootDir, ficheros_respaldo):
     r = dict()
     if rf['OK_KO'] == 'OK':
         # Retorna ventanas de infoantenas
-        #latitud = procesos_comunes.valor_elemento_xml(rf['Fichero'], './/Estacion_Certificada/Datos_Emplazamiento/Latitud')['Valor']
-        #longitud = procesos_comunes.valor_elemento_xml(rf['Fichero'], './/Estacion_Certificada/Datos_Emplazamiento/Longitud')['Valor']
+        latitud = procesos_comunes.valor_elemento_xml(rf['Fichero'], './/Estacion_Certificada/Datos_Emplazamiento/Latitud')['Valor']
+        longitud = procesos_comunes.valor_elemento_xml(rf['Fichero'], './/Estacion_Certificada/Datos_Emplazamiento/Longitud')['Valor']
         #print(latitud, longitud)
-        #infoantenas.obtiene_datos(longitud, latitud, ficheros_respaldo)
+        municipio, provincia=infoantenas.obtiene_datos(longitud, latitud, ficheros_respaldo)
 
         try:
             # Llama a función para levantar todos las webs
-            Accesos_Web.consulta_webs(rf['Fichero'], ficheros_respaldo)
+            Accesos_Web.consulta_webs(rf['Fichero'], ficheros_respaldo, municipio, provincia)
         except Exception as e:
             logging.debug('Se ha producido un error Proceso de validación contra fuentes web')
             logging.debug(e)

@@ -26,7 +26,7 @@ logging.basicConfig(level=logging.DEBUG
 resumen = pd.DataFrame(columns=('Etapa_Validacion', 'Resultado', 'Fecha'))
 
 try:
-    logging.debug('Comienza el programa')
+    logging.debug('Comienza el programa version 1.0')
     fichero_auditable = procesos_comunes.obtiene_fichero_auditable(rootDirAuditoria)
     nameFile = os.path.splitext(fichero_auditable)[0]
     rutas_trabajo = procesos_comunes.prepara_carpetas_trabajo(rootDirAuditoria)

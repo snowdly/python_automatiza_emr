@@ -10,6 +10,7 @@ import time
 import sys
 import os
 from principal import procesos_comunes
+import logging
 
 # inicializamos dateframe
 
@@ -32,7 +33,7 @@ def consulta_webs(fichero, ficheros_respaldo, municipio, provincia):
     cod_provincia = procesos_comunes.valor_elemento_xml(fichero,
                                                         './/Estacion_Certificada/Datos_Emplazamiento/Cod_INE_Provincia')
     ine = procesos_comunes.obtiene_datos_ine(fichero, cod_municipio['Valor'], cod_provincia['Valor'], ficheros_respaldo)
-    print(ine)
+    #print(ine)
 
     #obtienes datos de calle
     tipo_via = procesos_comunes.valor_elemento_xml(fichero,
@@ -62,6 +63,7 @@ def consulta_webs(fichero, ficheros_respaldo, municipio, provincia):
 
 
     print(wcatastro)
+    #ing.debug('Apertura de web catastro')
     try:
         driver.get(wcatastro)
         # leemos datos devueltos por catastro
@@ -74,9 +76,10 @@ def consulta_webs(fichero, ficheros_respaldo, municipio, provincia):
         print(" referencia catastral ok")
 
         # comprobamos si son correctos los datos de catastro contra los de xml
-    except:
+    except Exception as e:
         # codigo catastro erroneo, crear reparo
-        print("ERROR codigo catastro")
+        #print("ERROR codigo catastro ")
+        #logging.debug("ERROR codigo catastro ")
         pass
 
     #Abre Infoantenas
@@ -98,31 +101,30 @@ def consulta_webs(fichero, ficheros_respaldo, municipio, provincia):
         select = Select(driver.find_element_by_id('listmuni'))
         select.select_by_visible_text(municipio)
         print("OK municipio  coincide con combo infoantenas")
+        #logging.debug("OK municipio  coincide con combo infoantenas")
     except:
-        print("ERROR datos de municipio no coincide con combo infoantenas")
+        #print("ERROR datos de municipio no coincide con combo infoantenas: ")
+        #logging.debug("ERROR datos de municipio no coincide con combo infoantenas: ")
         pass
 
     try:
         # BUSCAMOS CALLE
-
         print("nombre de calle   ",nombre_via)
-
+        #logging.debug("nombre de calle   ", nombre_via)
         select = driver.find_element_by_xpath('//*[@id="nom_calle"]')
         select.send_keys(nombre_via)
-
- 
-
-        print("Busqueda de la calle oK ")
-    except:
-        print("ERROR al realizar la busqueda de la calle")
+        print("Busqueda de la calle OK ")
+        #logging.debug("Busqueda de la calle OK ")
+    except Exception as e:
+        #print("ERROR al realizar la busqueda de la calle: ")
+        #logging.debug("ERROR al realizar la busqueda de la calle: ")
         pass
     try:
         driver.find_element_by_xpath('/html/body/table/tbody/tr[2]/td[2]/div/form/table/tbody/tr[3]/td/div[1]/table/tbody/tr[11]/td/input[1]').click()
-
-        #select.send_keys(Keys.RETURN)    
-    except:
-
-        print("ERROR al realizar la busqueda")
+        #select.send_keys(Keys.RETURN)
+    except Exception as e:
+        #print("ERROR al realizar la busqueda: ")
+        #logging.debug("ERROR al realizar la busqueda: ")
         pass  
     try:
         # METEMS ZOOM A MAPA
@@ -147,8 +149,38 @@ def consulta_webs(fichero, ficheros_respaldo, municipio, provincia):
         # con array coordenadoas crear funcion que reste coordenadas web y xml y segun resultado click en flecha de forma recursiva
         # xpath mapa: //*[@id="OpenLayers.Layer.Vector.RootContainer_33_svgRoot"]
 
-    except:
-        print("error problemas al manipular el mapa")
+    except Exception as e:
+        #print("error problemas al manipular el mapa: ")
+        #logging.debug("error problemas al manipular el mapa: ")
+        pass
+
+    # Abre Fomento
+    # Esta comentado por que habre ventana pero se queda pensando el programa , no termina.
+    # falta cerrar ventana emergente y meter datos
+    # Opens a new tab
+    driver.execute_script("window.open()")
+
+    # Switch to the newly opened tab
+    driver.switch_to.window(driver.window_handles[2])
+
+    # Navigate to new URL in new tab
+    driver.get("https://mapas.fomento.gob.es/VisorSIU/")
+
+    time.sleep(2)
+    try:
+        select = driver.find_element_by_xpath('/html/body/div[2]/div[1]/div[3]/div[2]/div[2]/div[2]/button').click()
+        select = driver.find_element_by_xpath('//*[@id="esri_dijit_Search_0_input"]')
+        select.send_keys(
+            tipo_via + " " + nombre_via + " " + str(numero_portal) + ", " + ine[
+                'Nombre_Municipio_Catastro'] + ", " + ine['Nombre_Provincia'])
+        select.submit()
+        print("OK busqueda de calle")
+        #logging.debug("OK busqueda de calle")
+        # no se puede obtener el tipo de suelo que es por que hay que pulsar en el punto
+
+    except Exception as e:
+        #print("ERROR al hacer la busqueda en web de fomento: ")
+        #logging.debug("ERROR al hacer la busqueda en web de fomento: ")
         pass
 
     # Abre Iberpix
@@ -157,7 +189,7 @@ def consulta_webs(fichero, ficheros_respaldo, municipio, provincia):
     driver.execute_script("window.open()")
 
     # Switch to the newly opened tab
-    driver.switch_to.window(driver.window_handles[2])
+    driver.switch_to.window(driver.window_handles[3])
 
     # Navigate to new URL in new tab
     driver.get("https://www.ign.es/iberpix2/visor/")
@@ -169,14 +201,13 @@ def consulta_webs(fichero, ficheros_respaldo, municipio, provincia):
         select.send_keys(
             tipo_via + " " + nombre_via + " " + str(numero_portal) + ", " + ine['Nombre_Municipio_Catastro'] + ", " + ine['Nombre_Provincia'])
         time.sleep(4)
-
         # falta arreglar que pulse en la primera opcion
         # select.sendKeys(Keys.DOWN).sendKeys(Keys.ENTER)
-
         print("busqueda de calle ok")
-
-    except:
-        print("Error al hacer la busqueda en iberpix")
+        #logging.debug("busqueda de calle ok")
+    except Exception as e:
+        #print("Error al hacer la busqueda en iberpix: ")
+        #logging.debug("Error al hacer la busqueda en iberpix: ")
         pass
     """
     #verson de buscueda por coordenadas, problema para meer coordenanda en combo
@@ -202,31 +233,7 @@ def consulta_webs(fichero, ficheros_respaldo, municipio, provincia):
         pass
     """
 
-    #Abre Fomento
-    # Esta comentado por que habre ventana pero se queda pensando el programa , no termina.
-    # falta cerrar ventana emergente y meter datos
-    # Opens a new tab
-    driver.execute_script("window.open()")
 
-    # Switch to the newly opened tab
-    driver.switch_to.window(driver.window_handles[3])
-
-    # Navigate to new URL in new tab
-    driver.get("https://mapas.fomento.gob.es/VisorSIU/")
-
-    time.sleep(2)
-    try:
-        select = driver.find_element_by_xpath('/html/body/div[2]/div[1]/div[3]/div[2]/div[2]/div[2]/button').click()
-        select = driver.find_element_by_xpath('//*[@id="esri_dijit_Search_0_input"]')
-        select.send_keys(
-            tipo_via + " " + nombre_via + " " + str(numero_portal) + ", " + ine['Nombre_Municipio_Catastro'] + ", " + ine['Nombre_Provincia'])
-        select.submit()
-        print("OK busqueda de calle")
-        # no se puede obtener el tipo de suelo que es por que hay que pulsar en el punto
-
-    except:
-        print("ERROR al hacer la busqueda en web de fomento")
-        pass
 
 def Accesos_web(rootDir, Ficheros_Respaldo):
     # DECLARACION DE VARIABLES

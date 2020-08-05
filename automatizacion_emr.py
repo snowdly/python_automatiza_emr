@@ -27,6 +27,7 @@ resumen = pd.DataFrame(columns=('Etapa_Validacion', 'Resultado', 'Fecha'))
 
 try:
     logging.debug('Comienza el programa version 1.0')
+    print('Comienza el programa version 1.0')
     fichero_auditable = procesos_comunes.obtiene_fichero_auditable(rootDirAuditoria)
     nameFile = os.path.splitext(fichero_auditable)[0]
     rutas_trabajo = procesos_comunes.prepara_carpetas_trabajo(rootDirAuditoria)
@@ -37,6 +38,7 @@ except Exception as e:
 
 try:
     logging.debug('Inicia: Descomprimir ficheros')
+    print('Inicia: Descomprimir ficheros')
     r = lee_directorio.descomprime_todos_ficheros(rutas_trabajo['ruta_auditoria_carpeta_trabajo'], rutas_base['ruta_ficheros_respaldo'])
     resumen = resumen.append(r, ignore_index=True)
     logging.debug('Finaliza: Descomprimir ficheros')
@@ -47,6 +49,7 @@ except Exception as e:
 
 try:
     logging.debug('Inicia: Audita estructura de ficheros')
+    print('Inicia: Audita estructura de ficheros')
     r = audita_comprimidos.audita_principal()
     resumen = resumen.append(r, ignore_index=True)
     logging.debug('Finaliza: Finaliza estructura de ficheros')
@@ -58,6 +61,7 @@ except Exception as e:
 
 try:
     logging.debug('Inicia: Compara XMLs')
+    print('Inicia: Compara XMLs')
     r = compara_xml.compara_xml_principal(rutas_trabajo['ruta_auditoria_carpeta_trabajo'], rutas_trabajo['ruta_auditoria_carpeta_reporte'], nameFile)
     resumen = resumen.append(r, ignore_index=True)
     logging.debug('Finaliza: Compara XMLs')
@@ -69,6 +73,7 @@ except Exception as e:
 
 try:
     logging.debug('Inicia: Validación de cada XML')
+    print('Inicia: Validación de cada XML')
     r = proceso_xml_individual.principal(rutas_trabajo['ruta_auditoria_carpeta_trabajo'], rutas_trabajo['ruta_auditoria_carpeta_reporte'], nameFile, rutas_base['ruta_ficheros_respaldo'])
     resumen = resumen.append(r, ignore_index=True)
     logging.debug('Finaliza: Validación de cada XML')
@@ -79,6 +84,7 @@ except Exception as e:
     logging.debug(e)
     print(e)
 
+'''
 try:
     logging.debug('Inicia: Proceso de revisión de valores entre etiquetas XML')
     r = valida_xml_entre.principal()
@@ -100,10 +106,10 @@ except Exception as e:
     resumen = resumen.append(r, ignore_index=True)
     logging.debug('Se ha producido un error Proceso de validación contra INE y Base de Datos')
     logging.debug(e)
-
+'''
 try:
     logging.debug('Inicia: Proceso de validación con fuentes web')
-    r = valida_fuentes_web.principal(rutas_trabajo['ruta_auditoria_carpeta_trabajo'], rutas_base['ruta_ficheros_respaldo'])
+    r = valida_fuentes_web.principal_a()
     resumen = resumen.append(r, ignore_index=True)
     logging.debug('Finaliza: Proceso de validación con fuentes web')
 except Exception as e:
@@ -128,4 +134,15 @@ writer = pd.ExcelWriter(os.path.join(rutas_trabajo['ruta_auditoria_carpeta_repor
 resumen.to_excel(writer, 'sheet1')
 writer.save()
 
+# Procesos despues del Resumen
+try:
+    logging.debug('Inicia: Proceso de validación con fuentes web')
+    r = valida_fuentes_web.principal(rutas_trabajo['ruta_auditoria_carpeta_trabajo'], rutas_base['ruta_ficheros_respaldo'])
+    resumen = resumen.append(r, ignore_index=True)
+    logging.debug('Finaliza: Proceso de validación con fuentes web')
+except Exception as e:
+    r = procesos_comunes.estructura_respuesta_error('Proceso de validación contra fuentes web')
+    resumen = resumen.append(r, ignore_index=True)
+    logging.debug('Se ha producido un error Proceso de validación contra fuentes web')
+    logging.debug(e)
 

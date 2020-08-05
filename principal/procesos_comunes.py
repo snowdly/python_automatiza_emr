@@ -10,6 +10,8 @@ import itertools
 import pandas as pd
 import xlrd
 from principal import listas_comunes
+import requests
+import xml.dom.minidom
 
 # rootDir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 # print(rootDir)
@@ -28,8 +30,8 @@ def genera_rutas_trabajo():
     auditoria_carpeta = 'Auditorias/'
     ficheros_respaldo_carpeta = 'Ficheros_Respaldo/'
     logs_carpeta = 'Logs/'
-    # fileDir = os.path.dirname(os.path.abspath(__file__))
-    parentDir = os.path.dirname(os.path.abspath('D:/EMR_Auditorias_Python/automatizacion_emr.exe'))
+    parentDir = os.getcwd()
+    #parentDir = os.path.dirname(os.path.abspath('C:/EMR_Auditorias_Python/automatizacion_emr.exe'))
     rutas_base = dict()
     rutas_base['ruta_base'] = parentDir
     rutas_base['ruta_auditoria'] = os.path.join(parentDir, auditoria_carpeta)
@@ -37,6 +39,68 @@ def genera_rutas_trabajo():
     rutas_base['ruta_logs'] = os.path.join(parentDir, logs_carpeta)
     print(rutas_base)
     return rutas_base
+
+
+# obtiene los datos de catastro desde la api
+def consulta_api_catastro(RC):
+    # creacion de estructura de respuesta
+    datos_catastro = dict()
+    datos_catastro['nombre_provincia'] = ''
+    datos_catastro['nombre_municipio'] = ''
+    datos_catastro['tipo_via'] = ''
+    datos_catastro['nombre_via'] = ''
+    datos_catastro['numero_portal'] = ''
+    datos_catastro['OK_KO'] = 'OK'
+    datos_catastro['ERROR'] = ''
+
+    # consulta de api
+    URL = 'https://ovc.catastro.meh.es/ovcservweb/OVCSWLocalizacionRC/OVCCallejero.asmx/Consulta_DNPRC'
+    Provincia = ''
+    Municipio = ''
+    #RC = '9500111YJ2790B0001HR'
+    PARAMS = {'Provincia': Provincia, 'Municipio':Municipio, 'RC':RC}
+    try:
+        response = requests.get(url = URL, params = PARAMS)
+        print(response.content)
+        # guardar fichero temporal
+        parentDir = os.getcwd()
+        #parentDir = os.path.dirname(os.path.abspath('C:/EMR_Auditorias_Python/automatizacion_emr.exe'))
+        fichero_xml = os.path.join(parentDir,  'Consulta_DNPRC.xml')
+        with open(fichero_xml, 'wb') as f:
+            f.write(response.content)
+
+        # se obtienen los datos del xml
+        doc = xml.dom.minidom.parse(fichero_xml)
+        for elemento in doc.getElementsByTagName('cudnp'):
+            datos_catastro['cantidad_predios'] = elemento.firstChild.data
+        for elemento in doc.getElementsByTagName('np'):
+            datos_catastro['nombre_provincia'] = elemento.firstChild.data
+        for elemento in doc.getElementsByTagName('nm'):
+            datos_catastro['nombre_municipio'] = elemento.firstChild.data
+        for elemento in doc.getElementsByTagName('tv'):
+            datos_catastro['tipo_via'] = elemento.firstChild.data
+        for elemento in doc.getElementsByTagName('nv'):
+            datos_catastro['nombre_via'] = elemento.firstChild.data
+        for elemento in doc.getElementsByTagName('pnp'):
+            datos_catastro['numero_portal'] = elemento.firstChild.data
+        if int(datos_catastro['cantidad_predios'])>1:
+            datos_catastro['OK_KO'] = 'KO'
+            datos_catastro['ERROR'] = 'La referencia catastral retorna mas de un predio, ' \
+                                      'debe validar visualmente los datos '
+    except Exception as e:
+        datos_catastro['nombre_provincia'] = ''
+        datos_catastro['nombre_municipio'] = ''
+        datos_catastro['tipo_via'] = ''
+        datos_catastro['nombre_via'] = ''
+        datos_catastro['numero_portal'] = ''
+        datos_catastro['OK_KO'] = 'KO'
+        datos_catastro['ERROR'] = e
+
+    # borrar fichero temporal
+    os.remove(fichero_xml)
+
+    # retorna datos
+    return datos_catastro
 
 
 # Función para obtener el fichero auditable
@@ -91,7 +155,7 @@ def prepara_carpetas_trabajo(rootDir):
     carpeta_file = os.path.splitext(fichero_auditable)[0]
     # borrar directorio en caso de existir
     if os.path.exists(os.path.join(rootDir, carpeta_file)):
-        shutil.rmtree(os.path.join(rootDir, carpeta_file))
+        shutil.rmtree(os.path.join(rootDir, carpeta_file), ignore_errors=True)
         logging.debug("Se ha borrado la carpeta: " + os.path.join(rootDir, carpeta_file))
 
     # crea carpeta
@@ -347,23 +411,45 @@ def coordenadas_ETRS89(Longitud, Latitud):
 
     return (CoordenadaX, CoordenadaY)
 
-
-# Obtiene datos de INE
+# Obtiene datos de INE incluyendo la población
 def obtiene_datos_ine(fichero, Cod_Municipio_Ine, Cod_Provincia_INE, ficheros_respaldo):
     r = dict()
-    df_sheet = pd.read_excel(os.path.join(ficheros_respaldo, 'cod_provincia.xlsx' ), sheet_name='Hoja1')
+    df_sheet = pd.read_excel(os.path.join(ficheros_respaldo, 'cod_provincia.xlsx'), sheet_name='Hoja1')
     cod_provincia = df_sheet['Cod_Provincia_INE'] == int(Cod_Provincia_INE)
     cod_municipio = df_sheet['Cod_Municipio_Ine'] == Cod_Municipio_Ine
     df_encontrado = df_sheet[cod_provincia & cod_municipio]
-    # print(df_sheet[cod_provincia & cod_municipio])
-    r['Fichero'] = fichero
     r['Cod_Provincia_INE'] = df_encontrado['Cod_Provincia_INE'].to_string(index=False).strip()
     r['Cod_Municipio_Ine'] = df_encontrado['Cod_Municipio_Ine'].to_string(index=False).strip()
     r['Nombre_Municipio_Catastro'] = df_encontrado['Nombre Municipio_Catastro'].to_string(index=False).strip()
     r['Cod_Municipio_Catastro'] = df_encontrado['Cod_Municipio_Catastro'].to_string(index=False).strip()
     r['Cod_Provincia_Catastro'] = df_encontrado['Cod_Provincia_Catastro'].to_string(index=False).strip()
     r['Nombre_Provincia'] = df_encontrado['Nombre Provincia'].to_string(index=False).strip()
+    return r
 
+
+# Obtiene datos de INE incluyendo la población
+def obtiene_datos_ine_p(fichero, Cod_Municipio_Ine, Cod_Provincia_INE, Poblacion, ficheros_respaldo):
+    r = dict()
+    df_sheet = pd.read_excel(os.path.join(ficheros_respaldo, 'cod_provincia.xlsx'), sheet_name='Hoja1')
+    cod_provincia = df_sheet['Cod_Provincia_INE'] == int(Cod_Provincia_INE)
+    cod_municipio = df_sheet['Cod_Municipio_Ine'] == Cod_Municipio_Ine
+    municipio_catastro = df_sheet['Nombre Municipio_Catastro'] == Poblacion
+    df_encontrado = df_sheet[cod_provincia & cod_municipio]
+    if len(df_encontrado) > 1:
+        df_encontrado_p = df_sheet[cod_provincia & cod_municipio & municipio_catastro]
+        r['Cod_Provincia_INE'] = df_encontrado_p['Cod_Provincia_INE'].to_string(index=False).strip()
+        r['Cod_Municipio_Ine'] = df_encontrado_p['Cod_Municipio_Ine'].to_string(index=False).strip()
+        r['Nombre_Municipio_Catastro'] = df_encontrado_p['Nombre Municipio_Catastro'].to_string(index=False).strip()
+        r['Cod_Municipio_Catastro'] = df_encontrado_p['Cod_Municipio_Catastro'].to_string(index=False).strip()
+        r['Cod_Provincia_Catastro'] = df_encontrado_p['Cod_Provincia_Catastro'].to_string(index=False).strip()
+        r['Nombre_Provincia'] = df_encontrado_p['Nombre Provincia'].to_string(index=False).strip()
+    else:
+        r['Cod_Provincia_INE'] = df_encontrado['Cod_Provincia_INE'].to_string(index=False).strip()
+        r['Cod_Municipio_Ine'] = df_encontrado['Cod_Municipio_Ine'].to_string(index=False).strip()
+        r['Nombre_Municipio_Catastro'] = df_encontrado['Nombre Municipio_Catastro'].to_string(index=False).strip()
+        r['Cod_Municipio_Catastro'] = df_encontrado['Cod_Municipio_Catastro'].to_string(index=False).strip()
+        r['Cod_Provincia_Catastro'] = df_encontrado['Cod_Provincia_Catastro'].to_string(index=False).strip()
+        r['Nombre_Provincia'] = df_encontrado['Nombre Provincia'].to_string(index=False).strip()
     return r
 
 
@@ -379,7 +465,6 @@ def obtiene_datos_antenas(fichero, Cod_Municipio_Ine, Cod_Provincia_INE):
     r['Cod_Provincia_INE'] = df_encontrado['Cod_Provincia_INE'].to_string(index=False).strip()
     r['Cod_Municipio_Ine'] = df_encontrado['Cod_Municipio_Ine'].to_string(index=False).strip()
     r['Nombre Municipio_Catastro'] = df_encontrado['Nombre Municipio_Catastro'].to_string(index=False).strip()
-
     return r
 
 

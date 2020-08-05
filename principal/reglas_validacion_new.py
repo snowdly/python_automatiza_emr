@@ -144,6 +144,9 @@ def reglas_validacion_individual(etiqueta, regla, vdato, fichero, ficheros_respa
         if vdato is None:
             d['OK_KO'] = 'KO'
             V.append('No existe valor')
+        if not re.match("^[a-zA-ZàáâäãåąčćęèéêëėįìíîïłńòóôöõøùúûüųūÿýżźñçčšžÀÁÂÄÃÅĄĆČĖĘÈÉÊËÌÍÎÏĮŁŃÒÓÔÖÕØÙÚÛÜŲŪŸÝŻŹÑßÇŒÆČŠŽ∂ð '-]+$", vdato):
+            d['OK_KO'] = "KO"
+            V.append('Nombre no tiene el formato correcto')
         d['Validacion'] = V
         d['Fecha_Hora'] = datetime.datetime.now()
         return d
@@ -155,6 +158,9 @@ def reglas_validacion_individual(etiqueta, regla, vdato, fichero, ficheros_respa
         if vdato is None:
             d['OK_KO'] = 'KO'
             V.append('No existe valor')
+        if not re.match("^[a-zA-ZàáâäãåąčćęèéêëėįìíîïłńòóôöõøùúûüųūÿýżźñçčšžÀÁÂÄÃÅĄĆČĖĘÈÉÊËÌÍÎÏĮŁŃÒÓÔÖÕØÙÚÛÜŲŪŸÝŻŹÑßÇŒÆČŠŽ∂ð '-]+$", vdato):
+            d['OK_KO'] = "KO"
+            V.append('Apellido no tiene el formato correcto')
         d['Validacion'] = V
         d['Fecha_Hora'] = datetime.datetime.now()
         return d
@@ -166,6 +172,11 @@ def reglas_validacion_individual(etiqueta, regla, vdato, fichero, ficheros_respa
         if vdato is None:
             d['OK_KO'] = 'KO'
             V.append('No existe valor')
+        if not re.match(
+                "^[a-zA-ZàáâäãåąčćęèéêëėįìíîïłńòóôöõøùúûüųūÿýżźñçčšžÀÁÂÄÃÅĄĆČĖĘÈÉÊËÌÍÎÏĮŁŃÒÓÔÖÕØÙÚÛÜŲŪŸÝŻŹÑßÇŒÆČŠŽ∂ð '-]+$",
+                vdato):
+            d['OK_KO'] = "KO"
+            V.append('Apellido no tiene el formato correcto')
         d['Validacion'] = V
         d['Fecha_Hora'] = datetime.datetime.now()
         return d
@@ -203,7 +214,10 @@ def reglas_validacion_individual(etiqueta, regla, vdato, fichero, ficheros_respa
             d['OK_KO'] = 'KO'
             V.append('No existe valor')
         cod_provincia = procesos_comunes.valor_elemento_xml(fichero, './/Estacion_Certificada/Datos_Emplazamiento/Cod_INE_Provincia')
-        r= procesos_comunes.obtiene_datos_ine(fichero, vdato, cod_provincia['Valor'], ficheros_respaldo)
+        Poblacion = \
+            procesos_comunes.valor_elemento_xml(fichero, './/Estacion_Certificada/Datos_Emplazamiento/Calle/Poblacion')[
+                'Valor']
+        r= procesos_comunes.obtiene_datos_ine_p(fichero, vdato, cod_provincia['Valor'], Poblacion, ficheros_respaldo)
         if r['Cod_Municipio_Ine'] != vdato:
             d['OK_KO'] = 'KO'
             V.append('El valor no coincide con la tabla de datos del INE')
@@ -219,7 +233,10 @@ def reglas_validacion_individual(etiqueta, regla, vdato, fichero, ficheros_respa
             d['OK_KO'] = 'KO'
             V.append('No existe valor')
         cod_municipio = procesos_comunes.valor_elemento_xml(fichero, './/Estacion_Certificada/Datos_Emplazamiento/Cod_INE_Termino_Municipal')
-        r = procesos_comunes.obtiene_datos_ine(fichero, cod_municipio['Valor'], vdato, ficheros_respaldo)
+        Poblacion = \
+            procesos_comunes.valor_elemento_xml(fichero, './/Estacion_Certificada/Datos_Emplazamiento/Calle/Poblacion')[
+                'Valor']
+        r = procesos_comunes.obtiene_datos_ine_p(fichero, cod_municipio['Valor'], vdato, Poblacion, ficheros_respaldo)
         if r['Cod_Provincia_INE'] != vdato:
             d['OK_KO'] = 'KO'
             V.append('El valor no coincide con la tabla de datos del INE')
@@ -267,6 +284,12 @@ def reglas_validacion_individual(etiqueta, regla, vdato, fichero, ficheros_respa
         if vdato is None:
             d['OK_KO'] = 'KO'
             V.append('No existe valor')
+        '''
+        if len(vdato.strip()) < 20:
+            d['OK_KO'] = 'OK'
+            V.append('La longitud de la Referencia Catastral es inferior a la requerida, ' \
+                                      'debe validar visualmente los datos ')
+        '''
         d['Validacion'] = V
         d['Fecha_Hora'] = datetime.datetime.now()
         return d
@@ -289,6 +312,16 @@ def reglas_validacion_individual(etiqueta, regla, vdato, fichero, ficheros_respa
         if vdato is None:
             d['OK_KO'] = 'KO'
             V.append('No existe valor')
+        RC = procesos_comunes.valor_elemento_xml(fichero,'.//Estacion_Certificada/Datos_Emplazamiento/Referencia_Catastral')['Valor']
+        r_api_catastro = procesos_comunes.consulta_api_catastro(RC)
+        if r_api_catastro['OK_KO']== 'OK':
+            if str(r_api_catastro['nombre_municipio']).strip().upper() != str(vdato).strip().upper():
+                d['OK_KO'] = 'KO'
+                V.append('El valor no coincide con los datos de catastro')
+        else:
+            d['OK_KO'] = 'KO'
+            V.append(r_api_catastro['ERROR'])
+        '''        
         cod_municipio = procesos_comunes.valor_elemento_xml(fichero,
                                                             './/Estacion_Certificada/Datos_Emplazamiento/Cod_INE_Termino_Municipal')
         cod_provincia = procesos_comunes.valor_elemento_xml(fichero, './/Estacion_Certificada/Datos_Emplazamiento/Cod_INE_Provincia')
@@ -296,6 +329,7 @@ def reglas_validacion_individual(etiqueta, regla, vdato, fichero, ficheros_respa
         if r['Nombre_Municipio_Catastro'].strip().upper() != str(vdato).strip().upper():
             d['OK_KO'] = 'KO'
             V.append('El valor no coincide con la tabla de datos del INE')
+        '''
         d['Validacion'] = V
         d['Fecha_Hora'] = datetime.datetime.now()
         return d
@@ -307,9 +341,42 @@ def reglas_validacion_individual(etiqueta, regla, vdato, fichero, ficheros_respa
         if vdato is None:
             d['OK_KO'] = 'KO'
             V.append('No existe valor')
+        RC = procesos_comunes.valor_elemento_xml(fichero,
+                                                 './/Estacion_Certificada/Datos_Emplazamiento/Referencia_Catastral')['Valor']
+        r_api_catastro = procesos_comunes.consulta_api_catastro(RC)
+        if r_api_catastro['OK_KO'] == 'OK':
+            if str(r_api_catastro['tipo_via']).strip().upper() != str(vdato).strip().upper():
+                d['OK_KO'] = 'KO'
+                V.append('El valor no coincide con los datos de catastro')
+        else:
+            d['OK_KO'] = 'KO'
+            V.append(r_api_catastro['ERROR'])
+        '''
         if not re.match("AV|BU|CL|CM|CR|GL|PJ|PS|PZ|RB|RD|TR|VP", vdato):
             d['OK_KO'] = "KO"
             V.append('Valor debe ser igual a AV|BU|CL|CM|CR|GL|PJ|PS|PZ|RB|RD|TR|VP')
+        '''
+        d['Validacion'] = V
+        d['Fecha_Hora'] = datetime.datetime.now()
+        return d
+    elif regla == 'R_Estacion_Certificada_Datos_Emplazamiento_Calle_Nombre_Via':
+        d['Etiqueta'] = etiqueta
+        d['Valor'] = vdato
+        d['OK_KO'] = 'OK'
+        d['Validacion'] = ''
+        if vdato is None:
+            d['OK_KO'] = 'KO'
+            V.append('No existe valor')
+        RC = procesos_comunes.valor_elemento_xml(fichero,
+                                                 './/Estacion_Certificada/Datos_Emplazamiento/Referencia_Catastral')['Valor']
+        r_api_catastro = procesos_comunes.consulta_api_catastro(RC)
+        if r_api_catastro['OK_KO'] == 'OK':
+            if str(r_api_catastro['nombre_via']).strip().upper() != str(vdato).strip().upper():
+                d['OK_KO'] = 'KO'
+                V.append('El valor no coincide con los datos de catastro')
+        else:
+            d['OK_KO'] = 'KO'
+            V.append(r_api_catastro['ERROR'])
         d['Validacion'] = V
         d['Fecha_Hora'] = datetime.datetime.now()
         return d
@@ -321,6 +388,16 @@ def reglas_validacion_individual(etiqueta, regla, vdato, fichero, ficheros_respa
         if vdato is None:
             d['OK_KO'] = 'KO'
             V.append('No existe valor')
+        RC = procesos_comunes.valor_elemento_xml(fichero,
+                                                 './/Estacion_Certificada/Datos_Emplazamiento/Referencia_Catastral')['Valor']
+        r_api_catastro = procesos_comunes.consulta_api_catastro(RC)
+        if r_api_catastro['OK_KO'] == 'OK':
+            if str(r_api_catastro['numero_portal']).strip().upper() != str(vdato).strip().upper():
+                d['OK_KO'] = 'KO'
+                V.append('El valor no coincide con los datos de catastro')
+        else:
+            d['OK_KO'] = 'KO'
+            V.append(r_api_catastro['ERROR'])
         d['Validacion'] = V
         d['Fecha_Hora'] = datetime.datetime.now()
         return d
@@ -692,10 +769,15 @@ def reglas_validacion_individual(etiqueta, regla, vdato, fichero, ficheros_respa
         if float(vdato.replace(',', '.')) < 1:
             d['OK_KO'] = 'KO'
             V.append('Deben ser 5 o más puntos')
-        c = procesos_comunes.cantidad_elementos_xml(fichero, './/Informe_Medidas/Puntos_Medida/Punto_Medida/IdPunto')
-        if c['Cantidad'] < 5:
+        c1 = procesos_comunes.cantidad_elementos_xml(fichero, './/Informe_Medidas/Puntos_Medida/Punto_Medida/IdPunto')
+        if c1['Cantidad'] < 5:
             d['OK_KO'] = 'KO'
             V.append('Deben ser 5 o más puntos de medida')
+        c2 = procesos_comunes.cantidad_elementos_xml(fichero, './/Informe_Medidas/Informe_Medidas_Fase1'
+                                                              '/Medicion_Fase1/Medida_Fase1/IdPunto')
+        if c1['Cantidad'] != c2['Cantidad']:
+            d['OK_KO'] = 'KO'
+            V.append('Cantidad de Puntos de Medida diferente a cantidad de Medidas')
         d['Validacion'] = V
         d['Fecha_Hora'] = datetime.datetime.now()
 
@@ -805,6 +887,12 @@ def reglas_validacion_individual(etiqueta, regla, vdato, fichero, ficheros_respa
         if vdato is None:
             d['OK_KO'] = 'KO'
             V.append('No existe valor')
+        Poblacion = \
+            procesos_comunes.valor_elemento_xml(fichero, './/Estacion_Certificada/Datos_Emplazamiento/Calle/Poblacion')[
+                'Valor']
+        if str(vdato).strip().upper() != str(Poblacion).strip().upper():
+            d['OK_KO'] = 'KO'
+            V.append('No es el mismo valor que la Población de los datos del Emplazamiento, revisar visualmente')
         d['Validacion'] = V
         d['Fecha_Hora'] = datetime.datetime.now()
         return d
@@ -850,13 +938,9 @@ def reglas_validacion_individual(etiqueta, regla, vdato, fichero, ficheros_respa
         if vdato is None:
             d['OK_KO'] = 'KO'
             V.append('No existe valor')
-        nie = procesos_comunes.valor_elemento_xml(fichero,'.//Datos_Certificacion/Tecnico_Competente/NIF_NIE')['Valor']
-        t_nombre = procesos_comunes.valor_elemento_xml(fichero,'.//Datos_Certificacion/Tecnico_Competente/Nombre')['Valor']
-        t_apellido1 = procesos_comunes.valor_elemento_xml(fichero,'.//Datos_Certificacion/Tecnico_Competente/Apellido1')['Valor']
-        t_apellido2 = procesos_comunes.valor_elemento_xml(fichero,'.//Datos_Certificacion/Tecnico_Competente/Apellido2')['Valor']
-        if vdato != nie + ' ' + t_nombre + ' ' + t_apellido1 + ' ' + t_apellido2:
-            d['OK_KO'] = 'KO'
-            V.append('Datos no coinciden con datos de Tecnico Competente')
+        if not re.match("((([X-Z])|([LM])){1}([-]?)((\d){7})([-]?)([A-Z]{1}))|((\d{8})([-]?)([A-Z]))\s[a-zA-ZàáâäãåąčćęèéêëėįìíîïłńòóôöõøùúûüųūÿýżźñçčšžÀÁÂÄÃÅĄĆČĖĘÈÉÊËÌÍÎÏĮŁŃÒÓÔÖÕØÙÚÛÜŲŪŸÝŻŹÑßÇŒÆČŠŽ∂ð '-]+$", vdato):
+            d['OK_KO'] = "KO"
+            V.append('Tecnico Responsable no tiene el formato correcto')
         d['Validacion'] = V
         d['Fecha_Hora'] = datetime.datetime.now()
         return d
@@ -992,7 +1076,8 @@ def reglas_validacion_individual(etiqueta, regla, vdato, fichero, ficheros_respa
             d['OK_KO'] = 'KO'
             V.append('No existe valor')
         c1 = procesos_comunes.cantidad_elementos_xml(fichero, './/Informe_Medidas/Puntos_Medida/Punto_Medida/IdPunto')
-        c2 = procesos_comunes.cantidad_elementos_xml(fichero, './/Informe_Medidas/Informe_Medidas_Fase1/Medicion_Fase1/Medida_Fase1/IdPunto')
+        c2 = procesos_comunes.cantidad_elementos_xml(fichero, './/Informe_Medidas/Informe_Medidas_Fase1'
+                                                              '/Medicion_Fase1/Medida_Fase1/IdPunto')
         if c1['Cantidad'] != c2['Cantidad']:
             d['OK_KO'] = 'KO'
             V.append('Cantidad de Puntos de Medida diferente a cantidad de Medidas')
@@ -1101,7 +1186,12 @@ def reglas_validacion_individual(etiqueta, regla, vdato, fichero, ficheros_respa
         d['Valor'] = vdato
         d['OK_KO'] = 'OK'
         d['Validacion'] = ''
-
+        if vdato is None:
+            d['OK_KO'] = 'KO'
+            V.append('No existe valor')
+        if vdato.strip() != fichero_nombre.strip():
+            d['OK_KO'] = 'KO'
+            V.append('El dato no coincide con el nombre del documento')
         d['Validacion'] = V
         d['Fecha_Hora'] = datetime.datetime.now()
         return d

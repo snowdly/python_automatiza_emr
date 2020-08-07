@@ -12,6 +12,7 @@ import xlrd
 from principal import listas_comunes
 import requests
 import xml.dom.minidom
+import PyPDF2
 
 # rootDir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 # print(rootDir)
@@ -31,7 +32,7 @@ def genera_rutas_trabajo():
     ficheros_respaldo_carpeta = 'Ficheros_Respaldo/'
     logs_carpeta = 'Logs/'
     parentDir = os.getcwd()
-    #parentDir = os.path.dirname(os.path.abspath('C:/EMR_Auditorias_Python/automatizacion_emr.exe'))
+    #parentDir = os.path.dirname(os.path.abspath('D:/EMR_Auditorias_Python/automatizacion_emr.exe'))
     rutas_base = dict()
     rutas_base['ruta_base'] = parentDir
     rutas_base['ruta_auditoria'] = os.path.join(parentDir, auditoria_carpeta)
@@ -57,15 +58,15 @@ def consulta_api_catastro(RC):
     URL = 'https://ovc.catastro.meh.es/ovcservweb/OVCSWLocalizacionRC/OVCCallejero.asmx/Consulta_DNPRC'
     Provincia = ''
     Municipio = ''
-    #RC = '9500111YJ2790B0001HR'
-    PARAMS = {'Provincia': Provincia, 'Municipio':Municipio, 'RC':RC}
+    # RC = '9500111YJ2790B0001HR'
+    PARAMS = {'Provincia': Provincia, 'Municipio': Municipio, 'RC': RC}
     try:
-        response = requests.get(url = URL, params = PARAMS)
-        print(response.content)
+        response = requests.get(url=URL, params=PARAMS)
+        # print(response.content)
         # guardar fichero temporal
         parentDir = os.getcwd()
-        #parentDir = os.path.dirname(os.path.abspath('C:/EMR_Auditorias_Python/automatizacion_emr.exe'))
-        fichero_xml = os.path.join(parentDir,  'Consulta_DNPRC.xml')
+        #parentDir = os.path.dirname(os.path.abspath('D:/EMR_Auditorias_Python/automatizacion_emr.exe'))
+        fichero_xml = os.path.join(parentDir, 'Consulta_DNPRC.xml')
         with open(fichero_xml, 'wb') as f:
             f.write(response.content)
 
@@ -83,7 +84,7 @@ def consulta_api_catastro(RC):
             datos_catastro['nombre_via'] = elemento.firstChild.data
         for elemento in doc.getElementsByTagName('pnp'):
             datos_catastro['numero_portal'] = elemento.firstChild.data
-        if int(datos_catastro['cantidad_predios'])>1:
+        if int(datos_catastro['cantidad_predios']) > 1:
             datos_catastro['OK_KO'] = 'KO'
             datos_catastro['ERROR'] = 'La referencia catastral retorna mas de un predio, ' \
                                       'debe validar visualmente los datos '
@@ -145,6 +146,17 @@ def lista_xml(rootDir):
     for r, d, f in os.walk(rootDir):
         for item in f:
             if '.xml' in item:
+                files_in_dir.append(os.path.join(r, item))
+    return files_in_dir
+
+
+# Función para ubicar cada pdf, retorna una lista
+def lista_pdf(rootDir):
+    # r=>root, d=>directories, f=>files
+    files_in_dir = []
+    for r, d, f in os.walk(rootDir):
+        for item in f:
+            if '.pdf' in item:
                 files_in_dir.append(os.path.join(r, item))
     return files_in_dir
 
@@ -411,6 +423,7 @@ def coordenadas_ETRS89(Longitud, Latitud):
 
     return (CoordenadaX, CoordenadaY)
 
+
 # Obtiene datos de INE incluyendo la población
 def obtiene_datos_ine(fichero, Cod_Municipio_Ine, Cod_Provincia_INE, ficheros_respaldo):
     r = dict()
@@ -547,3 +560,49 @@ def obtiene_primer_xml(rootDir):
         r['Fichero'] = ''
         r['OK_KO'] = 'KO'
     return r
+
+
+def compara_tecnico_competente_pdf(carpeta_trabajo, Dato):
+    responsable_pdf = dict()
+    responsable_pdf['Fichero'] = ''
+    responsable_pdf['Paginas'] = 0
+    responsable_pdf['Dato'] = Dato
+    responsable_pdf['OK_KO'] = 'OK'
+    responsable_pdf['Error'] = ''
+    r = lista_pdf(carpeta_trabajo)
+    if len(r) > 0:
+        encontrado = 0
+        for documento in r:
+            try:
+                pdf = open(documento, "rb")
+                pdf_reader = PyPDF2.PdfFileReader(pdf, strict=False)
+                if pdf_reader.numPages == 1:
+                    responsable_pdf['Paginas'] = pdf_reader.numPages
+                    fichero_nombre, fichero_extension = os.path.splitext(os.path.basename(documento))
+                    print("Fichero a ser analizado: " + fichero_nombre + fichero_extension)
+                    responsable_pdf['Fichero'] = fichero_nombre + fichero_extension
+                    page = pdf_reader.getPage(0)
+                    texto = page.extractText().replace('\n', '')
+                    if texto == '':
+                        responsable_pdf['OK_KO'] = 'KO'
+                        responsable_pdf['Error'] = 'El fichero PDF: '+ fichero_nombre + fichero_extension+', no se han podido procesar'
+                    else:
+                        if not re.findall(Dato, texto):
+                            responsable_pdf['OK_KO'] = 'KO'
+                            responsable_pdf['Error'] = 'Documento Revisado: ' + responsable_pdf[
+                                'Fichero'] + ': No coincide el dato del ' \
+                                             'Técnico Competente'
+                        else:
+                            encontrado = encontrado + 1
+                            responsable_pdf['Error'] = 'Fichero analizado: ' + responsable_pdf['Fichero']
+                # Closing the object.
+                pdf.close()
+                if encontrado >= 1: break
+            except:
+                responsable_pdf['OK_KO'] = 'KO'
+                responsable_pdf['Error'] = 'No se han podido procesar los ficheros pdf'
+    else:
+        responsable_pdf['OK_KO'] = 'KO'
+        responsable_pdf['Error'] = 'No se han podido encontrar ningún pdf, que contengan las características de '\
+                                   'una Declaración de Responsable'
+    return responsable_pdf

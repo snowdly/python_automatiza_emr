@@ -5,7 +5,7 @@ from principal import listas_comunes
 import os
 
 
-def reglas_validacion_individual(etiqueta, regla, vdato, fichero, ficheros_respaldo):
+def reglas_validacion_individual(etiqueta, regla, vdato, fichero, ficheros_respaldo, carpeta_trabajo):
     fichero_nombre, fichero_extension = os.path.splitext(os.path.basename(fichero))
     d = dict()
     V = []
@@ -62,7 +62,7 @@ def reglas_validacion_individual(etiqueta, regla, vdato, fichero, ficheros_respa
             V.append('No existe valor')
 
         try:
-            #print(fichero_nombre_dividido[0][3])
+            # print(fichero_nombre_dividido[0][3])
             for letra in listas_comunes.expediente_concesional:
                 if letra['LETRA'] == fichero_nombre_dividido[0][3]:
                     if vdato != letra['EXPEDIENTE']:
@@ -133,6 +133,10 @@ def reglas_validacion_individual(etiqueta, regla, vdato, fichero, ficheros_respa
         if not re.match("((([X-Z])|([LM])){1}([-]?)((\d){7})([-]?)([A-Z]{1}))|((\d{8})([-]?)([A-Z]))", vdato):
             d['OK_KO'] = "KO"
             V.append('DNI o NIE no tiene el formato correcto')
+        r_datos_pdf = procesos_comunes.compara_tecnico_competente_pdf(carpeta_trabajo, vdato)
+        if r_datos_pdf['OK_KO'] == 'KO':
+            d['OK_KO'] = "KO"
+        V.append(r_datos_pdf['Error'])
         d['Validacion'] = V
         d['Fecha_Hora'] = datetime.datetime.now()
         return d
@@ -144,9 +148,15 @@ def reglas_validacion_individual(etiqueta, regla, vdato, fichero, ficheros_respa
         if vdato is None:
             d['OK_KO'] = 'KO'
             V.append('No existe valor')
-        if not re.match("^[a-zA-ZàáâäãåąčćęèéêëėįìíîïłńòóôöõøùúûüųūÿýżźñçčšžÀÁÂÄÃÅĄĆČĖĘÈÉÊËÌÍÎÏĮŁŃÒÓÔÖÕØÙÚÛÜŲŪŸÝŻŹÑßÇŒÆČŠŽ∂ð '-]+$", vdato):
+        if not re.match(
+                "^[a-zA-ZàáâäãåąčćęèéêëėįìíîïłńòóôöõøùúûüųūÿýżźñçčšžÀÁÂÄÃÅĄĆČĖĘÈÉÊËÌÍÎÏĮŁŃÒÓÔÖÕØÙÚÛÜŲŪŸÝŻŹÑßÇŒÆČŠŽ∂ð '-]+$",
+                vdato):
             d['OK_KO'] = "KO"
             V.append('Nombre no tiene el formato correcto')
+        r_datos_pdf = procesos_comunes.compara_tecnico_competente_pdf(carpeta_trabajo, vdato)
+        if r_datos_pdf['OK_KO'] == 'KO':
+            d['OK_KO'] = "KO"
+        V.append(r_datos_pdf['Error'])
         d['Validacion'] = V
         d['Fecha_Hora'] = datetime.datetime.now()
         return d
@@ -158,9 +168,15 @@ def reglas_validacion_individual(etiqueta, regla, vdato, fichero, ficheros_respa
         if vdato is None:
             d['OK_KO'] = 'KO'
             V.append('No existe valor')
-        if not re.match("^[a-zA-ZàáâäãåąčćęèéêëėįìíîïłńòóôöõøùúûüųūÿýżźñçčšžÀÁÂÄÃÅĄĆČĖĘÈÉÊËÌÍÎÏĮŁŃÒÓÔÖÕØÙÚÛÜŲŪŸÝŻŹÑßÇŒÆČŠŽ∂ð '-]+$", vdato):
+        if not re.match(
+                "^[a-zA-ZàáâäãåąčćęèéêëėįìíîïłńòóôöõøùúûüųūÿýżźñçčšžÀÁÂÄÃÅĄĆČĖĘÈÉÊËÌÍÎÏĮŁŃÒÓÔÖÕØÙÚÛÜŲŪŸÝŻŹÑßÇŒÆČŠŽ∂ð '-]+$",
+                vdato):
             d['OK_KO'] = "KO"
             V.append('Apellido no tiene el formato correcto')
+        r_datos_pdf = procesos_comunes.compara_tecnico_competente_pdf(carpeta_trabajo, vdato)
+        if r_datos_pdf['OK_KO'] == 'KO':
+            d['OK_KO'] = "KO"
+        V.append(r_datos_pdf['Error'])
         d['Validacion'] = V
         d['Fecha_Hora'] = datetime.datetime.now()
         return d
@@ -177,24 +193,29 @@ def reglas_validacion_individual(etiqueta, regla, vdato, fichero, ficheros_respa
                 vdato):
             d['OK_KO'] = "KO"
             V.append('Apellido no tiene el formato correcto')
+        r_datos_pdf = procesos_comunes.compara_tecnico_competente_pdf(carpeta_trabajo, vdato)
+        if r_datos_pdf['OK_KO'] == 'KO':
+            d['OK_KO'] = "KO"
+        V.append(r_datos_pdf['Error'])
         d['Validacion'] = V
         d['Fecha_Hora'] = datetime.datetime.now()
         return d
     elif regla == 'R_Estacion_Certificada_Datos_Emplazamiento_Codigo_Emplazamiento':
         d['Etiqueta'] = etiqueta
         d['Valor'] = vdato
-        d['OK_KO'] = 'OK'
+        d['OK_KO'] = 'VISUAL'
         d['Validacion'] = ''
         if vdato is None:
             d['OK_KO'] = 'KO'
             V.append('No existe valor')
+        V.append('Para la presente etapa, la validación debe ser visual')
         d['Validacion'] = V
         d['Fecha_Hora'] = datetime.datetime.now()
         return d
     elif regla == 'R_Estacion_Certificada_Datos_Emplazamiento_Emplazamiento_Compartido':
         d['Etiqueta'] = etiqueta
         d['Valor'] = vdato
-        d['OK_KO'] = 'OK'
+        d['OK_KO'] = 'VISUAL'
         d['Validacion'] = ''
         if vdato is None:
             d['OK_KO'] = 'KO'
@@ -202,6 +223,7 @@ def reglas_validacion_individual(etiqueta, regla, vdato, fichero, ficheros_respa
         if not re.match("SI|NO", vdato):
             d['OK_KO'] = "KO"
             V.append('Valor debe ser igual a SI ó NO')
+        V.append('Para la presente etapa, la validación debe ser visual')
         d['Validacion'] = V
         d['Fecha_Hora'] = datetime.datetime.now()
         return d
@@ -213,11 +235,12 @@ def reglas_validacion_individual(etiqueta, regla, vdato, fichero, ficheros_respa
         if vdato is None:
             d['OK_KO'] = 'KO'
             V.append('No existe valor')
-        cod_provincia = procesos_comunes.valor_elemento_xml(fichero, './/Estacion_Certificada/Datos_Emplazamiento/Cod_INE_Provincia')
+        cod_provincia = procesos_comunes.valor_elemento_xml(fichero,
+                                                            './/Estacion_Certificada/Datos_Emplazamiento/Cod_INE_Provincia')
         Poblacion = \
             procesos_comunes.valor_elemento_xml(fichero, './/Estacion_Certificada/Datos_Emplazamiento/Calle/Poblacion')[
                 'Valor']
-        r= procesos_comunes.obtiene_datos_ine_p(fichero, vdato, cod_provincia['Valor'], Poblacion, ficheros_respaldo)
+        r = procesos_comunes.obtiene_datos_ine_p(fichero, vdato, cod_provincia['Valor'], Poblacion, ficheros_respaldo)
         if r['Cod_Municipio_Ine'] != vdato:
             d['OK_KO'] = 'KO'
             V.append('El valor no coincide con la tabla de datos del INE')
@@ -232,7 +255,8 @@ def reglas_validacion_individual(etiqueta, regla, vdato, fichero, ficheros_respa
         if vdato is None:
             d['OK_KO'] = 'KO'
             V.append('No existe valor')
-        cod_municipio = procesos_comunes.valor_elemento_xml(fichero, './/Estacion_Certificada/Datos_Emplazamiento/Cod_INE_Termino_Municipal')
+        cod_municipio = procesos_comunes.valor_elemento_xml(fichero,
+                                                            './/Estacion_Certificada/Datos_Emplazamiento/Cod_INE_Termino_Municipal')
         Poblacion = \
             procesos_comunes.valor_elemento_xml(fichero, './/Estacion_Certificada/Datos_Emplazamiento/Calle/Poblacion')[
                 'Valor']
@@ -246,22 +270,24 @@ def reglas_validacion_individual(etiqueta, regla, vdato, fichero, ficheros_respa
     elif regla == 'R_Estacion_Certificada_Datos_Emplazamiento_Latitud':
         d['Etiqueta'] = etiqueta
         d['Valor'] = vdato
-        d['OK_KO'] = 'OK'
+        d['OK_KO'] = 'VISUAL'
         d['Validacion'] = ''
         if vdato is None:
             d['OK_KO'] = 'KO'
             V.append('No existe valor')
+        V.append('Para la presente etapa, la validación debe ser visual')
         d['Validacion'] = V
         d['Fecha_Hora'] = datetime.datetime.now()
         return d
     elif regla == 'R_Estacion_Certificada_Datos_Emplazamiento_Longitud':
         d['Etiqueta'] = etiqueta
         d['Valor'] = vdato
-        d['OK_KO'] = 'OK'
+        d['OK_KO'] = 'VISUAL'
         d['Validacion'] = ''
         if vdato is None:
             d['OK_KO'] = 'KO'
             V.append('No existe valor')
+        V.append('Para la presente etapa, la validación debe ser visual')
         d['Validacion'] = V
         d['Fecha_Hora'] = datetime.datetime.now()
         return d
@@ -273,6 +299,19 @@ def reglas_validacion_individual(etiqueta, regla, vdato, fichero, ficheros_respa
         if vdato is None:
             d['OK_KO'] = 'KO'
             V.append('No existe valor')
+        if not re.match("ETRS89|REGCAN95|WGS84", vdato):
+            d['OK_KO'] = 'KO'
+            V.append('Los valores permitidos en Datum: ETRS89 ó REGCAN95 ó WGS84')
+        codigo_emplazamiento = procesos_comunes.valor_elemento_xml(fichero,
+                                                                   './/Estacion_Certificada/Datos_Emplazamiento/Datum')['Valor']
+        if len(codigo_emplazamiento) >= 3:
+            inicial = codigo_emplazamiento[0:3]
+        else:
+            inicial = ''
+        if inicial == 'CAN':
+            if not re.match("REGCAN95|WGS84", vdato):
+                d['OK_KO'] = 'KO'
+                V.append('Canarias debe tener datum REGCAN95 ó WGS84')
         d['Validacion'] = V
         d['Fecha_Hora'] = datetime.datetime.now()
         return d
@@ -296,11 +335,12 @@ def reglas_validacion_individual(etiqueta, regla, vdato, fichero, ficheros_respa
     elif regla == 'R_Estacion_Certificada_Datos_Emplazamiento_Cota_Terreno_Sobre_Nivel_Mar':
         d['Etiqueta'] = etiqueta
         d['Valor'] = vdato
-        d['OK_KO'] = 'OK'
+        d['OK_KO'] = 'VISUAL'
         d['Validacion'] = ''
         if vdato is None:
             d['OK_KO'] = 'KO'
             V.append('No existe valor')
+        V.append('Para la presente etapa, la validación debe ser visual')
         d['Validacion'] = V
         d['Fecha_Hora'] = datetime.datetime.now()
         return d
@@ -312,9 +352,11 @@ def reglas_validacion_individual(etiqueta, regla, vdato, fichero, ficheros_respa
         if vdato is None:
             d['OK_KO'] = 'KO'
             V.append('No existe valor')
-        RC = procesos_comunes.valor_elemento_xml(fichero,'.//Estacion_Certificada/Datos_Emplazamiento/Referencia_Catastral')['Valor']
+        RC = procesos_comunes.valor_elemento_xml(fichero,
+                                                 './/Estacion_Certificada/Datos_Emplazamiento/Referencia_Catastral')[
+            'Valor']
         r_api_catastro = procesos_comunes.consulta_api_catastro(RC)
-        if r_api_catastro['OK_KO']== 'OK':
+        if r_api_catastro['OK_KO'] == 'OK':
             if str(r_api_catastro['nombre_municipio']).strip().upper() != str(vdato).strip().upper():
                 d['OK_KO'] = 'KO'
                 V.append('El valor no coincide con los datos de catastro')
@@ -342,7 +384,8 @@ def reglas_validacion_individual(etiqueta, regla, vdato, fichero, ficheros_respa
             d['OK_KO'] = 'KO'
             V.append('No existe valor')
         RC = procesos_comunes.valor_elemento_xml(fichero,
-                                                 './/Estacion_Certificada/Datos_Emplazamiento/Referencia_Catastral')['Valor']
+                                                 './/Estacion_Certificada/Datos_Emplazamiento/Referencia_Catastral')[
+            'Valor']
         r_api_catastro = procesos_comunes.consulta_api_catastro(RC)
         if r_api_catastro['OK_KO'] == 'OK':
             if str(r_api_catastro['tipo_via']).strip().upper() != str(vdato).strip().upper():
@@ -368,7 +411,8 @@ def reglas_validacion_individual(etiqueta, regla, vdato, fichero, ficheros_respa
             d['OK_KO'] = 'KO'
             V.append('No existe valor')
         RC = procesos_comunes.valor_elemento_xml(fichero,
-                                                 './/Estacion_Certificada/Datos_Emplazamiento/Referencia_Catastral')['Valor']
+                                                 './/Estacion_Certificada/Datos_Emplazamiento/Referencia_Catastral')[
+            'Valor']
         r_api_catastro = procesos_comunes.consulta_api_catastro(RC)
         if r_api_catastro['OK_KO'] == 'OK':
             if str(r_api_catastro['nombre_via']).strip().upper() != str(vdato).strip().upper():
@@ -389,7 +433,8 @@ def reglas_validacion_individual(etiqueta, regla, vdato, fichero, ficheros_respa
             d['OK_KO'] = 'KO'
             V.append('No existe valor')
         RC = procesos_comunes.valor_elemento_xml(fichero,
-                                                 './/Estacion_Certificada/Datos_Emplazamiento/Referencia_Catastral')['Valor']
+                                                 './/Estacion_Certificada/Datos_Emplazamiento/Referencia_Catastral')[
+            'Valor']
         r_api_catastro = procesos_comunes.consulta_api_catastro(RC)
         if r_api_catastro['OK_KO'] == 'OK':
             if str(r_api_catastro['numero_portal']).strip().upper() != str(vdato).strip().upper():
@@ -422,13 +467,14 @@ def reglas_validacion_individual(etiqueta, regla, vdato, fichero, ficheros_respa
             codigo_cambiado = codigo_emplazamiento[0:3] + lr['Letra'] + codigo_emplazamiento[4:]
             if vdato != codigo_cambiado:
                 d['OK_KO'] = 'KO'
-                V.append('Debe tener el mismo código que el parámetro codigo emplazamiento salvo la letra que ocupa el 4 '
-                         'lugar, en vez de una R debe ser la letra correspondiente a la tecnología del certificado '
-                         'radioeléctrico.')
+                V.append(
+                    'Debe tener el mismo código que el parámetro codigo emplazamiento salvo la letra que ocupa el 4 '
+                    'lugar, en vez de una R debe ser la letra correspondiente a la tecnología del certificado '
+                    'radioeléctrico.')
         else:
             d['OK_KO'] = 'KO'
-            V.append('No ha sido posible verificar la letra del expediente consecional, revise si el nombre del xml es correcto')
-
+            V.append(
+                'No ha sido posible verificar la letra del expediente consecional, revise si el nombre del xml es correcto')
 
         d['Validacion'] = V
         d['Fecha_Hora'] = datetime.datetime.now()
@@ -450,7 +496,7 @@ def reglas_validacion_individual(etiqueta, regla, vdato, fichero, ficheros_respa
     elif regla == 'R_Estacion_Certificada_Datos_Estacion_Tipo_Estacion':
         d['Etiqueta'] = etiqueta
         d['Valor'] = vdato
-        d['OK_KO'] = 'OK'
+        d['OK_KO'] = 'VISUAL'
         d['Validacion'] = ''
         if vdato is None:
             d['OK_KO'] = 'KO'
@@ -458,6 +504,7 @@ def reglas_validacion_individual(etiqueta, regla, vdato, fichero, ficheros_respa
         if not re.match("ER1|ER2|ER3|ER4|ER5", vdato):
             d['OK_KO'] = "KO"
             V.append('Valor debe ser igual a ER1|ER2|ER3|ER4|ER5')
+        V.append('Para la presente etapa, la validación debe ser visual')
         d['Validacion'] = V
         d['Fecha_Hora'] = datetime.datetime.now()
         return d
@@ -472,16 +519,19 @@ def reglas_validacion_individual(etiqueta, regla, vdato, fichero, ficheros_respa
         if not re.match("SI|NO", vdato):
             d['OK_KO'] = "KO"
             V.append('Valor debe ser igual a SI|NO')
-        c=procesos_comunes.cantidad_elementos_xml(fichero,
-                                                './/Informe_Medidas/Puntos_Medida/Punto_Medida/Punto_Sensible/Situacion')['Cantidad']
+        c = procesos_comunes.cantidad_elementos_xml(fichero,
+                                                    './/Informe_Medidas/Puntos_Medida/Punto_Medida/Punto_Sensible/Situacion')[
+            'Cantidad']
         if c == 0:
             if vdato != 'NO':
                 d['OK_KO'] = "KO"
-                V.append('El valor indica que NO existe entorno sensible, sin embargo SI existen datos para .//Informe_Medidas/Puntos_Medida/Punto_Medida/Punto_Sensible')
+                V.append(
+                    'El valor indica que NO existe entorno sensible, sin embargo SI existen datos para .//Informe_Medidas/Puntos_Medida/Punto_Medida/Punto_Sensible')
         else:
             if vdato != 'SI':
                 d['OK_KO'] = "KO"
-                V.append('El valor indica que SI existe entorno sensible, sin embargo NO existen datos para .//Informe_Medidas/Puntos_Medida/Punto_Medida/Punto_Sensible')
+                V.append(
+                    'El valor indica que SI existe entorno sensible, sin embargo NO existen datos para .//Informe_Medidas/Puntos_Medida/Punto_Medida/Punto_Sensible')
         d['Validacion'] = V
         d['Fecha_Hora'] = datetime.datetime.now()
         return d
@@ -489,25 +539,26 @@ def reglas_validacion_individual(etiqueta, regla, vdato, fichero, ficheros_respa
     elif regla == 'R_Estacion_Certificada_Datos_Estacion_Num_Sectores_Interiores':
         d['Etiqueta'] = etiqueta
         d['Valor'] = vdato
-        d['OK_KO'] = 'OK'
+        d['OK_KO'] = 'VISUAL'
         d['Validacion'] = ''
         if vdato is None:
             d['OK_KO'] = 'KO'
             V.append('No existe valor')
         sector_interior = procesos_comunes.valor_elemento_xml(fichero,
-                                                    './/Estacion_Certificada/Datos_Estacion/Num_Sectores_Interiores')[
+                                                              './/Estacion_Certificada/Datos_Estacion/Num_Sectores_Interiores')[
             'Valor']
         sector_exterior = procesos_comunes.valor_elemento_xml(fichero,
-                                                    './/Estacion_Certificada/Datos_Estacion/Num_Sectores_Exteriores')[
+                                                              './/Estacion_Certificada/Datos_Estacion/Num_Sectores_Exteriores')[
             'Valor']
         sectores = procesos_comunes.cantidad_elementos_xml(fichero,
-                                                    './/Estacion_Certificada/Datos_Estacion/Sectores/Sector/Tipo_Potencia_Radiada')[
+                                                           './/Estacion_Certificada/Datos_Estacion/Sectores/Sector/Tipo_Potencia_Radiada')[
             'Cantidad']
 
         if sectores != (int(sector_interior) + int(sector_exterior)):
             d['OK_KO'] = "KO"
             V.append(
                 'El valor de Num_Sectores_Interiores más Num_Sectores_Exteriores, es diferente a la cantidad de Sectores')
+        V.append('Para la presente etapa, la validación debe ser visual')
         d['Validacion'] = V
         d['Fecha_Hora'] = datetime.datetime.now()
         return d
@@ -581,7 +632,7 @@ def reglas_validacion_individual(etiqueta, regla, vdato, fichero, ficheros_respa
     elif regla == 'R_Estacion_Certificada_Datos_Estacion_Sectores_Sector_Localizacion_Antena':
         d['Etiqueta'] = etiqueta
         d['Valor'] = vdato
-        d['OK_KO'] = 'OK'
+        d['OK_KO'] = 'VISUAL'
         d['Validacion'] = ''
         if vdato is None:
             d['OK_KO'] = 'KO'
@@ -589,13 +640,14 @@ def reglas_validacion_individual(etiqueta, regla, vdato, fichero, ficheros_respa
         if not re.match("EXTERIOR|INTERIOR", vdato):
             d['OK_KO'] = "KO"
             V.append('Valor debe ser igual a EXTERIOR ó INTERIOR')
+        V.append('Para la presente etapa, la validación debe ser visual')
         d['Validacion'] = V
         d['Fecha_Hora'] = datetime.datetime.now()
         return d
     elif regla == 'R_Estacion_Certificada_Datos_Estacion_Sectores_Sector_Tipo_Antena':
         d['Etiqueta'] = etiqueta
         d['Valor'] = vdato
-        d['OK_KO'] = 'OK'
+        d['OK_KO'] = 'VISUAL'
         d['Validacion'] = ''
         if vdato is None:
             d['OK_KO'] = 'KO'
@@ -603,6 +655,7 @@ def reglas_validacion_individual(etiqueta, regla, vdato, fichero, ficheros_respa
         if not re.match("D|N", vdato):
             d['OK_KO'] = "KO"
             V.append('Valor debe ser igual a D ó N')
+        V.append('Para la presente etapa, la validación debe ser visual')
         d['Validacion'] = V
         d['Fecha_Hora'] = datetime.datetime.now()
         return d
@@ -623,22 +676,24 @@ def reglas_validacion_individual(etiqueta, regla, vdato, fichero, ficheros_respa
     elif regla == 'R_Estacion_Certificada_Datos_Estacion_Sectores_Sector_Altura_Antena_Sobre_Terreno':
         d['Etiqueta'] = etiqueta
         d['Valor'] = vdato
-        d['OK_KO'] = 'OK'
+        d['OK_KO'] = 'VISUAL'
         d['Validacion'] = ''
         if vdato is None:
             d['OK_KO'] = 'KO'
             V.append('No existe valor')
+        V.append('Para la presente etapa, la validación debe ser visual')
         d['Validacion'] = V
         d['Fecha_Hora'] = datetime.datetime.now()
         return d
     elif regla == 'R_Estacion_Certificada_Datos_Estacion_Sectores_Sector_Inclinacion_Haz_Sobre_Horizontal':
         d['Etiqueta'] = etiqueta
         d['Valor'] = vdato
-        d['OK_KO'] = 'OK'
+        d['OK_KO'] = 'VISUAL'
         d['Validacion'] = ''
         if vdato is None:
             d['OK_KO'] = 'KO'
             V.append('No existe valor')
+        V.append('Para la presente etapa, la validación debe ser visual')
         d['Validacion'] = V
         d['Fecha_Hora'] = datetime.datetime.now()
         return d
@@ -670,11 +725,12 @@ def reglas_validacion_individual(etiqueta, regla, vdato, fichero, ficheros_respa
     elif regla == 'R_Estacion_Certificada_Datos_Estacion_Sectores_Sector_Antena_Directiva_Apertura_Horizontal_Haz':
         d['Etiqueta'] = etiqueta
         d['Valor'] = vdato
-        d['OK_KO'] = 'OK'
+        d['OK_KO'] = 'VISUAL'
         d['Validacion'] = ''
         if vdato is None:
             d['OK_KO'] = 'KO'
             V.append('No existe valor')
+        V.append('Para la presente etapa, la validación debe ser visual')
         d['Validacion'] = V
         d['Fecha_Hora'] = datetime.datetime.now()
         return d
@@ -692,11 +748,12 @@ def reglas_validacion_individual(etiqueta, regla, vdato, fichero, ficheros_respa
     elif regla == 'R_Estacion_Certificada_Datos_Estacion_Sectores_Sector_Antena_Directiva_Acimut_Maxima_Radiacion':
         d['Etiqueta'] = etiqueta
         d['Valor'] = vdato
-        d['OK_KO'] = 'OK'
+        d['OK_KO'] = 'VISUAL'
         d['Validacion'] = ''
         if vdato is None:
             d['OK_KO'] = 'KO'
             V.append('No existe valor')
+        V.append('Para la presente etapa, la validación debe ser visual')
         d['Validacion'] = V
         d['Fecha_Hora'] = datetime.datetime.now()
         return d
@@ -739,18 +796,19 @@ def reglas_validacion_individual(etiqueta, regla, vdato, fichero, ficheros_respa
     elif regla == 'R_Estacion_Certificada_Datos_Estacion_Sectores_Sector_Volumen_Referencia_Distancia_Referencia':
         d['Etiqueta'] = etiqueta
         d['Valor'] = vdato
-        d['OK_KO'] = 'OK'
+        d['OK_KO'] = 'VISUAL'
         d['Validacion'] = ''
         if vdato is None:
             d['OK_KO'] = 'KO'
             V.append('No existe valor')
+        V.append('Para la presente etapa, la validación debe ser visual')
         d['Validacion'] = V
         d['Fecha_Hora'] = datetime.datetime.now()
         return d
     elif regla == 'R_Estacion_Certificada_Datos_Estacion_Sectores_Sector_Volumen_Referencia_Coeficiente_Reflexion':
         d['Etiqueta'] = etiqueta
         d['Valor'] = vdato
-        d['OK_KO'] = 'OK'
+        d['OK_KO'] = 'VISUAL'
         d['Validacion'] = ''
         if vdato is None:
             d['OK_KO'] = 'KO'
@@ -758,6 +816,7 @@ def reglas_validacion_individual(etiqueta, regla, vdato, fichero, ficheros_respa
         if not re.match('1|2.56|4', vdato):
             d['OK_KO'] = 'KO'
             V.append('Valor debe ser igual a 1 ó 2.56 ó 4')
+        V.append('Para la presente etapa, la validación debe ser visual')
         d['Validacion'] = V
         d['Fecha_Hora'] = datetime.datetime.now()
         return d
@@ -807,8 +866,9 @@ def reglas_validacion_individual(etiqueta, regla, vdato, fichero, ficheros_respa
     elif regla == 'R_Informe_Medidas_Puntos_Medida_Punto_Medida_Punto_Sensible_Situacion':
         d['Etiqueta'] = etiqueta
         d['Valor'] = vdato
-        d['OK_KO'] = 'OK'
+        d['OK_KO'] = 'VISUAL'
         d['Validacion'] = ''
+        V.append('Para la presente etapa, la validación debe ser visual')
         d['Validacion'] = V
         d['Fecha_Hora'] = datetime.datetime.now()
         return d
@@ -829,7 +889,7 @@ def reglas_validacion_individual(etiqueta, regla, vdato, fichero, ficheros_respa
     elif regla == 'R_Informe_Medidas_Puntos_Medida_Punto_Medida_Punto_Sensible_Tipo_Via':
         d['Etiqueta'] = etiqueta
         d['Valor'] = vdato
-        d['OK_KO'] = 'OK'
+        d['OK_KO'] = 'VISUAL'
         d['Validacion'] = ''
         if vdato is None:
             d['OK_KO'] = 'KO'
@@ -837,45 +897,49 @@ def reglas_validacion_individual(etiqueta, regla, vdato, fichero, ficheros_respa
         if not re.match('AV|BU|CL|CM|CR|GL|PJ|PS|PZ|RB|RD|TR|VP', vdato):
             d['OK_KO'] = 'KO'
             V.append('Valores AV|BU|CL|CM|CR|GL|PJ|PS|PZ|RB|RD|TR|VP')
+        V.append('Para la presente etapa, la validación debe ser visual')
         d['Validacion'] = V
         d['Fecha_Hora'] = datetime.datetime.now()
         return d
     elif regla == 'R_Informe_Medidas_Puntos_Medida_Punto_Medida_Punto_Sensible_Nombre_Via':
         d['Etiqueta'] = etiqueta
         d['Valor'] = vdato
-        d['OK_KO'] = 'OK'
+        d['OK_KO'] = 'VISUAL'
         d['Validacion'] = ''
         if vdato is None:
             d['OK_KO'] = 'KO'
             V.append('No existe valor')
+        V.append('Para la presente etapa, la validación debe ser visual')
         d['Validacion'] = V
         d['Fecha_Hora'] = datetime.datetime.now()
         return d
     elif regla == 'R_Informe_Medidas_Puntos_Medida_Punto_Medida_Punto_Sensible_Numero_Portal':
         d['Etiqueta'] = etiqueta
         d['Valor'] = vdato
-        d['OK_KO'] = 'OK'
+        d['OK_KO'] = 'VISUAL'
         d['Validacion'] = ''
         if vdato is None:
             d['OK_KO'] = 'KO'
             V.append('No existe valor')
-        if not(vdato == 'S/N' or vdato.isdigit() or vdato == 'SN'):
+        if not (vdato == 'S/N' or vdato.isdigit() or vdato == 'SN'):
             d['OK_KO'] = 'KO'
             V.append('Debe ser número o S/N')
+        V.append('Para la presente etapa, la validación debe ser visual')
         d['Validacion'] = V
         d['Fecha_Hora'] = datetime.datetime.now()
         return d
     elif regla == 'R_Informe_Medidas_Puntos_Medida_Punto_Medida_Punto_Sensible_Codigo_Postal':
         d['Etiqueta'] = etiqueta
         d['Valor'] = vdato
-        d['OK_KO'] = 'OK'
+        d['OK_KO'] = 'VISUAL'
         d['Validacion'] = ''
         if vdato is None:
             d['OK_KO'] = 'KO'
             V.append('No existe valor')
-        if not(vdato.isdigit() and len(vdato) == 5):
+        if not (vdato.isdigit() and len(vdato) == 5):
             d['OK_KO'] = 'KO'
             V.append('Debe tener formato de 5 números')
+        V.append('Para la presente etapa, la validación debe ser visual')
         d['Validacion'] = V
         d['Fecha_Hora'] = datetime.datetime.now()
         return d
@@ -938,7 +1002,9 @@ def reglas_validacion_individual(etiqueta, regla, vdato, fichero, ficheros_respa
         if vdato is None:
             d['OK_KO'] = 'KO'
             V.append('No existe valor')
-        if not re.match("((([X-Z])|([LM])){1}([-]?)((\d){7})([-]?)([A-Z]{1}))|((\d{8})([-]?)([A-Z]))\s[a-zA-ZàáâäãåąčćęèéêëėįìíîïłńòóôöõøùúûüųūÿýżźñçčšžÀÁÂÄÃÅĄĆČĖĘÈÉÊËÌÍÎÏĮŁŃÒÓÔÖÕØÙÚÛÜŲŪŸÝŻŹÑßÇŒÆČŠŽ∂ð '-]+$", vdato):
+        if not re.match(
+                "((([X-Z])|([LM])){1}([-]?)((\d){7})([-]?)([A-Z]{1}))|((\d{8})([-]?)([A-Z]))\s[a-zA-ZàáâäãåąčćęèéêëėįìíîïłńòóôöõøùúûüųūÿýżźñçčšžÀÁÂÄÃÅĄĆČĖĘÈÉÊËÌÍÎÏĮŁŃÒÓÔÖÕØÙÚÛÜŲŪŸÝŻŹÑßÇŒÆČŠŽ∂ð '-]+$",
+                vdato):
             d['OK_KO'] = "KO"
             V.append('Tecnico Responsable no tiene el formato correcto')
         d['Validacion'] = V
@@ -969,11 +1035,13 @@ def reglas_validacion_individual(etiqueta, regla, vdato, fichero, ficheros_respa
     elif regla == 'R_Informe_Medidas_Informe_Medidas_Fase1_Equipos_Medida_Fase1_Equipo_Medida_Fase1_Fecha_Ultima_Calibracion':
         d['Etiqueta'] = etiqueta
         d['Valor'] = vdato
-        d['OK_KO'] = 'OK'
+        d['OK_KO'] = 'VISUAL'
         d['Validacion'] = ''
-        if procesos_comunes.add_months(datetime.datetime.strptime(vdato, '%Y-%m-%d').date(), 24) < datetime.date.today():
+        if procesos_comunes.add_months(datetime.datetime.strptime(vdato, '%Y-%m-%d').date(),
+                                       24) < datetime.date.today():
             d['OK_KO'] = 'KO'
             V.append('La calibración tiene como máximo una duración de 2 años')
+        V.append('Para la presente etapa, la validación debe ser visual')
         d['Validacion'] = V
         d['Fecha_Hora'] = datetime.datetime.now()
         return d
@@ -1004,66 +1072,72 @@ def reglas_validacion_individual(etiqueta, regla, vdato, fichero, ficheros_respa
     elif regla == 'R_Informe_Medidas_Informe_Medidas_Fase1_Equipos_Medida_Fase1_Equipo_Medida_Fase1_Medidor_Marca_Medidor':
         d['Etiqueta'] = etiqueta
         d['Valor'] = vdato
-        d['OK_KO'] = 'OK'
+        d['OK_KO'] = 'VISUAL'
         d['Validacion'] = ''
         if vdato is None:
             d['OK_KO'] = 'KO'
             V.append('No existe valor')
+        V.append('Para la presente etapa, la validación debe ser visual')
         d['Validacion'] = V
         d['Fecha_Hora'] = datetime.datetime.now()
         return d
     elif regla == 'R_Informe_Medidas_Informe_Medidas_Fase1_Equipos_Medida_Fase1_Equipo_Medida_Fase1_Medidor_Modelo_Medidor':
         d['Etiqueta'] = etiqueta
         d['Valor'] = vdato
-        d['OK_KO'] = 'OK'
+        d['OK_KO'] = 'VISUAL'
         d['Validacion'] = ''
         if vdato is None:
             d['OK_KO'] = 'KO'
             V.append('No existe valor')
+        V.append('Para la presente etapa, la validación debe ser visual')
         d['Validacion'] = V
         d['Fecha_Hora'] = datetime.datetime.now()
         return d
     elif regla == 'R_Informe_Medidas_Informe_Medidas_Fase1_Equipos_Medida_Fase1_Equipo_Medida_Fase1_Medidor_Numero_Serie_Medidor':
         d['Etiqueta'] = etiqueta
         d['Valor'] = vdato
-        d['OK_KO'] = 'OK'
+        d['OK_KO'] = 'VISUAL'
         d['Validacion'] = ''
         if vdato is None:
             d['OK_KO'] = 'KO'
             V.append('No existe valor')
+        V.append('Para la presente etapa, la validación debe ser visual')
         d['Validacion'] = V
         d['Fecha_Hora'] = datetime.datetime.now()
         return d
     elif regla == 'R_Informe_Medidas_Informe_Medidas_Fase1_Equipos_Medida_Fase1_Equipo_Medida_Fase1_Antena_Marca_Antena':
         d['Etiqueta'] = etiqueta
         d['Valor'] = vdato
-        d['OK_KO'] = 'OK'
+        d['OK_KO'] = 'VISUAL'
         d['Validacion'] = ''
         if vdato is None:
             d['OK_KO'] = 'KO'
             V.append('No existe valor')
+        V.append('Para la presente etapa, la validación debe ser visual')
         d['Validacion'] = V
         d['Fecha_Hora'] = datetime.datetime.now()
         return d
     elif regla == 'R_Informe_Medidas_Informe_Medidas_Fase1_Equipos_Medida_Fase1_Equipo_Medida_Fase1_Antena_Modelo_Antena':
         d['Etiqueta'] = etiqueta
         d['Valor'] = vdato
-        d['OK_KO'] = 'OK'
+        d['OK_KO'] = 'VISUAL'
         d['Validacion'] = ''
         if vdato is None:
             d['OK_KO'] = 'KO'
             V.append('No existe valor')
+        V.append('Para la presente etapa, la validación debe ser visual')
         d['Validacion'] = V
         d['Fecha_Hora'] = datetime.datetime.now()
         return d
     elif regla == 'R_Informe_Medidas_Informe_Medidas_Fase1_Equipos_Medida_Fase1_Equipo_Medida_Fase1_Antena_Numero_Serie_Antena':
         d['Etiqueta'] = etiqueta
         d['Valor'] = vdato
-        d['OK_KO'] = 'OK'
+        d['OK_KO'] = 'VISUAL'
         d['Validacion'] = ''
         if vdato is None:
             d['OK_KO'] = 'KO'
             V.append('No existe valor')
+        V.append('Para la presente etapa, la validación debe ser visual')
         d['Validacion'] = V
         d['Fecha_Hora'] = datetime.datetime.now()
         return d
@@ -1113,11 +1187,12 @@ def reglas_validacion_individual(etiqueta, regla, vdato, fichero, ficheros_respa
     elif regla == 'R_Informe_Medidas_Informe_Medidas_Fase1_Medicion_Fase1_Medida_Fase1_Nivel_Referencia_Vm':
         d['Etiqueta'] = etiqueta
         d['Valor'] = vdato
-        d['OK_KO'] = 'OK'
+        d['OK_KO'] = 'VISUAL'
         d['Validacion'] = ''
         if vdato is None:
             d['OK_KO'] = 'KO'
             V.append('No existe valor')
+        V.append('Para la presente etapa, la validación debe ser visual')
         d['Validacion'] = V
         d['Fecha_Hora'] = datetime.datetime.now()
         return d

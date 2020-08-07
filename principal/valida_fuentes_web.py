@@ -8,8 +8,8 @@ import logging
 def principal_a():
     # Retorna resultado del proceso
     r = dict()
-    r['Etapa_Validacion'] = 'Proceso de validación contra fuentes PDF'
-    r['Resultado'] = 'Pendiente'
+    r['Etapa_Validacion'] = 'Proceso de validación contra fuentes WEB'
+    r['Resultado'] = 'Finalizado'
     r['Fecha'] = datetime.datetime.now()
     return r
 

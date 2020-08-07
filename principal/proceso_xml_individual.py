@@ -30,10 +30,14 @@ def principal(rootDir, rootResultados, nameFile, ficheros_respaldo):
             root = tree.getroot()
             for each in root.findall(e['Etiqueta']):
                 # print(each.text)
-                dv = reglas_validacion_new.reglas_validacion_individual(e['Etiqueta'], e['Regla'],
-                                                                        '' if each is None else each.text,
-                                                                        fichero, ficheros_respaldo)
-                analisis = analisis.append(dv, ignore_index=True)
+                try:
+                    dv = reglas_validacion_new.reglas_validacion_individual(e['Etiqueta'], e['Regla'],
+                                                                            '' if each is None else each.text,
+                                                                            fichero, ficheros_respaldo, rootDir)
+                    analisis = analisis.append(dv, ignore_index=True)
+                except Exception as err:
+                    print('Error en ' + e['Etiqueta'] + '   ' + err)
+                    logging.debug('Error en ' + e['Etiqueta'] + '   ' + err)
 
         writer = pd.ExcelWriter(
             os.path.join(rootResultados, nameFile + '_analisis_inidvidual_xml/', fichero_nombre + "_analisis.xlsx"))

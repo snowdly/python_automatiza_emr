@@ -12,7 +12,7 @@ from principal import valida_fuentes_pdf
 from principal import proceso_xml_individual
 
 # Asignación de variables
-print (os.path.dirname(os.path.abspath(__file__)))
+#print (os.path.dirname(os.path.abspath(__file__)))
 rutas_base = procesos_comunes.genera_rutas_trabajo()
 rootDir = rutas_base['ruta_base']
 rootDirAuditoria = rutas_base['ruta_auditoria']

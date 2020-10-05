@@ -31,8 +31,8 @@ def genera_rutas_trabajo():
     auditoria_carpeta = 'Auditorias/'
     ficheros_respaldo_carpeta = 'Ficheros_Respaldo/'
     logs_carpeta = 'Logs/'
-    parentDir = os.getcwd()
-    #parentDir = os.path.dirname(os.path.abspath('D:/EMR_Auditorias_Python/automatizacion_emr.exe'))
+    #parentDir = os.getcwd()
+    parentDir = os.path.dirname(os.path.abspath('D:/EMR_Auditorias_Python/automatizacion_emr.exe'))
     rutas_base = dict()
     rutas_base['ruta_base'] = parentDir
     rutas_base['ruta_auditoria'] = os.path.join(parentDir, auditoria_carpeta)
@@ -64,8 +64,8 @@ def consulta_api_catastro(RC):
         response = requests.get(url=URL, params=PARAMS)
         # print(response.content)
         # guardar fichero temporal
-        parentDir = os.getcwd()
-        #parentDir = os.path.dirname(os.path.abspath('D:/EMR_Auditorias_Python/automatizacion_emr.exe'))
+        #parentDir = os.getcwd()
+        parentDir = os.path.dirname(os.path.abspath('D:/EMR_Auditorias_Python/automatizacion_emr.exe'))
         fichero_xml = os.path.join(parentDir, 'Consulta_DNPRC.xml')
         with open(fichero_xml, 'wb') as f:
             f.write(response.content)
@@ -160,6 +160,26 @@ def lista_pdf(rootDir):
                 files_in_dir.append(os.path.join(r, item))
     return files_in_dir
 
+# Función para ubicar cada fichero con un extension determinada, retorna una lista
+def lista_extension(rootDir, extension):
+    # r=>root, d=>directories, f=>files
+    files_in_dir = []
+    for r, d, f in os.walk(rootDir):
+        for item in f:
+            if '.' + extension in item:
+                files_in_dir.append(os.path.join(r, item))
+    return files_in_dir
+
+# Función para ubicar cada fichero con un extension determinada, retorna una lista
+def lista_extension_primero(rootDir, extension):
+    # r=>root, d=>directories, f=>files
+    files_in_dir = []
+    for r, d, f in os.walk(rootDir):
+        for item in f:
+            if '.' + extension in item:
+                files_in_dir.append(os.path.join(r, item))
+                break
+    return files_in_dir
 
 # Funcion para preparar carpetas de trabajo
 def prepara_carpetas_trabajo(rootDir):
@@ -606,3 +626,24 @@ def compara_tecnico_competente_pdf(carpeta_trabajo, Dato):
         responsable_pdf['Error'] = 'No se han podido encontrar ningún pdf, que contengan las características de '\
                                    'una Declaración de Responsable'
     return responsable_pdf
+
+def estructura_xml_completa(fichero_xml):
+    tree = ElementTree.parse(fichero_xml)
+    root = tree.getroot()
+    lista_d_xml = []
+    for elemento in listas_comunes.etiqueta_xml:
+        for child in root.findall(elemento):
+            try:
+                if not child.text == '\n':
+                    d_xml = dict()
+                    d_xml['Etiqueta'] = elemento + child.tag
+                    res = next(
+                        (sub for sub in listas_comunes.lista_completa if sub['Etiqueta'] == elemento + child.tag), None)
+                    d_xml['Regla'] = str(res['Regla'])
+                    d_xml['Valor'] = child.text
+                    # print(d_xml)
+                    lista_d_xml.append(d_xml)
+            except Exception as e:
+                print("Error en " + elemento + child.tag)
+                print(e)
+    return lista_d_xml

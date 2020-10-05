@@ -23,6 +23,7 @@ def reglas_validacion_individual(etiqueta, regla, vdato, fichero, ficheros_respa
             V.append('Valor debe ser igual a A')
         d['Validacion'] = V
         d['Fecha_Hora'] = datetime.datetime.now()
+        d['Comparacion'] = "Se compara con el parámetro Tipo_Certificacion del documento XML"
         return d
     elif regla == 'R_Datos_Certificacion_Tipo_Solicitud':
         d['Etiqueta'] = etiqueta
@@ -37,6 +38,7 @@ def reglas_validacion_individual(etiqueta, regla, vdato, fichero, ficheros_respa
             V.append('Valor debe ser igual a ALT ó MOD')
         d['Validacion'] = V
         d['Fecha_Hora'] = datetime.datetime.now()
+        d['Comparacion'] = "Se compara con el parámetro Tipo_Solicitud del documento XML"
         return d
     elif regla == 'R_Datos_Certificacion_Titular_Nombre_Razon_Social':
         d['Etiqueta'] = etiqueta
@@ -51,6 +53,7 @@ def reglas_validacion_individual(etiqueta, regla, vdato, fichero, ficheros_respa
             V.append('Valor debe ser igual a AMENA ó ORANGE')
         d['Validacion'] = V
         d['Fecha_Hora'] = datetime.datetime.now()
+        d['Comparacion'] = "Se compara con el parámetro Titular_Nombre_Razon_Social del documento XML"
         return d
     elif regla == 'R_Datos_Certificacion_Expediente_Concesional':
         d['Etiqueta'] = etiqueta
@@ -74,6 +77,7 @@ def reglas_validacion_individual(etiqueta, regla, vdato, fichero, ficheros_respa
 
         d['Validacion'] = V
         d['Fecha_Hora'] = datetime.datetime.now()
+        d['Comparacion'] = "Se compara con el parámetro Expediente_Concesional del documento XML"
         return d
     elif regla == 'R_Datos_Certificacion_Datos_Visado_Numero_Visado':
         d['Etiqueta'] = etiqueta
@@ -85,6 +89,7 @@ def reglas_validacion_individual(etiqueta, regla, vdato, fichero, ficheros_respa
             V.append('No existe valor')
         d['Validacion'] = V
         d['Fecha_Hora'] = datetime.datetime.now()
+        d['Comparacion'] = "Se compara con el parámetro Numero_Visado del documento XML"
         return d
     elif regla == 'R_Datos_Certificacion_Datos_Visado_Fecha_Visado':
         d['Etiqueta'] = etiqueta
@@ -96,6 +101,7 @@ def reglas_validacion_individual(etiqueta, regla, vdato, fichero, ficheros_respa
             V.append('No existe valor')
         d['Validacion'] = V
         d['Fecha_Hora'] = datetime.datetime.now()
+        d['Comparacion'] = "Se compara con el parámetro Numero_Visado del documento XML"
         return d
     elif regla == 'R_Datos_Certificacion_Datos_Visado_Numero_Colegiado':
         d['Etiqueta'] = etiqueta
@@ -107,6 +113,7 @@ def reglas_validacion_individual(etiqueta, regla, vdato, fichero, ficheros_respa
             V.append('No existe valor')
         d['Validacion'] = V
         d['Fecha_Hora'] = datetime.datetime.now()
+        d['Comparacion'] = "Se compara con el parámetro Numero_Colegiado del documento XML"
         return d
     elif regla == 'R_Datos_Certificacion_Datos_Visado_Colegio_Profesional':
         d['Etiqueta'] = etiqueta
@@ -121,6 +128,7 @@ def reglas_validacion_individual(etiqueta, regla, vdato, fichero, ficheros_respa
             V.append('Valor debe ser igual a COITT ó COIT')
         d['Validacion'] = V
         d['Fecha_Hora'] = datetime.datetime.now()
+        d['Comparacion'] = "Se compara con el parámetro Colegio_Profesional del documento XML"
         return d
     elif regla == 'R_Datos_Certificacion_Tecnico_Competente_NIF_NIE':
         d['Etiqueta'] = etiqueta
@@ -139,6 +147,7 @@ def reglas_validacion_individual(etiqueta, regla, vdato, fichero, ficheros_respa
         V.append(r_datos_pdf['Error'])
         d['Validacion'] = V
         d['Fecha_Hora'] = datetime.datetime.now()
+        d['Comparacion'] = "Se compara con el documento PDF Declaración Responsable de Técnico competente"
         return d
     elif regla == 'R_Datos_Certificacion_Tecnico_Competente_Nombre':
         d['Etiqueta'] = etiqueta
@@ -159,6 +168,7 @@ def reglas_validacion_individual(etiqueta, regla, vdato, fichero, ficheros_respa
         V.append(r_datos_pdf['Error'])
         d['Validacion'] = V
         d['Fecha_Hora'] = datetime.datetime.now()
+        d['Comparacion'] = "Se compara con el documento PDF Declaración Responsable de Técnico competente"
         return d
     elif regla == 'R_Datos_Certificacion_Tecnico_Competente_Apellido1':
         d['Etiqueta'] = etiqueta
@@ -179,6 +189,7 @@ def reglas_validacion_individual(etiqueta, regla, vdato, fichero, ficheros_respa
         V.append(r_datos_pdf['Error'])
         d['Validacion'] = V
         d['Fecha_Hora'] = datetime.datetime.now()
+        d['Comparacion'] = "Se compara con el documento PDF Declaración Responsable de Técnico competente"
         return d
     elif regla == 'R_Datos_Certificacion_Tecnico_Competente_Apellido2':
         d['Etiqueta'] = etiqueta
@@ -199,6 +210,7 @@ def reglas_validacion_individual(etiqueta, regla, vdato, fichero, ficheros_respa
         V.append(r_datos_pdf['Error'])
         d['Validacion'] = V
         d['Fecha_Hora'] = datetime.datetime.now()
+        d['Comparacion'] = "Se compara con el documento PDF Declaración Responsable de Técnico competente"
         return d
     elif regla == 'R_Estacion_Certificada_Datos_Emplazamiento_Codigo_Emplazamiento':
         d['Etiqueta'] = etiqueta
@@ -211,6 +223,7 @@ def reglas_validacion_individual(etiqueta, regla, vdato, fichero, ficheros_respa
         V.append('Para la presente etapa, la validación debe ser visual')
         d['Validacion'] = V
         d['Fecha_Hora'] = datetime.datetime.now()
+        d['Comparacion'] = "Se compara con Excel de Códigos INE"
         return d
     elif regla == 'R_Estacion_Certificada_Datos_Emplazamiento_Emplazamiento_Compartido':
         d['Etiqueta'] = etiqueta
@@ -226,6 +239,7 @@ def reglas_validacion_individual(etiqueta, regla, vdato, fichero, ficheros_respa
         V.append('Para la presente etapa, la validación debe ser visual')
         d['Validacion'] = V
         d['Fecha_Hora'] = datetime.datetime.now()
+        d['Comparacion'] = "Se compara con Excel de Códigos INE"
         return d
     elif regla == 'R_Estacion_Certificada_Datos_Emplazamiento_Cod_INE_Termino_Municipal':
         d['Etiqueta'] = etiqueta
@@ -246,6 +260,7 @@ def reglas_validacion_individual(etiqueta, regla, vdato, fichero, ficheros_respa
             V.append('El valor no coincide con la tabla de datos del INE')
         d['Validacion'] = V
         d['Fecha_Hora'] = datetime.datetime.now()
+        d['Comparacion'] = "Se compara con el Término Municipal del documento Excel de Códigos INE"
         return d
     elif regla == 'R_Estacion_Certificada_Datos_Emplazamiento_Cod_INE_Provincia':
         d['Etiqueta'] = etiqueta
@@ -266,6 +281,7 @@ def reglas_validacion_individual(etiqueta, regla, vdato, fichero, ficheros_respa
             V.append('El valor no coincide con la tabla de datos del INE')
         d['Validacion'] = V
         d['Fecha_Hora'] = datetime.datetime.now()
+        d['Comparacion'] = "Se compara con el Cod_INE_Provincia del documento Excel de Códigos INE"
         return d
     elif regla == 'R_Estacion_Certificada_Datos_Emplazamiento_Latitud':
         d['Etiqueta'] = etiqueta
@@ -278,6 +294,7 @@ def reglas_validacion_individual(etiqueta, regla, vdato, fichero, ficheros_respa
         V.append('Para la presente etapa, la validación debe ser visual')
         d['Validacion'] = V
         d['Fecha_Hora'] = datetime.datetime.now()
+        d['Comparacion'] = "Se compara con información obtenida de la página web de Infoantenas"
         return d
     elif regla == 'R_Estacion_Certificada_Datos_Emplazamiento_Longitud':
         d['Etiqueta'] = etiqueta
@@ -290,6 +307,7 @@ def reglas_validacion_individual(etiqueta, regla, vdato, fichero, ficheros_respa
         V.append('Para la presente etapa, la validación debe ser visual')
         d['Validacion'] = V
         d['Fecha_Hora'] = datetime.datetime.now()
+        d['Comparacion'] = "Se compara con información obtenida de la página web de Infoantenas"
         return d
     elif regla == 'R_Estacion_Certificada_Datos_Emplazamiento_Datum':
         d['Etiqueta'] = etiqueta
@@ -314,6 +332,7 @@ def reglas_validacion_individual(etiqueta, regla, vdato, fichero, ficheros_respa
                 V.append('Canarias debe tener datum REGCAN95 ó WGS84')
         d['Validacion'] = V
         d['Fecha_Hora'] = datetime.datetime.now()
+        d['Comparacion'] = "Se compara con el parámetro Datum del documento XML"
         return d
     elif regla == 'R_Estacion_Certificada_Datos_Emplazamiento_Referencia_Catastral':
         d['Etiqueta'] = etiqueta
@@ -331,6 +350,7 @@ def reglas_validacion_individual(etiqueta, regla, vdato, fichero, ficheros_respa
         '''
         d['Validacion'] = V
         d['Fecha_Hora'] = datetime.datetime.now()
+        d['Comparacion'] = "Se compara con el dato recogido de la página web de sede catastro"
         return d
     elif regla == 'R_Estacion_Certificada_Datos_Emplazamiento_Cota_Terreno_Sobre_Nivel_Mar':
         d['Etiqueta'] = etiqueta
@@ -343,6 +363,7 @@ def reglas_validacion_individual(etiqueta, regla, vdato, fichero, ficheros_respa
         V.append('Para la presente etapa, la validación debe ser visual')
         d['Validacion'] = V
         d['Fecha_Hora'] = datetime.datetime.now()
+        d['Comparacion'] = "Se compara con el valor de la página web de iberpix"
         return d
     elif regla == 'R_Estacion_Certificada_Datos_Emplazamiento_Calle_Poblacion':
         d['Etiqueta'] = etiqueta
@@ -374,6 +395,7 @@ def reglas_validacion_individual(etiqueta, regla, vdato, fichero, ficheros_respa
         '''
         d['Validacion'] = V
         d['Fecha_Hora'] = datetime.datetime.now()
+        d['Comparacion'] = "Se compara con el dato recogido de la página web de sede catastro"
         return d
     elif regla == 'R_Estacion_Certificada_Datos_Emplazamiento_Calle_Tipo_Via':
         d['Etiqueta'] = etiqueta
@@ -401,6 +423,7 @@ def reglas_validacion_individual(etiqueta, regla, vdato, fichero, ficheros_respa
         '''
         d['Validacion'] = V
         d['Fecha_Hora'] = datetime.datetime.now()
+        d['Comparacion'] = "Se compara con el dato recogido de la página web de sede catastro"
         return d
     elif regla == 'R_Estacion_Certificada_Datos_Emplazamiento_Calle_Nombre_Via':
         d['Etiqueta'] = etiqueta
@@ -423,6 +446,7 @@ def reglas_validacion_individual(etiqueta, regla, vdato, fichero, ficheros_respa
             V.append(r_api_catastro['ERROR'])
         d['Validacion'] = V
         d['Fecha_Hora'] = datetime.datetime.now()
+        d['Comparacion'] = "Se compara con el dato recogido de la página web de sede catastro"
         return d
     elif regla == 'R_Estacion_Certificada_Datos_Emplazamiento_Calle_Numero_Portal':
         d['Etiqueta'] = etiqueta
@@ -445,6 +469,7 @@ def reglas_validacion_individual(etiqueta, regla, vdato, fichero, ficheros_respa
             V.append(r_api_catastro['ERROR'])
         d['Validacion'] = V
         d['Fecha_Hora'] = datetime.datetime.now()
+        d['Comparacion'] = "Se compara con el dato recogido de la página web de sede catastro"
         return d
     elif regla == 'R_Estacion_Certificada_Datos_Emplazamiento_Calle_Situacion':
         d['Etiqueta'] = etiqueta
@@ -453,6 +478,7 @@ def reglas_validacion_individual(etiqueta, regla, vdato, fichero, ficheros_respa
         d['Validacion'] = ''
         d['Validacion'] = V
         d['Fecha_Hora'] = datetime.datetime.now()
+        d['Comparacion'] = "Dato no obligatorio, se utiliza para especificar aún con mas detalle la ubicación de la BTS"
         return d
     elif regla == 'R_Estacion_Certificada_Datos_Estacion_Codigo_Estacion':
         d['Etiqueta'] = etiqueta
@@ -478,6 +504,7 @@ def reglas_validacion_individual(etiqueta, regla, vdato, fichero, ficheros_respa
 
         d['Validacion'] = V
         d['Fecha_Hora'] = datetime.datetime.now()
+        d['Comparacion'] = "Se obtiene del título del documento xml"
         return d
     elif regla == 'R_Estacion_Certificada_Datos_Estacion_Tipo_Sistema':
         d['Etiqueta'] = etiqueta
@@ -492,6 +519,7 @@ def reglas_validacion_individual(etiqueta, regla, vdato, fichero, ficheros_respa
             V.append('Valores UMTS|GSM|DCS|RB|LTE|WIMAX|LMDS3.5')
         d['Validacion'] = V
         d['Fecha_Hora'] = datetime.datetime.now()
+        d['Comparacion'] = "Se obtiene del valor Tipo_Sistema del documento xml "
         return d
     elif regla == 'R_Estacion_Certificada_Datos_Estacion_Tipo_Estacion':
         d['Etiqueta'] = etiqueta
@@ -507,6 +535,7 @@ def reglas_validacion_individual(etiqueta, regla, vdato, fichero, ficheros_respa
         V.append('Para la presente etapa, la validación debe ser visual')
         d['Validacion'] = V
         d['Fecha_Hora'] = datetime.datetime.now()
+        #d['Comparacion'] = "Se obtiene del valor Tipo_Sistema del documento xml "
         return d
     elif regla == 'R_Estacion_Certificada_Datos_Estacion_Entorno_Sensible':
         d['Etiqueta'] = etiqueta
@@ -534,6 +563,7 @@ def reglas_validacion_individual(etiqueta, regla, vdato, fichero, ficheros_respa
                     'El valor indica que SI existe entorno sensible, sin embargo NO existen datos para .//Informe_Medidas/Puntos_Medida/Punto_Medida/Punto_Sensible')
         d['Validacion'] = V
         d['Fecha_Hora'] = datetime.datetime.now()
+        d['Comparacion'] = "Se obtiene del valor Entorno Sensible del documento xml"
         return d
 
     elif regla == 'R_Estacion_Certificada_Datos_Estacion_Num_Sectores_Interiores':
@@ -565,7 +595,7 @@ def reglas_validacion_individual(etiqueta, regla, vdato, fichero, ficheros_respa
     elif regla == 'R_Estacion_Certificada_Datos_Estacion_Num_Sectores_Exteriores':
         d['Etiqueta'] = etiqueta
         d['Valor'] = vdato
-        d['OK_KO'] = 'OK'
+        d['OK_KO'] = 'VISUAL'
         d['Validacion'] = ''
         if vdato is None:
             d['OK_KO'] = 'KO'
@@ -584,6 +614,7 @@ def reglas_validacion_individual(etiqueta, regla, vdato, fichero, ficheros_respa
             d['OK_KO'] = "KO"
             V.append(
                 'El valor de Num_Sectores_Interiores más Num_Sectores_Exteriores, es diferente a la cantidad de Sectores')
+        V.append('Para la presente etapa, la validación debe ser visual')
         d['Validacion'] = V
         d['Fecha_Hora'] = datetime.datetime.now()
         return d
@@ -737,11 +768,12 @@ def reglas_validacion_individual(etiqueta, regla, vdato, fichero, ficheros_respa
     elif regla == 'R_Estacion_Certificada_Datos_Estacion_Sectores_Sector_Antena_Directiva_Apertura_Vertical_Haz':
         d['Etiqueta'] = etiqueta
         d['Valor'] = vdato
-        d['OK_KO'] = 'OK'
+        d['OK_KO'] = 'VISUAL'
         d['Validacion'] = ''
         if vdato is None:
             d['OK_KO'] = 'KO'
             V.append('No existe valor')
+        V.append('Para la presente etapa, la validación debe ser visual')
         d['Validacion'] = V
         d['Fecha_Hora'] = datetime.datetime.now()
         return d
@@ -844,7 +876,7 @@ def reglas_validacion_individual(etiqueta, regla, vdato, fichero, ficheros_respa
     elif regla == 'R_Informe_Medidas_Puntos_Medida_Punto_Medida_Distancia':
         d['Etiqueta'] = etiqueta
         d['Valor'] = vdato
-        d['OK_KO'] = 'OK'
+        d['OK_KO'] = 'OK-VISUAL'
         d['Validacion'] = ''
         if not ((float(vdato.replace(',', '.')) >= 0) and (float(vdato.replace(',', '.')) <= 100)):
             d['OK_KO'] = 'KO'
@@ -855,7 +887,7 @@ def reglas_validacion_individual(etiqueta, regla, vdato, fichero, ficheros_respa
     elif regla == 'R_Informe_Medidas_Puntos_Medida_Punto_Medida_Acimut':
         d['Etiqueta'] = etiqueta
         d['Valor'] = vdato
-        d['OK_KO'] = 'OK'
+        d['OK_KO'] = 'OK-VISUAL'
         d['Validacion'] = ''
         if not ((float(vdato.replace(',', '.')) >= 0) and (float(vdato.replace(',', '.')) <= 359)):
             d['OK_KO'] = 'KO'

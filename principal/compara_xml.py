@@ -4,6 +4,7 @@ import itertools
 import pandas as pd
 import datetime
 import logging
+from principal import procesos_comunes
 
 # Variables Globales
 #rootDir = "D:/EMR_Auditorias_Python/Auditorias/Resultado/Carpeta_de_Trabajo/"
@@ -183,32 +184,3 @@ def compara_xml_principal(rootDir, rootDirResultados, nameFile):
     r['Fecha'] = datetime.datetime.now()
     return r
 
-
-
-#compara_xml_principal(rootDir, nameFile, rootDirResultados)
-
-'''
-def difference(list1, list2):
-    list_dif = [i for i in list1 + list2 if i not in list1 or i not in list2]
-    return list_dif
-
-
-# Initializing list 1 and list 2
-x = [10, 15, 20, 25, 30, 35, 40]
-y = [25, 40, 35]
-
-print("List first: " + str(x))
-print("List second: " + str(y))
-
-# Take difference of list 1 and list 2
-z = difference(x, y)
-
-print("Difference of first and second String: " + str(z))
-
-# if lists are equal
-if not z:
-    print("First and Second list are Equal")
-# if lsts are not equal
-else:
-    print("First and Second list are Not Equal")
-'''

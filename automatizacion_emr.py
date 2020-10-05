@@ -84,28 +84,18 @@ except Exception as e:
     logging.debug(e)
     print(e)
 
-'''
 try:
-    logging.debug('Inicia: Proceso de revisión de valores entre etiquetas XML')
-    r = valida_xml_entre.principal()
+    logging.debug('Inicia: Proceso de consolidado de XML')
+    print('Inicia: Proceso de consolidado de XML')
+    r = proceso_xml_individual.genera_resumen_xml(rutas_trabajo['ruta_auditoria_carpeta_reporte'], nameFile)
     resumen = resumen.append(r, ignore_index=True)
-    logging.debug('Finaliza: Proceso de revisión de valores entre etiquetas XML')
+    logging.debug('Finaliza: Proceso de consolidado de XML')
 except Exception as e:
-    r = procesos_comunes.estructura_respuesta_error('Proceso de validación de XML grupal')
+    r = procesos_comunes.estructura_respuesta_error('Proceso de consolidado de XML')
     resumen = resumen.append(r, ignore_index=True)
-    logging.debug('Se ha producido un error Proceso de validación de XML grupal')
+    logging.debug('Se ha producido un error Proceso de consolidado de XML')
     logging.debug(e)
-
-try:
-    logging.debug('Inicia: Proceso de validación INE y Base de Datos')
-    r = valida_ine_bd.principal()
-    resumen = resumen.append(r, ignore_index=True)
-    logging.debug('Finaliza: Proceso de validación INE y Base de Datos')
-except Exception as e:
-    r = procesos_comunes.estructura_respuesta_error('Proceso de validación contra INE y Base de Datos')
-    resumen = resumen.append(r, ignore_index=True)
-    logging.debug('Se ha producido un error Proceso de validación contra INE y Base de Datos')
-    logging.debug(e)
+    print(e)
 '''
 try:
     logging.debug('Inicia: Proceso de validación con fuentes web')
@@ -128,7 +118,7 @@ except Exception as e:
     resumen = resumen.append(r, ignore_index=True)
     logging.debug('Se ha producido un error Proceso de validación contra fuentes PDF')
     logging.debug(e)
-
+'''
 # Genera resumen
 writer = pd.ExcelWriter(os.path.join(rutas_trabajo['ruta_auditoria_carpeta_reporte'],  nameFile+'_Resumen.xlsx'))
 resumen.to_excel(writer, 'sheet1')

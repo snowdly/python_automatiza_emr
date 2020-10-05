@@ -1,164 +1,98 @@
 import os
-import zipfile
-import rarfile
-from principal import valida_xml_individual_base
+import pandas as pd
+import datetime
+import itertools
+from xml.etree import ElementTree
+from principal import listas_comunes
+from principal import procesos_comunes
 
-# DECLARACION DE VARIABLES GLOBALES
-nameZip = ""
-rootDir = "D:/EMR_Auditorias_Python/Auditorias/Resultado/Carpeta_de_Trabajo/"
-rarfile.UNRAR_TOOL = 'D:/EMR_Auditorias_Python/Ficheros_Respaldo/UnRAR.exe'
-dirRarFile='D:/EMR_Auditorias_Python/Auditorias/Resultado/Carpeta_de_Trabajo/IB0641/13520/s1700_n0001_r00_BAL0032V_BALR0032V_ER1_A_HUAWEI_103719_1.rar'
-
-def extrae_datos(rootDir):
-    directories = os.listdir(rootDir)
-    rootDir_sub = rootDir
-    for file in directories:
-        if os.path.isdir(os.path.join(rootDir, file)):
-            print("Es una carpeta: " + rootDir + file)
-            filename = os.path.basename(file)
-            (carpeta, ext) = os.path.splitext(filename)
-            rootDir_sub = rootDir_sub + "/" + file
-            extrae_datos(rootDir_sub)
-        else:
-            if file.endswith("zip"):
-                print("Es un zip: " + rootDir + '/' + file)
-                (carpeta_zip, ext_zip) = os.path.splitext(file)
-                with zipfile.ZipFile(rootDir + '/' + file, 'r') as zip_ref_zip:
-                    zip_ref_zip.extractall(rootDir) #zip_ref_zip.extractall(rootDir + "/" + carpeta_zip)
-            elif file.endswith("rar"):
-                print("Es un rar: " + rootDir + '/' + file)
-                (carpeta_rar, ext_rar) = os.path.splitext(file)
-                r = rarfile.RarFile(rootDir + '/' + file)
-                r.extractall(rootDir) #r.extractall(rootDir + "/" + carpeta_rar)
-                r.close()
+fichero_xml = r'D:/EMR_Auditorias_Python/Auditorias/PO6100/Carpeta_de_Trabajo/23207/GALB6100E_GALR6100E_ER1_M_ARCA_112601_1.xml'
+rootDir = r'D:/EMR_Auditorias_Python/Auditorias/PO6100/Reporte_Estado_Auditoria/PO6100_analisis_inidvidual_xml/'
+rootDira = r'D:/EMR_Auditorias_Python/Auditorias/PO6100/'
+etiqueta_xml = ['.//Datos_Certificacion/'
+    , './/Datos_Certificacion/Datos_Visado/'
+    , './/Datos_Certificacion/Tecnico_Competente/'
+    , './/Estacion_Certificada/Datos_Emplazamiento/'
+    , './/Estacion_Certificada/Datos_Emplazamiento/Calle/'
+    , './/Estacion_Certificada/Datos_Estacion/'
+    , './/Estacion_Certificada/Datos_Estacion/Sectores/Sector/'
+    , './/Estacion_Certificada/Datos_Estacion/Sectores/Sector/Antena_Directiva/'
+    , './/Estacion_Certificada/Datos_Estacion/Sectores/Sector/Volumen_Referencia/'
+    , './/Informe_Medidas/Puntos_Medida/Punto_Medida/'
+    , './/Informe_Medidas/Puntos_Medida/Punto_Sensible/'
+    , './/Informe_Medidas/Informe_Medidas_Fase1/Datos_Medicion/'
+    , './/Informe_Medidas/Informe_Medidas_Fase1/Equipos_Medida_Fase1/Equipo_Medida_Fase1/'
+    , './/Informe_Medidas/Informe_Medidas_Fase1/Equipos_Medida_Fase1/Equipo_Medida_Fase1/Medidor/'
+    , './/Informe_Medidas/Informe_Medidas_Fase1/Equipos_Medida_Fase1/Equipo_Medida_Fase1/Antena/'
+    , './/Informe_Medidas/Informe_Medidas_Fase1/Medicion_Fase1/Medida_Fase1/'
+    , './/Documentos/Informacion_Adicional/Documento/'
+                ]
 
 
-def extrae_datos_recursivo(rootDir, nivel):
-    for i in range(nivel):
-        try:
-            extrae_datos(rootDir)
-        except:
-            print("Finalizado por Carpeta")
+lista_etiquetas=[]
+l = procesos_comunes.lista_extension_primero(rootDir, 'xlsx')
+#print(len(l))
+if len(l) == 1:
+    df = pd.read_excel(l[0])
+    for index, row in df.iterrows():
+        #print(row['Etiqueta'], row['Valor'], row['OK_KO'])
+        lista_etiquetas.append(row['Etiqueta'])
 
+d = dict()
+log = pd.DataFrame(columns=('Etiqueta', 'Valor', 'OK_KO', 'Validacion', 'Fecha_Hora', 'Bandera'))
+aa=[]
+for e in lista_etiquetas:
+    datos = []
+    for item in procesos_comunes.lista_xml(rootDira):
+        # print("file in dir: ", item)
+        tree = ElementTree.parse(item)
+        root = tree.getroot()
+        for each in root.findall(e):
+            datos.append(each.text)
 
-# Llamada principal
-directories = os.listdir(rootDir)
-for file in directories:
-    extrae_datos_recursivo(rootDir, 5)
+    for a, b in itertools.combinations(datos, 2):
+        if a != b:
+            # print(a, b)
+            d['Etiqueta'] = e
+            d['Valor'] = a + " | " + b
+            d['OK_KO'] = "KO"
+            d['Validacion'] = "Valores distintos en la etiqueta: " + e
+            d['Fecha_Hora'] = datetime.datetime.now()
+            d['Bandera'] = 1
+            #log = log.append(d, ignore_index=True)
+            aa.append(d)
 
-
+for ele in aa:
+    print(ele)
 '''
-(fichero_rar, ext_rar) = os.path.splitext(os.path.basename(dirRarFile))
-r = rarfile.RarFile(dirRarFile)
-r.extractall('D:/EMR_Auditorias_Python/Auditorias/Resultado/Carpeta_de_Trabajo/IB0641/13520')
-r.close()
+#Guardamos en un array todos los datos de los excel
+array_df=[]
+for fichero in procesos_comunes.lista_extension(rootDir, 'xlsx'):
+    fichero_nombre, fichero_extension = os.path.splitext(os.path.basename(fichero))
+    df = pd.read_excel(fichero, na_values=[''])
+    array_df.append(df)
+
+
+# Recorremos el listado en el orden que queremos
+valores=[]
+l = procesos_comunes.lista_extension_primero(rootDir, 'xlsx')
+print(len(l))
+if len(l) == 1:
+    df = pd.read_excel(l[0])
+    for index, row in df.iterrows():
+        #print(row['Etiqueta'], row['Valor'], row['OK_KO'])
+        for elemento_df in array_df:
+            a = elemento_df.loc[elemento_df['Etiqueta'] == row['Etiqueta']]
+            valores.append(a)
+print(valores)
 '''
 
-'''
-    for files_sub in os.listdir(rootDir + carpeta):
-        if os.path.isdir(os.path.join(rootDir + carpeta, files_sub)):
-            print(files_sub)
-            for files_sub_sub in os.listdir(rootDir + carpeta + "\\" + files_sub):
-                if files_sub_sub.endswith("zip"):
-                    (carpeta_sub_sub, ext_sub_sub) = os.path.splitext(files_sub_sub)
-                    with zipfile.ZipFile(rootDir + carpeta + "\\" + files_sub + "\\" + files_sub_sub,
-                                         'r') as zip_ref_sub_sub:
-                        zip_ref_sub_sub.extractall(rootDir + carpeta + "\\" + files_sub + "\\" + carpeta_sub_sub)
-        else:
-            for files_sub_sub in os.listdir(rootDir + carpeta):
-                if files_sub_sub.endswith("zip"):
-                    (carpeta_sub_sub, ext_sub_sub) = os.path.splitext(files_sub_sub)
-                    with zipfile.ZipFile(rootDir + carpeta + "\\" + "\\" + files_sub_sub,
-                                         'r') as zip_ref_sub_sub:
-                        zip_ref_sub_sub.extractall(rootDir + carpeta + "\\" + "\\" + carpeta_sub_sub)
 
-
-
-
-# LISTAR Y DESCOMPRIMIR SEGUNDO ZIP
-directories = os.listdir(rootDir)
-for file in directories:
-    if file.endswith("zip"):
-        filename = os.path.basename(file)
-        (carpeta, ext) = os.path.splitext(filename)
-        nameZip = file
-        print(carpeta)
-        print(file)
-        with zipfile.ZipFile(rootDir + "\\" + file, 'r') as zip_ref:
-            zip_ref.extractall(rootDir + carpeta)
-            # proceso_principal.principal(rootDir, nameZip, carpeta)
-        # DENTRO DE CARPETA
-        for files_sub in os.listdir(rootDir + carpeta):
-            if os.path.isdir(os.path.join(rootDir + carpeta, files_sub)):
-                print(files_sub)
-                for files_sub_sub in os.listdir(rootDir + carpeta + "\\" + files_sub):
-                    if files_sub_sub.endswith("zip"):
-                        (carpeta_sub_sub, ext_sub_sub) = os.path.splitext(files_sub_sub)
-                        with zipfile.ZipFile(rootDir + carpeta + "\\" + files_sub + "\\" + files_sub_sub,
-                                             'r') as zip_ref_sub_sub:
-                            zip_ref_sub_sub.extractall(rootDir + carpeta + "\\" + files_sub + "\\" + carpeta_sub_sub)
-
-                        # DENTRO DE SUB CARPETA
-                        for files_sub_sub_sub in os.listdir(
-                                rootDir + carpeta + "\\" + files_sub + "\\" + carpeta_sub_sub):
-                            if files_sub_sub_sub.endswith("zip"):
-                                (carpeta_sub_sub_sub, ext_sub_sub_sub) = os.path.splitext(files_sub_sub_sub)
-                                with zipfile.ZipFile(
-                                        rootDir + carpeta + "\\" + files_sub + "\\" + carpeta_sub_sub + "\\" + files_sub_sub_sub,
-                                        'r') as zip_ref_sub_sub_sub:
-                                    zip_ref_sub_sub_sub.extractall(
-                                        rootDir + carpeta + "\\" + files_sub + "\\" + carpeta_sub_sub + "\\" + carpeta_sub_sub_sub)
-                    # SI SE TRATA DE UN RAR
-                    if files_sub_sub.endswith("rar"):
-                        print("Se encontró rar")
-                        (carpeta_sub_sub, ext_sub_sub) = os.path.splitext(files_sub_sub)
-                        r = rarfile.RarFile(rootDir + carpeta + "\\" + files_sub + "\\" + files_sub_sub)
-                        r.extractall(rootDir + carpeta + "\\" + files_sub + "\\" + carpeta_sub_sub)
-                        r.close()
-                    # SI SE TRATA DE UN 7z
-                    if files_sub_sub.endswith("7z"):
-                        print("Se encontró rar")
-    if file.endswith("rar"):
-        print("Se encontró rar")
-        filename = os.path.basename(file)
-        (carpeta, ext) = os.path.splitext(filename)
-        nameZip = file
-        print(carpeta)
-        print(file)
-        r_l = rarfile.RarFile(rootDir + "\\" + file)
-        r_l.extractall(rootDir + carpeta)
-        r_l.close()
-        # proceso_principal.principal(rootDir, nameZip, carpeta)
-        # DENTRO DE CARPETA
-        for files_sub in os.listdir(rootDir + carpeta):
-            if os.path.isdir(os.path.join(rootDir + carpeta, files_sub)):
-                print(files_sub)
-                for files_sub_sub in os.listdir(rootDir + carpeta + "\\" + files_sub):
-                    if files_sub_sub.endswith("zip"):
-                        (carpeta_sub_sub, ext_sub_sub) = os.path.splitext(files_sub_sub)
-                        with zipfile.ZipFile(rootDir + carpeta + "\\" + files_sub + "\\" + files_sub_sub,
-                                             'r') as zip_ref_sub_sub:
-                            zip_ref_sub_sub.extractall(rootDir + carpeta + "\\" + files_sub + "\\" + carpeta_sub_sub)
-
-                        # DENTRO DE SUB CARPETA
-                        for files_sub_sub_sub in os.listdir(
-                                rootDir + carpeta + "\\" + files_sub + "\\" + carpeta_sub_sub):
-                            if files_sub_sub_sub.endswith("zip"):
-                                (carpeta_sub_sub_sub, ext_sub_sub_sub) = os.path.splitext(files_sub_sub_sub)
-                                with zipfile.ZipFile(
-                                        rootDir + carpeta + "\\" + files_sub + "\\" + carpeta_sub_sub + "\\" + files_sub_sub_sub,
-                                        'r') as zip_ref_sub_sub_sub:
-                                    zip_ref_sub_sub_sub.extractall(
-                                        rootDir + carpeta + "\\" + files_sub + "\\" + carpeta_sub_sub + "\\" + carpeta_sub_sub_sub)
-                    # SI SE TRATA DE UN RAR
-                    if files_sub_sub.endswith("rar"):
-                        print("Se encontró rar")
-                        (carpeta_sub_sub, ext_sub_sub) = os.path.splitext(files_sub_sub)
-                        r = rarfile.RarFile(rootDir + carpeta + "\\" + files_sub + "\\" + files_sub_sub)
-                        r.extractall(rootDir + carpeta + "\\" + files_sub + "\\" + carpeta_sub_sub)
-                        r.close()
-                    # SI SE TRATA DE UN 7z
-                    if files_sub_sub.endswith("7z"):
-                        print("Se encontró rar")
-
-'''
+# Recorrer cada fichero excel
+# for fichero in procesos_comunes.lista_extension_primero(rootDir, 'xlsx'):
+#    fichero_nombre, fichero_extension = os.path.splitext(os.path.basename(fichero))
+#    print(fichero)
+# df = pd.read_excel(fichero)
+# a=df.loc[df['Etiqueta'] == './/Datos_Certificacion/Titular_Nombre_Razon_Social']["Valor"]
+# print(str(a))
+# print(df)

@@ -1,3 +1,22 @@
+etiqueta_xml = ['.//Datos_Certificacion/'
+            , './/Datos_Certificacion/Datos_Visado/'
+            , './/Datos_Certificacion/Tecnico_Competente/'
+            , './/Estacion_Certificada/Datos_Emplazamiento/'
+            , './/Estacion_Certificada/Datos_Emplazamiento/Calle/'
+            , './/Estacion_Certificada/Datos_Estacion/'
+            , './/Estacion_Certificada/Datos_Estacion/Sectores/Sector/'
+            , './/Estacion_Certificada/Datos_Estacion/Sectores/Sector/Antena_Directiva/'
+            , './/Estacion_Certificada/Datos_Estacion/Sectores/Sector/Volumen_Referencia/'
+            , './/Informe_Medidas/Puntos_Medida/Punto_Medida/'
+            , './/Informe_Medidas/Puntos_Medida/Punto_Sensible/'
+            , './/Informe_Medidas/Informe_Medidas_Fase1/Datos_Medicion/'
+            , './/Informe_Medidas/Informe_Medidas_Fase1/Equipos_Medida_Fase1/Equipo_Medida_Fase1/'
+            , './/Informe_Medidas/Informe_Medidas_Fase1/Equipos_Medida_Fase1/Equipo_Medida_Fase1/Medidor/'
+            , './/Informe_Medidas/Informe_Medidas_Fase1/Equipos_Medida_Fase1/Equipo_Medida_Fase1/Antena/'
+            , './/Informe_Medidas/Informe_Medidas_Fase1/Medicion_Fase1/Medida_Fase1/'
+            , './/Documentos/Informacion_Adicional/Documento/'
+            ]
+
 lista_completa = [
     {'Etiqueta': './/Datos_Certificacion/Tipo_Certificacion', 'Regla': 'R_Datos_Certificacion_Tipo_Certificacion'}
     , {'Etiqueta': './/Datos_Certificacion/Tipo_Solicitud', 'Regla': 'R_Datos_Certificacion_Tipo_Solicitud'}
@@ -49,6 +68,8 @@ lista_completa = [
        'Regla': 'R_Estacion_Certificada_Datos_Emplazamiento_Calle_Numero_Portal'}
     , {'Etiqueta': './/Estacion_Certificada/Datos_Emplazamiento/Calle/Situacion',
        'Regla': 'R_Estacion_Certificada_Datos_Emplazamiento_Calle_Situacion'}
+    , {'Etiqueta': './/Estacion_Certificada/Datos_Estacion/Codigo_Expediente',
+       'Regla': 'R_Estacion_Certificada_Datos_Estacion_Codigo_Expediente'}
     , {'Etiqueta': './/Estacion_Certificada/Datos_Estacion/Codigo_Estacion',
        'Regla': 'R_Estacion_Certificada_Datos_Estacion_Codigo_Estacion'}
     , {'Etiqueta': './/Estacion_Certificada/Datos_Estacion/Tipo_Sistema',

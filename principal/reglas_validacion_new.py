@@ -5,7 +5,7 @@ from principal import listas_comunes
 import os
 
 
-def reglas_validacion_individual(etiqueta, regla, vdato, fichero, ficheros_respaldo, carpeta_trabajo):
+def reglas_validacion_individual(etiqueta, regla, vdato, fichero, ficheros_respaldo, carpeta_trabajo, pdf_texto):
     fichero_nombre, fichero_extension = os.path.splitext(os.path.basename(fichero))
     d = dict()
     V = []
@@ -876,7 +876,7 @@ def reglas_validacion_individual(etiqueta, regla, vdato, fichero, ficheros_respa
     elif regla == 'R_Informe_Medidas_Puntos_Medida_Punto_Medida_Distancia':
         d['Etiqueta'] = etiqueta
         d['Valor'] = vdato
-        d['OK_KO'] = 'OK-VISUAL'
+        d['OK_KO'] = 'OK/VISUAL'
         d['Validacion'] = ''
         if not ((float(vdato.replace(',', '.')) >= 0) and (float(vdato.replace(',', '.')) <= 100)):
             d['OK_KO'] = 'KO'
@@ -887,7 +887,7 @@ def reglas_validacion_individual(etiqueta, regla, vdato, fichero, ficheros_respa
     elif regla == 'R_Informe_Medidas_Puntos_Medida_Punto_Medida_Acimut':
         d['Etiqueta'] = etiqueta
         d['Valor'] = vdato
-        d['OK_KO'] = 'OK-VISUAL'
+        d['OK_KO'] = 'OK/VISUAL'
         d['Validacion'] = ''
         if not ((float(vdato.replace(',', '.')) >= 0) and (float(vdato.replace(',', '.')) <= 359)):
             d['OK_KO'] = 'KO'
@@ -1073,7 +1073,19 @@ def reglas_validacion_individual(etiqueta, regla, vdato, fichero, ficheros_respa
                                        24) < datetime.date.today():
             d['OK_KO'] = 'KO'
             V.append('La calibración tiene como máximo una duración de 2 años')
-        V.append('Para la presente etapa, la validación debe ser visual')
+        #V.append('Para la presente etapa, la validación debe ser visual')
+        fecha_vdato = datetime.datetime.strptime(vdato, '%Y-%m-%d')
+        vdato = fecha_vdato.strftime('%d/%m/%Y')
+        for encontrado in re.findall("CALIBRACION\s.+", pdf_texto['Texto']):
+            if encontrado.find(vdato.upper()) != -1:
+                d['OK_KO'] = "OK"
+                break
+            else:
+                d['OK_KO'] = "KO/VISUAL"
+        if d['OK_KO'] == "KO/VISUAL":
+            V.append(
+                'Valor: ' + vdato + '  no coincide con dato extraído de PDF: ' + encontrado + '  . La revisión debe ser VISUAL')
+        # V.append('Para la presente etapa, la validación debe ser visual')
         d['Validacion'] = V
         d['Fecha_Hora'] = datetime.datetime.now()
         return d
@@ -1108,8 +1120,17 @@ def reglas_validacion_individual(etiqueta, regla, vdato, fichero, ficheros_respa
         d['Validacion'] = ''
         if vdato is None:
             d['OK_KO'] = 'KO'
-            V.append('No existe valor')
-        V.append('Para la presente etapa, la validación debe ser visual')
+            V.append('No existe valor en el xml')
+        #V.append('Fichero analizado: ' + pdf_texto['Fichero'])
+        for encontrado in re.findall("MARCA\s.+", pdf_texto['Texto']):
+            if encontrado.find(vdato.upper()) != -1:
+                d['OK_KO'] = "OK"
+                break
+            else:
+                d['OK_KO'] = "KO/VISUAL"
+        if d['OK_KO'] == "KO/VISUAL":
+            V.append('Valor: '+ vdato + '  no coincide con dato extraído de PDF: ' + encontrado +'  . La revisión debe ser VISUAL')
+        #V.append('Para la presente etapa, la validación debe ser visual')
         d['Validacion'] = V
         d['Fecha_Hora'] = datetime.datetime.now()
         return d
@@ -1120,8 +1141,16 @@ def reglas_validacion_individual(etiqueta, regla, vdato, fichero, ficheros_respa
         d['Validacion'] = ''
         if vdato is None:
             d['OK_KO'] = 'KO'
-            V.append('No existe valor')
-        V.append('Para la presente etapa, la validación debe ser visual')
+            V.append('No existe valor en el xml')
+        #V.append('Fichero analizado: ' + pdf_texto['Fichero'])
+        for encontrado in re.findall("MODELO\s.+", pdf_texto['Texto']):
+            if encontrado.find(vdato.upper()) != -1:
+                d['OK_KO'] = "OK"
+                break
+            else:
+                d['OK_KO'] = "KO/VISUAL"
+        if d['OK_KO'] == "KO/VISUAL":
+            V.append('Valor: '+ vdato + '  no coincide con dato extraído de PDF: ' + encontrado +'  . La revisión debe ser VISUAL')
         d['Validacion'] = V
         d['Fecha_Hora'] = datetime.datetime.now()
         return d
@@ -1132,8 +1161,16 @@ def reglas_validacion_individual(etiqueta, regla, vdato, fichero, ficheros_respa
         d['Validacion'] = ''
         if vdato is None:
             d['OK_KO'] = 'KO'
-            V.append('No existe valor')
-        V.append('Para la presente etapa, la validación debe ser visual')
+            V.append('No existe valor en el xml')
+        #V.append('Fichero analizado: ' + pdf_texto['Fichero'])
+        for encontrado in re.findall("IDENTIFICACION\s.+", pdf_texto['Texto']):
+            if encontrado.find(vdato.upper()) != -1:
+                d['OK_KO'] = "OK"
+                break
+            else:
+                d['OK_KO'] = "KO/VISUAL"
+        if d['OK_KO'] == "KO/VISUAL":
+            V.append('Valor: '+ vdato + '  no coincide con dato extraído de PDF: ' + encontrado +'  . La revisión debe ser VISUAL')
         d['Validacion'] = V
         d['Fecha_Hora'] = datetime.datetime.now()
         return d
@@ -1144,8 +1181,16 @@ def reglas_validacion_individual(etiqueta, regla, vdato, fichero, ficheros_respa
         d['Validacion'] = ''
         if vdato is None:
             d['OK_KO'] = 'KO'
-            V.append('No existe valor')
-        V.append('Para la presente etapa, la validación debe ser visual')
+            V.append('No existe valor en el xml')
+        #V.append('Fichero analizado: ' + pdf_texto['Fichero'])
+        for encontrado in re.findall("MARCA\s.+", pdf_texto['Texto']):
+            if encontrado.find(vdato.upper()) != -1:
+                d['OK_KO'] = "OK"
+                break
+            else:
+                d['OK_KO'] = "KO/VISUAL"
+        if d['OK_KO'] == "KO/VISUAL":
+            V.append('Valor: '+ vdato + '  no coincide con dato extraído de PDF: ' + encontrado +'  . La revisión debe ser VISUAL')
         d['Validacion'] = V
         d['Fecha_Hora'] = datetime.datetime.now()
         return d
@@ -1156,8 +1201,16 @@ def reglas_validacion_individual(etiqueta, regla, vdato, fichero, ficheros_respa
         d['Validacion'] = ''
         if vdato is None:
             d['OK_KO'] = 'KO'
-            V.append('No existe valor')
-        V.append('Para la presente etapa, la validación debe ser visual')
+            V.append('No existe valor en el xml')
+        #V.append('Fichero analizado: ' + pdf_texto['Fichero'])
+        for encontrado in re.findall("SONDA\:.+", pdf_texto['Texto']):
+            if encontrado.find(vdato.upper()) != -1:
+                d['OK_KO'] = "OK"
+                break
+            else:
+                d['OK_KO'] = "KO/VISUAL"
+        if d['OK_KO'] == "KO/VISUAL":
+            V.append('Valor: '+ vdato + '  no coincide con dato extraído de PDF: ' + encontrado +'  . La revisión debe ser VISUAL')
         d['Validacion'] = V
         d['Fecha_Hora'] = datetime.datetime.now()
         return d
@@ -1168,8 +1221,16 @@ def reglas_validacion_individual(etiqueta, regla, vdato, fichero, ficheros_respa
         d['Validacion'] = ''
         if vdato is None:
             d['OK_KO'] = 'KO'
-            V.append('No existe valor')
-        V.append('Para la presente etapa, la validación debe ser visual')
+            V.append('No existe valor en el xml')
+        #V.append('Fichero analizado: ' + pdf_texto['Fichero'])
+        for encontrado in re.findall("SONDA\:.+", pdf_texto['Texto']):
+            if encontrado.find(vdato.upper()) != -1:
+                d['OK_KO'] = "OK"
+                break
+            else:
+                d['OK_KO'] = "KO/VISUAL"
+        if d['OK_KO'] == "KO/VISUAL":
+            V.append('Valor: '+ vdato + '  no coincide con dato extraído de PDF: ' + encontrado +'  . La revisión debe ser VISUAL')
         d['Validacion'] = V
         d['Fecha_Hora'] = datetime.datetime.now()
         return d

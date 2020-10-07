@@ -6,6 +6,7 @@ from principal import listas_comunes
 import datetime
 import logging
 import pandas as pd
+import shutil
 
 #rootDir = 'D:/EMR_Auditorias_Python/Auditorias/LU7385/Carpeta_de_Trabajo/'
 #rootResultados = 'D:/EMR_Auditorias_Python/Auditorias/LU7385/Reporte_Estado_Auditoria/'
@@ -56,7 +57,6 @@ def principal_ant(rootDir, rootResultados, nameFile, ficheros_respaldo):
 
 def principal(rootDir, rootResultados, nameFile, ficheros_respaldo):
     d = dict()
-
     for fichero in procesos_comunes.lista_xml(rootDir):
         logging.debug("Analizando fichero : " + fichero)
         # CREA EL DIRECTORIO SI NO EXISTE
@@ -67,17 +67,26 @@ def principal(rootDir, rootResultados, nameFile, ficheros_respaldo):
         #print(fichero_nombre, fichero_extension)
         analisis = pd.DataFrame(columns=('Etiqueta', 'Valor', 'OK_KO', 'Validacion', 'Fecha_Hora', 'Comparacion'))
 
+        # TRATAMIENTO DE IMÁGENES
+        epdf = procesos_comunes.extrae_imagenes_pdf(fichero, rootDir)
+        ipdf = procesos_comunes.extrae_texto_imagen(fichero, rootDir)
+
         lista = procesos_comunes.estructura_xml_completa(fichero)
         for elemento in lista:
             try:
                 dv = reglas_validacion_new.reglas_validacion_individual(elemento['Etiqueta'], elemento['Regla'],
                                                                         elemento['Valor'],
-                                                                        fichero, ficheros_respaldo, rootDir)
+                                                                        fichero, ficheros_respaldo, rootDir, ipdf)
                 analisis = analisis.append(dv, ignore_index=True)
             except Exception as err:
                 print('Error en ' + e['Etiqueta'] + '   ' + err)
                 logging.debug('Error en ' + e['Etiqueta'] + '   ' + err)
 
+        # ELIMINAR TEMPORALES
+        if os.path.exists(epdf['DirTemporal']):
+            shutil.rmtree(epdf['DirTemporal'], ignore_errors=True)
+
+        # GRABACION EN EL EXCEL
         writer = pd.ExcelWriter(
             os.path.join(rootResultados, nameFile + '_analisis_inidvidual_xml/', fichero_nombre + "_analisis.xlsx"))
         analisis.to_excel(writer, 'Analisis_XML')

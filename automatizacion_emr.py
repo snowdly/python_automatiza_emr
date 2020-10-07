@@ -58,7 +58,7 @@ except Exception as e:
     resumen = resumen.append(r, ignore_index=True)
     logging.debug('Se ha producido un error Proceso de revisión de estructura de ficheros')
     logging.debug(e)
-
+'''
 try:
     logging.debug('Inicia: Compara XMLs')
     print('Inicia: Compara XMLs')
@@ -70,7 +70,7 @@ except Exception as e:
     resumen = resumen.append(r, ignore_index=True)
     logging.debug('Se ha producido un error Proceso de comparación entre XML')
     logging.debug(e)
-
+'''
 try:
     logging.debug('Inicia: Validación de cada XML')
     print('Inicia: Validación de cada XML')
@@ -96,7 +96,7 @@ except Exception as e:
     logging.debug('Se ha producido un error Proceso de consolidado de XML')
     logging.debug(e)
     print(e)
-'''
+
 try:
     logging.debug('Inicia: Proceso de validación con fuentes web')
     r = valida_fuentes_web.principal_a()
@@ -118,7 +118,7 @@ except Exception as e:
     resumen = resumen.append(r, ignore_index=True)
     logging.debug('Se ha producido un error Proceso de validación contra fuentes PDF')
     logging.debug(e)
-'''
+
 # Genera resumen
 writer = pd.ExcelWriter(os.path.join(rutas_trabajo['ruta_auditoria_carpeta_reporte'],  nameFile+'_Resumen.xlsx'))
 resumen.to_excel(writer, 'sheet1')

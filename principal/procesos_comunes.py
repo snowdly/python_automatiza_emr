@@ -13,6 +13,10 @@ from principal import listas_comunes
 import requests
 import xml.dom.minidom
 import PyPDF2
+import pytesseract
+from PIL import Image
+import fitz
+import io
 
 # rootDir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 # print(rootDir)
@@ -599,7 +603,7 @@ def compara_tecnico_competente_pdf(carpeta_trabajo, Dato):
                 if pdf_reader.numPages == 1:
                     responsable_pdf['Paginas'] = pdf_reader.numPages
                     fichero_nombre, fichero_extension = os.path.splitext(os.path.basename(documento))
-                    print("Fichero a ser analizado: " + fichero_nombre + fichero_extension)
+                    #print("Fichero a ser analizado: " + fichero_nombre + fichero_extension)
                     responsable_pdf['Fichero'] = fichero_nombre + fichero_extension
                     page = pdf_reader.getPage(0)
                     texto = page.extractText().replace('\n', '')
@@ -647,3 +651,69 @@ def estructura_xml_completa(fichero_xml):
                 print("Error en " + elemento + child.tag)
                 print(e)
     return lista_d_xml
+
+def extrae_imagenes_pdf(fichero, rootDir):
+    d = dict()
+    fichero_nombre, fichero_extension = os.path.splitext(os.path.basename(fichero))
+    fichero_pdf = fichero.replace('xml', 'pdf')
+    d['Fichero'] = fichero_pdf
+    d['Error'] = ''
+    try:
+        # print(fichero_pdf)
+        pdf_file = fitz.open(fichero_pdf)
+        # print(pdf_file.pageCount)
+        V = []
+        for x in range(pdf_file.pageCount - 2, pdf_file.pageCount):
+
+            # print(x)
+            page = pdf_file[x]
+            image_list = page.getImageList()
+            for image_index, img in enumerate(page.getImageList(), start=1):
+
+                # get the XREF of the image
+                xref = img[0]
+                # extract the image bytes
+                base_image = pdf_file.extractImage(xref)
+                image_bytes = base_image["image"]
+                # get the image extension
+                image_ext = base_image["ext"]
+                # load it to PIL
+                image = Image.open(io.BytesIO(image_bytes))
+
+                # Creamos una nueva carpeta si no existe
+                if not os.path.exists(os.path.join(rootDir, 'Temporal_base', fichero_nombre)):
+                    os.makedirs(os.path.join(rootDir, 'Temporal_base', fichero_nombre))
+
+                # save it to local disk
+                ruta_graba = os.path.join(rootDir, 'Temporal_base', fichero_nombre,
+                                          'image_' + str(x) + '.' + image_ext)
+                image.save(open(ruta_graba, 'wb'))
+                V.append(ruta_graba)
+        V = list(dict.fromkeys(V))
+        d['DirTemporal'] = os.path.join(rootDir, 'Temporal_base')
+        d['Imagenes'] = V
+    except Exception as e:
+        d['DirTemporal'] = ''
+        d['Imagenes'] = ''
+        d['Error'] = 'Error al intentar extraer imágenes del fichero pdf ' + fichero + '  ' + e
+    return d
+
+def extrae_texto_imagen(fichero, rootDir):
+    d = dict()
+    d['Texto'] = ''
+    fichero_nombre, fichero_extension = os.path.splitext(os.path.basename(fichero))
+    d['Fichero'] = fichero_nombre + '.pdf'
+    d['Error'] = 'OK'
+    try:
+        pytesseract.pytesseract.tesseract_cmd = r'C:\Program Files\Tesseract-OCR\tesseract'
+        ruta_imagen =  os.path.join(rootDir, 'Temporal_base', fichero_nombre) #r'D:/EMR_Auditorias_Python/Auditorias/PO6100/Carpeta_de_Trabajo\\Temporal_base\\GALE6100E_GALR6100E_ER1_M_ARCA_112601_1'
+        texto_a_revisar = ''
+        for imagen_pdf in lista_extension(ruta_imagen,'jpeg'):
+            texto_a_revisar = texto_a_revisar + '     ' + pytesseract.image_to_string(imagen_pdf)
+
+        texto_a_revisar = texto_a_revisar.upper()
+        d['Texto'] = texto_a_revisar
+    except Exception as e:
+        d['Texto']=''
+        d['Error'] = 'Error al intentar leer imagen, verifique que se ha instalado en el equipo  el Tesseract-OCR' + e
+    return d

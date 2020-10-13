@@ -5,7 +5,7 @@ from principal import listas_comunes
 import os
 
 
-def reglas_validacion_individual(etiqueta, regla, vdato, fichero, ficheros_respaldo, carpeta_trabajo, pdf_texto):
+def reglas_validacion_individual(etiqueta, regla, vdato, fichero, ficheros_respaldo, carpeta_trabajo, pdf_texto, fichero_texto_cap, fichero_tecnico):
     fichero_nombre, fichero_extension = os.path.splitext(os.path.basename(fichero))
     d = dict()
     V = []
@@ -215,20 +215,26 @@ def reglas_validacion_individual(etiqueta, regla, vdato, fichero, ficheros_respa
     elif regla == 'R_Estacion_Certificada_Datos_Emplazamiento_Codigo_Emplazamiento':
         d['Etiqueta'] = etiqueta
         d['Valor'] = vdato
-        d['OK_KO'] = 'VISUAL'
+        d['OK_KO'] = 'OK'
         d['Validacion'] = ''
         if vdato is None:
             d['OK_KO'] = 'KO'
             V.append('No existe valor')
-        V.append('Para la presente etapa, la validación debe ser visual')
+        intll = procesos_comunes.busca_datos_pdf_texto(vdato, fichero_tecnico['Fichero_Texto'])
+        if len(intll['ListaEncontrados']) > 1:
+            d['OK_KO'] = 'OK'
+        else:
+            d['OK_KO'] = 'KO/VISUAL'
+            V.append('Valor no coincide con información del documento Técnico. Realizar validación VISUAL')
+
         d['Validacion'] = V
         d['Fecha_Hora'] = datetime.datetime.now()
-        d['Comparacion'] = "Se compara con Excel de Códigos INE"
+        d['Comparacion'] = "Se compara con Documento Técnico"
         return d
     elif regla == 'R_Estacion_Certificada_Datos_Emplazamiento_Emplazamiento_Compartido':
         d['Etiqueta'] = etiqueta
         d['Valor'] = vdato
-        d['OK_KO'] = 'VISUAL'
+        d['OK_KO'] = 'OK'
         d['Validacion'] = ''
         if vdato is None:
             d['OK_KO'] = 'KO'
@@ -236,10 +242,23 @@ def reglas_validacion_individual(etiqueta, regla, vdato, fichero, ficheros_respa
         if not re.match("SI|NO", vdato):
             d['OK_KO'] = "KO"
             V.append('Valor debe ser igual a SI ó NO')
-        V.append('Para la presente etapa, la validación debe ser visual')
+        #VALIDACION IA
+        datoreg=''
+        valor_tipo_sistema = procesos_comunes.valor_elemento_xml(fichero,
+                                                                 './/Estacion_Certificada/Datos_Estacion/Tipo_Sistema')
+        for tecnologia in listas_comunes.tabla_tecnologias:
+            if tecnologia['TECNOLOGIA'] == valor_tipo_sistema['Valor'].upper():
+                datoreg = tecnologia['OTRAS']
+                break
+        intll = procesos_comunes.busca_datos_pdf_texto(datoreg, fichero_texto_cap['Fichero_Texto'])
+        otras_tecnologias = 'SI' if len(intll['ListaEncontrados']) > 1 else 'NO'
+        if vdato.upper() != otras_tecnologias.upper():
+            d['OK_KO'] = 'KO/VISUAL'
+            V.append('Valor no coincide con información del documento CAP. Realizar validación VISUAL')
+        #V.append('Para la presente etapa, la validación debe ser visual')
         d['Validacion'] = V
         d['Fecha_Hora'] = datetime.datetime.now()
-        d['Comparacion'] = "Se compara con Excel de Códigos INE"
+        d['Comparacion'] = "Se compara con información del documento CAP"
         return d
     elif regla == 'R_Estacion_Certificada_Datos_Emplazamiento_Cod_INE_Termino_Municipal':
         d['Etiqueta'] = etiqueta
@@ -286,12 +305,21 @@ def reglas_validacion_individual(etiqueta, regla, vdato, fichero, ficheros_respa
     elif regla == 'R_Estacion_Certificada_Datos_Emplazamiento_Latitud':
         d['Etiqueta'] = etiqueta
         d['Valor'] = vdato
-        d['OK_KO'] = 'VISUAL'
+        d['OK_KO'] = 'OK'
         d['Validacion'] = ''
         if vdato is None:
             d['OK_KO'] = 'KO'
             V.append('No existe valor')
-        V.append('Para la presente etapa, la validación debe ser visual')
+
+        # VALIDACION IA
+        datoreg = 'LATITUD(\W)*' + vdato
+        intll = procesos_comunes.busca_datos_pdf_texto(datoreg, fichero_tecnico['Fichero_Texto'])
+        if len(intll['ListaEncontrados']) >= 1:
+            d['OK_KO'] = 'OK'
+        else:
+            d['OK_KO'] = 'KO/VISUAL'
+            V.append('Valor no coincide con información del documento Técnico. Realizar validación VISUAL')
+
         d['Validacion'] = V
         d['Fecha_Hora'] = datetime.datetime.now()
         d['Comparacion'] = "Se compara con información obtenida de la página web de Infoantenas"
@@ -299,12 +327,21 @@ def reglas_validacion_individual(etiqueta, regla, vdato, fichero, ficheros_respa
     elif regla == 'R_Estacion_Certificada_Datos_Emplazamiento_Longitud':
         d['Etiqueta'] = etiqueta
         d['Valor'] = vdato
-        d['OK_KO'] = 'VISUAL'
+        d['OK_KO'] = 'OK'
         d['Validacion'] = ''
         if vdato is None:
             d['OK_KO'] = 'KO'
             V.append('No existe valor')
-        V.append('Para la presente etapa, la validación debe ser visual')
+
+        # VALIDACION IA
+        datoreg = 'LONGITUD(\W)*' + vdato
+        intll = procesos_comunes.busca_datos_pdf_texto(datoreg, fichero_tecnico['Fichero_Texto'])
+        if len(intll['ListaEncontrados']) >= 1:
+            d['OK_KO'] = 'OK'
+        else:
+            d['OK_KO'] = 'KO/VISUAL'
+            V.append('Valor no coincide con información del documento Técnico. Realizar validación VISUAL')
+
         d['Validacion'] = V
         d['Fecha_Hora'] = datetime.datetime.now()
         d['Comparacion'] = "Se compara con información obtenida de la página web de Infoantenas"
@@ -524,7 +561,7 @@ def reglas_validacion_individual(etiqueta, regla, vdato, fichero, ficheros_respa
     elif regla == 'R_Estacion_Certificada_Datos_Estacion_Tipo_Estacion':
         d['Etiqueta'] = etiqueta
         d['Valor'] = vdato
-        d['OK_KO'] = 'VISUAL'
+        d['OK_KO'] = 'OK/VISUAL'
         d['Validacion'] = ''
         if vdato is None:
             d['OK_KO'] = 'KO'
@@ -569,7 +606,7 @@ def reglas_validacion_individual(etiqueta, regla, vdato, fichero, ficheros_respa
     elif regla == 'R_Estacion_Certificada_Datos_Estacion_Num_Sectores_Interiores':
         d['Etiqueta'] = etiqueta
         d['Valor'] = vdato
-        d['OK_KO'] = 'VISUAL'
+        d['OK_KO'] = 'OK/VISUAL'
         d['Validacion'] = ''
         if vdato is None:
             d['OK_KO'] = 'KO'
@@ -595,7 +632,7 @@ def reglas_validacion_individual(etiqueta, regla, vdato, fichero, ficheros_respa
     elif regla == 'R_Estacion_Certificada_Datos_Estacion_Num_Sectores_Exteriores':
         d['Etiqueta'] = etiqueta
         d['Valor'] = vdato
-        d['OK_KO'] = 'VISUAL'
+        d['OK_KO'] = 'OK/VISUAL'
         d['Validacion'] = ''
         if vdato is None:
             d['OK_KO'] = 'KO'
@@ -898,9 +935,18 @@ def reglas_validacion_individual(etiqueta, regla, vdato, fichero, ficheros_respa
     elif regla == 'R_Informe_Medidas_Puntos_Medida_Punto_Medida_Punto_Sensible_Situacion':
         d['Etiqueta'] = etiqueta
         d['Valor'] = vdato
-        d['OK_KO'] = 'VISUAL'
+        d['OK_KO'] = 'OK'
         d['Validacion'] = ''
-        V.append('Para la presente etapa, la validación debe ser visual')
+
+        # VALIDACION IA
+        intll = procesos_comunes.busca_datos_pdf_texto(vdato.upper(), fichero_tecnico['Fichero_Texto'])
+        if len(intll['ListaEncontrados']) >= 1:
+            d['OK_KO'] = 'OK'
+        else:
+            d['OK_KO'] = 'KO/VISUAL'
+            V.append('Valor no coincide con información del documento Técnico. Realizar validación VISUAL')
+
+        #V.append('Para la presente etapa, la validación debe ser visual')
         d['Validacion'] = V
         d['Fecha_Hora'] = datetime.datetime.now()
         return d
@@ -915,13 +961,29 @@ def reglas_validacion_individual(etiqueta, regla, vdato, fichero, ficheros_respa
         if not re.match('HS|ES|PP|RA', vdato):
             d['OK_KO'] = 'KO'
             V.append('Valores HS|ES|PP|RA')
+        #VALIDACION IA
+        nombrevia = procesos_comunes.valor_elemento_xml(fichero,
+                                                            './/Informe_Medidas/Puntos_Medida/Punto_Medida/Punto_Sensible/Nombre_Via')
+        intll = procesos_comunes.busca_datos_pdf_texto(nombrevia['Valor'].upper(), fichero_tecnico['Fichero_Texto'])
+        if len(intll['ListaEncontrados']) >= 1:
+            for encontrado in intll['ListaEncontrados']:
+                if encontrado.find(vdato.upper()) != -1:
+                    d['OK_KO'] = "OK"
+                    break
+                else:
+                    d['OK_KO'] = "KO/VISUAL"
+                    V.append('Valor no coincide con información del documento Técnico. Realizar validación VISUAL')
+        else:
+            d['OK_KO'] = 'KO/VISUAL'
+            V.append('Valor no coincide con información del documento Técnico. Realizar validación VISUAL')
+
         d['Validacion'] = V
         d['Fecha_Hora'] = datetime.datetime.now()
         return d
     elif regla == 'R_Informe_Medidas_Puntos_Medida_Punto_Medida_Punto_Sensible_Tipo_Via':
         d['Etiqueta'] = etiqueta
         d['Valor'] = vdato
-        d['OK_KO'] = 'VISUAL'
+        d['OK_KO'] = 'OK'
         d['Validacion'] = ''
         if vdato is None:
             d['OK_KO'] = 'KO'
@@ -929,26 +991,50 @@ def reglas_validacion_individual(etiqueta, regla, vdato, fichero, ficheros_respa
         if not re.match('AV|BU|CL|CM|CR|GL|PJ|PS|PZ|RB|RD|TR|VP', vdato):
             d['OK_KO'] = 'KO'
             V.append('Valores AV|BU|CL|CM|CR|GL|PJ|PS|PZ|RB|RD|TR|VP')
-        V.append('Para la presente etapa, la validación debe ser visual')
+
+        # VALIDACION IA
+        nombrevia = procesos_comunes.valor_elemento_xml(fichero,
+                                                        './/Informe_Medidas/Puntos_Medida/Punto_Medida/Punto_Sensible/Nombre_Via')
+        intll = procesos_comunes.busca_datos_pdf_texto(nombrevia['Valor'].upper(), fichero_tecnico['Fichero_Texto'])
+        if len(intll['ListaEncontrados']) >= 1:
+            for encontrado in intll['ListaEncontrados']:
+                if encontrado.find(vdato.upper()) != -1:
+                    d['OK_KO'] = "OK"
+                    break
+                else:
+                    d['OK_KO'] = "KO/VISUAL"
+                    V.append('Valor no coincide con información del documento Técnico. Realizar validación VISUAL')
+        else:
+            d['OK_KO'] = 'KO/VISUAL'
+            V.append('Valor no coincide con información del documento Técnico. Realizar validación VISUAL')
+
+        #V.append('Para la presente etapa, la validación debe ser visual')
         d['Validacion'] = V
         d['Fecha_Hora'] = datetime.datetime.now()
         return d
     elif regla == 'R_Informe_Medidas_Puntos_Medida_Punto_Medida_Punto_Sensible_Nombre_Via':
         d['Etiqueta'] = etiqueta
         d['Valor'] = vdato
-        d['OK_KO'] = 'VISUAL'
+        d['OK_KO'] = 'OK'
         d['Validacion'] = ''
         if vdato is None:
             d['OK_KO'] = 'KO'
             V.append('No existe valor')
-        V.append('Para la presente etapa, la validación debe ser visual')
+        # VALIDACION IA
+        intll = procesos_comunes.busca_datos_pdf_texto(vdato.upper(), fichero_tecnico['Fichero_Texto'])
+        if len(intll['ListaEncontrados']) >= 1:
+            d['OK_KO'] = 'OK'
+        else:
+            d['OK_KO'] = 'KO/VISUAL'
+            V.append('Valor no coincide con información del documento Técnico. Realizar validación VISUAL')
+        #V.append('Para la presente etapa, la validación debe ser visual')
         d['Validacion'] = V
         d['Fecha_Hora'] = datetime.datetime.now()
         return d
     elif regla == 'R_Informe_Medidas_Puntos_Medida_Punto_Medida_Punto_Sensible_Numero_Portal':
         d['Etiqueta'] = etiqueta
         d['Valor'] = vdato
-        d['OK_KO'] = 'VISUAL'
+        d['OK_KO'] = 'OK'
         d['Validacion'] = ''
         if vdato is None:
             d['OK_KO'] = 'KO'
@@ -956,7 +1042,23 @@ def reglas_validacion_individual(etiqueta, regla, vdato, fichero, ficheros_respa
         if not (vdato == 'S/N' or vdato.isdigit() or vdato == 'SN'):
             d['OK_KO'] = 'KO'
             V.append('Debe ser número o S/N')
-        V.append('Para la presente etapa, la validación debe ser visual')
+
+        # VALIDACION IA
+        nombrevia = procesos_comunes.valor_elemento_xml(fichero,
+                                                        './/Informe_Medidas/Puntos_Medida/Punto_Medida/Punto_Sensible/Nombre_Via')
+        intll = procesos_comunes.busca_datos_pdf_texto(nombrevia['Valor'].upper(), fichero_tecnico['Fichero_Texto'])
+        if len(intll['ListaEncontrados']) >= 1:
+            for encontrado in intll['ListaEncontrados']:
+                if encontrado.find(vdato.upper()) != -1:
+                    d['OK_KO'] = "OK"
+                    break
+                else:
+                    d['OK_KO'] = "KO/VISUAL"
+                    V.append('Valor no coincide con información del documento Técnico. Realizar validación VISUAL')
+        else:
+            d['OK_KO'] = 'KO/VISUAL'
+            V.append('Valor no coincide con información del documento Técnico. Realizar validación VISUAL')
+        #V.append('Para la presente etapa, la validación debe ser visual')
         d['Validacion'] = V
         d['Fecha_Hora'] = datetime.datetime.now()
         return d

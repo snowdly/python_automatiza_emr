@@ -17,6 +17,7 @@ import pytesseract
 from PIL import Image
 import fitz
 import io
+from pdf2image import convert_from_path
 
 # rootDir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 # print(rootDir)
@@ -35,7 +36,7 @@ def genera_rutas_trabajo():
     auditoria_carpeta = 'Auditorias/'
     ficheros_respaldo_carpeta = 'Ficheros_Respaldo/'
     logs_carpeta = 'Logs/'
-    #parentDir = os.getcwd()
+    # parentDir = os.getcwd()
     parentDir = os.path.dirname(os.path.abspath('D:/EMR_Auditorias_Python/automatizacion_emr.exe'))
     rutas_base = dict()
     rutas_base['ruta_base'] = parentDir
@@ -68,7 +69,7 @@ def consulta_api_catastro(RC):
         response = requests.get(url=URL, params=PARAMS)
         # print(response.content)
         # guardar fichero temporal
-        #parentDir = os.getcwd()
+        # parentDir = os.getcwd()
         parentDir = os.path.dirname(os.path.abspath('D:/EMR_Auditorias_Python/automatizacion_emr.exe'))
         fichero_xml = os.path.join(parentDir, 'Consulta_DNPRC.xml')
         with open(fichero_xml, 'wb') as f:
@@ -164,6 +165,7 @@ def lista_pdf(rootDir):
                 files_in_dir.append(os.path.join(r, item))
     return files_in_dir
 
+
 # Función para ubicar cada fichero con un extension determinada, retorna una lista
 def lista_extension(rootDir, extension):
     # r=>root, d=>directories, f=>files
@@ -173,6 +175,7 @@ def lista_extension(rootDir, extension):
             if '.' + extension in item:
                 files_in_dir.append(os.path.join(r, item))
     return files_in_dir
+
 
 # Función para ubicar cada fichero con un extension determinada, retorna una lista
 def lista_extension_primero(rootDir, extension):
@@ -184,6 +187,7 @@ def lista_extension_primero(rootDir, extension):
                 files_in_dir.append(os.path.join(r, item))
                 break
     return files_in_dir
+
 
 # Funcion para preparar carpetas de trabajo
 def prepara_carpetas_trabajo(rootDir):
@@ -603,13 +607,14 @@ def compara_tecnico_competente_pdf(carpeta_trabajo, Dato):
                 if pdf_reader.numPages == 1:
                     responsable_pdf['Paginas'] = pdf_reader.numPages
                     fichero_nombre, fichero_extension = os.path.splitext(os.path.basename(documento))
-                    #print("Fichero a ser analizado: " + fichero_nombre + fichero_extension)
+                    # print("Fichero a ser analizado: " + fichero_nombre + fichero_extension)
                     responsable_pdf['Fichero'] = fichero_nombre + fichero_extension
                     page = pdf_reader.getPage(0)
                     texto = page.extractText().replace('\n', '')
                     if texto == '':
                         responsable_pdf['OK_KO'] = 'KO'
-                        responsable_pdf['Error'] = 'El fichero PDF: '+ fichero_nombre + fichero_extension+', no se han podido procesar'
+                        responsable_pdf[
+                            'Error'] = 'El fichero PDF: ' + fichero_nombre + fichero_extension + ', no se han podido procesar'
                     else:
                         if not re.findall(Dato, texto):
                             responsable_pdf['OK_KO'] = 'KO'
@@ -627,9 +632,10 @@ def compara_tecnico_competente_pdf(carpeta_trabajo, Dato):
                 responsable_pdf['Error'] = 'No se han podido procesar los ficheros pdf'
     else:
         responsable_pdf['OK_KO'] = 'KO'
-        responsable_pdf['Error'] = 'No se han podido encontrar ningún pdf, que contengan las características de '\
+        responsable_pdf['Error'] = 'No se han podido encontrar ningún pdf, que contengan las características de ' \
                                    'una Declaración de Responsable'
     return responsable_pdf
+
 
 def estructura_xml_completa(fichero_xml):
     tree = ElementTree.parse(fichero_xml)
@@ -651,6 +657,7 @@ def estructura_xml_completa(fichero_xml):
                 print("Error en " + elemento + child.tag)
                 print(e)
     return lista_d_xml
+
 
 def extrae_imagenes_pdf(fichero, rootDir):
     d = dict()
@@ -698,6 +705,7 @@ def extrae_imagenes_pdf(fichero, rootDir):
         d['Error'] = 'Error al intentar extraer imágenes del fichero pdf ' + fichero + '  ' + e
     return d
 
+
 def extrae_texto_imagen(fichero, rootDir):
     d = dict()
     d['Texto'] = ''
@@ -706,14 +714,197 @@ def extrae_texto_imagen(fichero, rootDir):
     d['Error'] = 'OK'
     try:
         pytesseract.pytesseract.tesseract_cmd = r'C:\Program Files\Tesseract-OCR\tesseract'
-        ruta_imagen =  os.path.join(rootDir, 'Temporal_base', fichero_nombre) #r'D:/EMR_Auditorias_Python/Auditorias/PO6100/Carpeta_de_Trabajo\\Temporal_base\\GALE6100E_GALR6100E_ER1_M_ARCA_112601_1'
+        ruta_imagen = os.path.join(rootDir, 'Temporal_base',
+                                   fichero_nombre)  # r'D:/EMR_Auditorias_Python/Auditorias/PO6100/Carpeta_de_Trabajo\\Temporal_base\\GALE6100E_GALR6100E_ER1_M_ARCA_112601_1'
         texto_a_revisar = ''
-        for imagen_pdf in lista_extension(ruta_imagen,'jpeg'):
+        for imagen_pdf in lista_extension(ruta_imagen, 'jpeg'):
             texto_a_revisar = texto_a_revisar + '     ' + pytesseract.image_to_string(imagen_pdf)
 
         texto_a_revisar = texto_a_revisar.upper()
         d['Texto'] = texto_a_revisar
     except Exception as e:
-        d['Texto']=''
+        d['Texto'] = ''
         d['Error'] = 'Error al intentar leer imagen, verifique que se ha instalado en el equipo  el Tesseract-OCR' + e
+    return d
+
+
+# RETORNA EL FICHERO CAP
+def busca_cap_pdf(rootDir):
+    # r=>root, d=>directories, f=>files
+    files_in_dir = []
+    for r, d, f in os.walk(rootDir):
+        for item in f:
+            if '.pdf' in item:
+                if item.upper().find('_CAP_') != -1:
+                    files_in_dir.append(os.path.join(r, item))
+    return files_in_dir
+
+
+# TRANSFORMA UN PICHERO PDF EN TEXTO POR MEDIO DE OCR
+def fichero_cap_a_texto(PDF_file, ficheros_respaldo, carpeta_trabajo, nameFile, nameTemp):
+    d = dict()
+    fichero_nombre, fichero_extension = os.path.splitext(os.path.basename(PDF_file))
+    tempDir = os.path.join(carpeta_trabajo, nameTemp)
+    if not os.path.exists(tempDir):
+        os.makedirs(tempDir)
+    try:
+        '''
+        Part #1 : Converting PDF to images
+        '''
+        # Store all the pages of the PDF in a variable
+        pages = convert_from_path(PDF_file, poppler_path=os.path.join(ficheros_respaldo, 'poppler-0.68.0/bin'))
+        # Counter to store images of each page of PDF to image
+        image_counter = 1
+        # Iterate through all the pages stored above
+        for page in pages:
+            filename = "page_" + str(image_counter) + ".jpg"
+            # Save the image of the page in system
+            page.save(os.path.join(tempDir, nameFile + '_'+ filename), 'JPEG')
+            # Increment the counter to update filename
+            image_counter = image_counter + 1
+
+        ''' 
+        Part #2 - Recognizing text from the images using OCR 
+        '''
+        # Variable to get count of total number of pages
+        filelimit = image_counter - 1
+        # Creating a text file to write the output
+        outfile = os.path.join(tempDir, nameFile + "_text.txt")
+        # Open the file in append mode so that
+        # All contents of all images are added to the same file
+        f = open(outfile, "a")
+        pytesseract.pytesseract.tesseract_cmd = r'C:\Program Files\Tesseract-OCR\tesseract'
+        # https://tesseract-ocr.github.io/tessdoc/4.0-with-LSTM.html#400-alpha-for-windows
+        # https://github.com/UB-Mannheim/tesseract/wiki
+
+        # Iterate from 1 to total number of pages
+        for i in range(1, filelimit + 1):
+            # Set filename to recognize text from
+            # Again, these files will be:
+            # page_1.jpg
+            # page_2.jpg
+            # ....
+            # page_n.jpg
+            filename = "page_" + str(i) + ".jpg"
+
+            # Recognize the text as string in image using pytesserct
+            text = str(((pytesseract.image_to_string(Image.open(os.path.join(tempDir, nameFile + '_'+ filename))))))
+
+            # The recognized text is stored in variable text
+            # Any string processing may be applied on text
+            # Here, basic formatting has been done:
+            # In many PDFs, at line ending, if a word can't
+            # be written fully, a 'hyphen' is added.
+            # The rest of the word is written in the next line
+            # Eg: This is a sample text this word here GeeksF-
+            # orGeeks is half on first line, remaining on next.
+            # To remove this, we replace every '-\n' to ''.
+            text = text.replace('-\n', '')
+
+            # Finally, write the processed text to the file.
+            f.write(text)
+
+        # Close the file after writing all the text.
+        f.close()
+        d['Fichero_Texto'] = outfile
+        d['Error'] = ''
+
+    except Exception as e:
+        d['Fichero_Texto'] = ''
+        d['Error'] = 'Error al convertir en texto el fichero ' + PDF_file + '   ' + e
+
+    return d
+
+
+# TRANSFORMA UN FICHERO PDF EN TEXTO POR MEDIO DE OCR
+def fichero_pdf_imagen_texto(PDF_file, ficheros_respaldo, carpeta_trabajo, nameTemp):
+    d = dict()
+    fichero_nombre, fichero_extension = os.path.splitext(os.path.basename(PDF_file))
+    tempDir = os.path.join(carpeta_trabajo, nameTemp, fichero_nombre)
+    if not os.path.exists(tempDir):
+        os.makedirs(tempDir)
+    try:
+        '''
+        Part #1 : Converting PDF to images
+        '''
+        # Store all the pages of the PDF in a variable
+        pages = convert_from_path(PDF_file, poppler_path=os.path.join(ficheros_respaldo, 'poppler-0.68.0/bin'))
+        # Counter to store images of each page of PDF to image
+        image_counter = 1
+        # Iterate through all the pages stored above
+        for page in pages:
+            filename = "page_" + str(image_counter) + ".jpg"
+            # Save the image of the page in system
+            page.save(os.path.join(tempDir, fichero_nombre + '_'+ filename), 'JPEG')
+            # Increment the counter to update filename
+            image_counter = image_counter + 1
+
+        ''' 
+        Part #2 - Recognizing text from the images using OCR 
+        '''
+        # Variable to get count of total number of pages
+        filelimit = image_counter - 1
+        # Creating a text file to write the output
+        outfile = os.path.join(tempDir, fichero_nombre + "_text.txt")
+        # Open the file in append mode so that
+        # All contents of all images are added to the same file
+        f = open(outfile, "a")
+        pytesseract.pytesseract.tesseract_cmd = r'C:\Program Files\Tesseract-OCR\tesseract'
+        # https://tesseract-ocr.github.io/tessdoc/4.0-with-LSTM.html#400-alpha-for-windows
+        # https://github.com/UB-Mannheim/tesseract/wiki
+
+        # Iterate from 1 to total number of pages
+        for i in range(1, filelimit + 1):
+            # Set filename to recognize text from
+            # Again, these files will be:
+            # page_1.jpg
+            # page_2.jpg
+            # ....
+            # page_n.jpg
+            filename = "page_" + str(i) + ".jpg"
+
+            # Recognize the text as string in image using pytesserct
+            text = str(((pytesseract.image_to_string(Image.open(os.path.join(tempDir, fichero_nombre + '_'+ filename)))))).upper()
+
+            # The recognized text is stored in variable text
+            # Any string processing may be applied on text
+            # Here, basic formatting has been done:
+            # In many PDFs, at line ending, if a word can't
+            # be written fully, a 'hyphen' is added.
+            # The rest of the word is written in the next line
+            # Eg: This is a sample text this word here GeeksF-
+            # orGeeks is half on first line, remaining on next.
+            # To remove this, we replace every '-\n' to ''.
+            text = text.replace('-\n', '')
+
+            # Finally, write the processed text to the file.
+            f.write(text)
+
+        # Close the file after writing all the text.
+        f.close()
+        d['Fichero_Texto'] = outfile
+        d['Error'] = ''
+
+    except Exception as e:
+        d['Fichero_Texto'] = ''
+        d['Error'] = 'Error al convertir en texto el fichero ' + PDF_file + '   ' + e
+
+    return d
+
+# BUSCA DATOS EN EL TEXTO OBTENIDO POR IA
+def busca_datos_pdf_texto(datoreg, filename):
+    d = dict()
+    lista_encontrados = []
+    d['Error'] = ''
+    try:
+        pattern = re.compile(datoreg, re.IGNORECASE)
+        with open(filename, "rt") as myfile:
+            for line in myfile:
+                if pattern.search(line) != None:
+                    # print(line, end='')
+                    lista_encontrados.append(line)
+    except Exception as e:
+        d['ListaEncontrados'] = lista_encontrados
+        d['Error'] = 'Error al buscar datos en  ' + filename + '   ' + e
+    d['ListaEncontrados'] = lista_encontrados
     return d

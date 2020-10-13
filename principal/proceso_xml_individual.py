@@ -55,8 +55,26 @@ def principal_ant(rootDir, rootResultados, nameFile, ficheros_respaldo):
     r['Fecha'] = datetime.datetime.now()
     return r
 
+def genera_fichero_texto_desde_pdf_cap(rootDir, rootResultados, nameFile, ficheros_respaldo):
+    fichero_cap=procesos_comunes.busca_cap_pdf(rootDir)
+    if len(fichero_cap)>0:
+        r = procesos_comunes.fichero_cap_a_texto(fichero_cap, ficheros_respaldo, rootDir, nameFile)
+
+
 def principal(rootDir, rootResultados, nameFile, ficheros_respaldo):
     d = dict()
+
+    # GENERA FICHERO DE TEXTO DESDE PDF CAP
+    fichero_cap = procesos_comunes.busca_cap_pdf(rootDir)
+    if len(fichero_cap) > 0:
+        print("Inicia conversión a texto de fichero: " + fichero_cap[0])
+        fichero_texto_cap = procesos_comunes.fichero_pdf_imagen_texto(fichero_cap[0], ficheros_respaldo, rootDir, 'Conversion_Fichero_CAP')
+        print("Finaliza conversión a texto de fichero: " + fichero_cap[0])
+    # ----
+    #fichero_texto_cap = dict()
+    #fichero_texto_cap['Fichero_Texto']= r'D:\EMR_Auditorias_Python\Conversion_Fichero_CAP\s0700_n0001_r00_GAL6100_JUMPING_CAP_V1\s0700_n0001_r00_GAL6100_JUMPING_CAP_V1_text.txt'
+    #fichero_texto_cap['Error']=''
+
     for fichero in procesos_comunes.lista_xml(rootDir):
         logging.debug("Analizando fichero : " + fichero)
         # CREA EL DIRECTORIO SI NO EXISTE
@@ -71,16 +89,33 @@ def principal(rootDir, rootResultados, nameFile, ficheros_respaldo):
         epdf = procesos_comunes.extrae_imagenes_pdf(fichero, rootDir)
         ipdf = procesos_comunes.extrae_texto_imagen(fichero, rootDir)
 
+        # GENERA FICHERO DE TEXTO DESDE PDF TECNICO
+        print("Inicia conversión a texto de fichero: " + fichero.replace('xml', 'pdf'))
+        fichero_tecnico = procesos_comunes.fichero_pdf_imagen_texto(fichero.replace('xml', 'pdf'), ficheros_respaldo, rootDir , 'Conversion_Fichero_Tecnico')
+        print("Finaliza conversión a texto de fichero: " + fichero.replace('xml', 'pdf'))
+        # ---
+        #fichero_tecnico = dict()
+        #fichero_tecnico['Fichero_Texto']=os.path.join(r'D:\EMR_Auditorias_Python','Conversion_Fichero_Tecnico', fichero_nombre, fichero_nombre + '_text.txt')
+        #fichero_tecnico['Error']=''
+
         lista = procesos_comunes.estructura_xml_completa(fichero)
         for elemento in lista:
             try:
                 dv = reglas_validacion_new.reglas_validacion_individual(elemento['Etiqueta'], elemento['Regla'],
-                                                                        elemento['Valor'],
-                                                                        fichero, ficheros_respaldo, rootDir, ipdf)
+                                                                        '' if elemento['Valor'] is None else elemento['Valor'],
+                                                                        fichero, ficheros_respaldo, rootDir, ipdf,
+                                                                        fichero_texto_cap, fichero_tecnico)
+                # Se agrega comparación desde el listado
+                for completa in listas_comunes.lista_completa :
+                    if completa['Etiqueta'] == elemento['Etiqueta']:
+                        dv['Comparacion']=completa['Comparacion']
+                        break
+                # -----------------------------------------------
+
                 analisis = analisis.append(dv, ignore_index=True)
             except Exception as err:
-                print('Error en ' + e['Etiqueta'] + '   ' + err)
-                logging.debug('Error en ' + e['Etiqueta'] + '   ' + err)
+                print('Error en ' + elemento['Etiqueta'] + '   ' + err)
+                logging.debug('Error en ' + elemento['Etiqueta'] + '   ' + err)
 
         # ELIMINAR TEMPORALES
         if os.path.exists(epdf['DirTemporal']):
@@ -120,24 +155,27 @@ def genera_resumen_xml(rootDirResultados, nameFile):
         df = pd.read_excel(fichero, na_values=[''], ignore_index=True)
         array_df.append(df)
 
-    # Obtenemos cada fila de cada excel
-    similares = pd.DataFrame(columns=('Etiqueta', 'Valor', 'OK_KO', 'Validacion', 'Comparacion'))
-    d = dict()
-    for i in range(len(lista_etiquetas) - 1):
-        for elemento_df in array_df:
-            d['Etiqueta'] = elemento_df.iloc[i]['Etiqueta']
-            d['Valor'] = elemento_df.iloc[i]['Valor']
-            d['OK_KO'] = elemento_df.iloc[i]['OK_KO']
-            d['Validacion'] = elemento_df.iloc[i]['Validacion']
-            d['Comparacion'] = elemento_df.iloc[i]['Comparacion']
-            similares = similares.append(d, ignore_index=True)
+    #Solo se realiza si existen 2 o mas excel
+    if len(array_df)>=2:
 
-    unicos = similares.drop_duplicates()
-    if unicos['Etiqueta'].count() > 1:
-        writer = pd.ExcelWriter(
-            os.path.join(rootDirResultados, nameFile + '_analisis_inidvidual_xml/', nameFile + "_CONSOLIDADO_analisis.xlsx"))
-        unicos.to_excel(writer, 'CONSOLIDADO_XML')
-        writer.save()
+        # Obtenemos cada fila de cada excel
+        similares = pd.DataFrame(columns=('Etiqueta', 'Valor', 'OK_KO', 'Validacion', 'Comparacion'))
+        d = dict()
+        for i in range(len(lista_etiquetas) - 1):
+            for elemento_df in array_df:
+                d['Etiqueta'] = elemento_df.iloc[i]['Etiqueta']
+                d['Valor'] = elemento_df.iloc[i]['Valor']
+                d['OK_KO'] = elemento_df.iloc[i]['OK_KO']
+                d['Validacion'] = elemento_df.iloc[i]['Validacion']
+                d['Comparacion'] = elemento_df.iloc[i]['Comparacion']
+                similares = similares.append(d, ignore_index=True)
+
+        unicos = similares.drop_duplicates()
+        if unicos['Etiqueta'].count() > 1:
+            writer = pd.ExcelWriter(
+                os.path.join(rootDirResultados, nameFile + '_analisis_inidvidual_xml/', nameFile + "_CONSOLIDADO_analisis.xlsx"))
+            unicos.to_excel(writer, 'CONSOLIDADO_XML')
+            writer.save()
 
     # Retorna resultado del proceso
     r = dict()

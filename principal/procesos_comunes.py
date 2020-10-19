@@ -36,7 +36,7 @@ def genera_rutas_trabajo():
     auditoria_carpeta = 'Auditorias/'
     ficheros_respaldo_carpeta = 'Ficheros_Respaldo/'
     logs_carpeta = 'Logs/'
-    # parentDir = os.getcwd()
+    #parentDir = os.getcwd()
     parentDir = os.path.dirname(os.path.abspath('D:/EMR_Auditorias_Python/automatizacion_emr.exe'))
     rutas_base = dict()
     rutas_base['ruta_base'] = parentDir
@@ -69,7 +69,7 @@ def consulta_api_catastro(RC):
         response = requests.get(url=URL, params=PARAMS)
         # print(response.content)
         # guardar fichero temporal
-        # parentDir = os.getcwd()
+        #parentDir = os.getcwd()
         parentDir = os.path.dirname(os.path.abspath('D:/EMR_Auditorias_Python/automatizacion_emr.exe'))
         fichero_xml = os.path.join(parentDir, 'Consulta_DNPRC.xml')
         with open(fichero_xml, 'wb') as f:

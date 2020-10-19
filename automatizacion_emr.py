@@ -120,9 +120,9 @@ except Exception as e:
     logging.debug(e)
 
 # Genera resumen
-writer = pd.ExcelWriter(os.path.join(rutas_trabajo['ruta_auditoria_carpeta_reporte'],  nameFile+'_Resumen.xlsx'))
-resumen.to_excel(writer, 'sheet1')
-writer.save()
+#writer = pd.ExcelWriter(os.path.join(rutas_trabajo['ruta_auditoria_carpeta_reporte'],  nameFile+'_Resumen.xlsx'))
+##resumen.to_excel(writer, 'sheet1')
+#writer.save()
 
 # Procesos despues del Resumen
 try:
@@ -170,4 +170,4 @@ print("******************************** Ejecución terminada correctamente *****
 print("")
 print("************************************************************************************************")
 print("")
-wait = input("                            Presione ENTER para terminar.")
+wait = input("                            Puede cerrar la ventana.")

@@ -382,8 +382,7 @@ def reglas_validacion_individual(etiqueta, regla, vdato, fichero, ficheros_respa
         '''
         if len(vdato.strip()) < 20:
             d['OK_KO'] = 'OK'
-            V.append('La longitud de la Referencia Catastral es inferior a la requerida, ' \
-                                      'debe validar visualmente los datos ')
+            V.append('Datos no coinciden, revisar visualmente en web')
         '''
         d['Validacion'] = V
         d['Fecha_Hora'] = datetime.datetime.now()
@@ -417,7 +416,7 @@ def reglas_validacion_individual(etiqueta, regla, vdato, fichero, ficheros_respa
         if r_api_catastro['OK_KO'] == 'OK':
             if str(r_api_catastro['nombre_municipio']).strip().upper() != str(vdato).strip().upper():
                 d['OK_KO'] = 'KO'
-                V.append('El valor no coincide con los datos de catastro')
+                V.append('Datos no coinciden, revisar visualmente en web')
         else:
             d['OK_KO'] = 'KO'
             V.append(r_api_catastro['ERROR'])
@@ -449,7 +448,7 @@ def reglas_validacion_individual(etiqueta, regla, vdato, fichero, ficheros_respa
         if r_api_catastro['OK_KO'] == 'OK':
             if str(r_api_catastro['tipo_via']).strip().upper() != str(vdato).strip().upper():
                 d['OK_KO'] = 'KO'
-                V.append('El valor no coincide con los datos de catastro')
+                V.append('Datos no coinciden, revisar visualmente en web')
         else:
             d['OK_KO'] = 'KO'
             V.append(r_api_catastro['ERROR'])
@@ -477,7 +476,7 @@ def reglas_validacion_individual(etiqueta, regla, vdato, fichero, ficheros_respa
         if r_api_catastro['OK_KO'] == 'OK':
             if str(r_api_catastro['nombre_via']).strip().upper() != str(vdato).strip().upper():
                 d['OK_KO'] = 'KO'
-                V.append('El valor no coincide con los datos de catastro')
+                V.append('Datos no coinciden, revisar visualmente en web')
         else:
             d['OK_KO'] = 'KO'
             V.append(r_api_catastro['ERROR'])
@@ -500,13 +499,13 @@ def reglas_validacion_individual(etiqueta, regla, vdato, fichero, ficheros_respa
         if r_api_catastro['OK_KO'] == 'OK':
             if str(r_api_catastro['numero_portal']).strip().upper() != str(vdato).strip().upper():
                 d['OK_KO'] = 'KO'
-                V.append('El valor no coincide con los datos de catastro')
+                V.append('Datos no coinciden, revisar visualmente en web')
         else:
             d['OK_KO'] = 'KO'
             V.append(r_api_catastro['ERROR'])
         d['Validacion'] = V
         d['Fecha_Hora'] = datetime.datetime.now()
-        d['Comparacion'] = "Se compara con el dato recogido de la página web de sede catastro"
+        d['Comparacion'] = "Datos no coinciden, revisar visualmente en web"
         return d
     elif regla == 'R_Estacion_Certificada_Datos_Emplazamiento_Calle_Situacion':
         d['Etiqueta'] = etiqueta
@@ -569,7 +568,7 @@ def reglas_validacion_individual(etiqueta, regla, vdato, fichero, ficheros_respa
         if not re.match("ER1|ER2|ER3|ER4|ER5", vdato):
             d['OK_KO'] = "KO"
             V.append('Valor debe ser igual a ER1|ER2|ER3|ER4|ER5')
-        V.append('Para la presente etapa, la validación debe ser visual')
+        V.append('Dato con coherencia, pendiente validarse visualmente')
         d['Validacion'] = V
         d['Fecha_Hora'] = datetime.datetime.now()
         #d['Comparacion'] = "Se obtiene del valor Tipo_Sistema del documento xml "
@@ -625,7 +624,7 @@ def reglas_validacion_individual(etiqueta, regla, vdato, fichero, ficheros_respa
             d['OK_KO'] = "KO"
             V.append(
                 'El valor de Num_Sectores_Interiores más Num_Sectores_Exteriores, es diferente a la cantidad de Sectores')
-        V.append('Para la presente etapa, la validación debe ser visual')
+        V.append('Dato con coherencia, pendiente validarse visualmente')
         d['Validacion'] = V
         d['Fecha_Hora'] = datetime.datetime.now()
         return d
@@ -651,7 +650,7 @@ def reglas_validacion_individual(etiqueta, regla, vdato, fichero, ficheros_respa
             d['OK_KO'] = "KO"
             V.append(
                 'El valor de Num_Sectores_Interiores más Num_Sectores_Exteriores, es diferente a la cantidad de Sectores')
-        V.append('Para la presente etapa, la validación debe ser visual')
+        V.append('Dato con coherencia, pendiente validarse visualmente')
         d['Validacion'] = V
         d['Fecha_Hora'] = datetime.datetime.now()
         return d
@@ -918,6 +917,7 @@ def reglas_validacion_individual(etiqueta, regla, vdato, fichero, ficheros_respa
         if not ((float(vdato.replace(',', '.')) >= 0) and (float(vdato.replace(',', '.')) <= 100)):
             d['OK_KO'] = 'KO'
             V.append('Puntos de Medida debe estar entre 0 y 100 metros')
+        V.append('Dato con coherencia, pendiente validarse visualmente')
         d['Validacion'] = V
         d['Fecha_Hora'] = datetime.datetime.now()
         return d
@@ -929,6 +929,7 @@ def reglas_validacion_individual(etiqueta, regla, vdato, fichero, ficheros_respa
         if not ((float(vdato.replace(',', '.')) >= 0) and (float(vdato.replace(',', '.')) <= 359)):
             d['OK_KO'] = 'KO'
             V.append('Puntos de Medida debe estar entre 0 y 359 grados')
+        V.append('Dato con coherencia, pendiente validarse visualmente')
         d['Validacion'] = V
         d['Fecha_Hora'] = datetime.datetime.now()
         return d

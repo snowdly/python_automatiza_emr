@@ -63,10 +63,8 @@ def genera_fichero_texto_desde_pdf_cap(rootDir, rootResultados, nameFile, ficher
 
 def principal(rootDir, rootResultados, nameFile, ficheros_respaldo):
     d = dict()
-    fichero_texto_cap = dict()
-    fichero_tecnico = dict()
-    fichero_tecnico['Fichero_Texto'] = ''
-    fichero_tecnico['Error'] = ''
+    fichero_texto_cap = ''
+    fichero_tecnico = ''
 
     # GENERA FICHERO DE TEXTO DESDE PDF CAP
     try:
@@ -74,12 +72,11 @@ def principal(rootDir, rootResultados, nameFile, ficheros_respaldo):
         if len(fichero_cap) > 0:
             print("Inicia conversión a texto de fichero: " + fichero_cap[0])
             logging.debug("Inicia conversión a texto de fichero: " + fichero_cap[0])
-            fichero_texto_cap = procesos_comunes.fichero_pdf_imagen_texto(fichero_cap[0], ficheros_respaldo, rootDir, 'Conversion_Fichero_CAP')
+            fichero_texto_cap = procesos_comunes.fichero_pdf_imagen_texto(fichero_cap[0], ficheros_respaldo, rootDir, 'Conversion_Fichero_CAP')['Fichero_Texto']
             print("Finaliza conversión a texto de fichero: " + fichero_cap[0])
             logging.debug("Finaliza conversión a texto de fichero: " + fichero_cap[0])
         else:
-            fichero_texto_cap['Fichero_Texto'] = ''
-            fichero_texto_cap['Error'] = ''
+            fichero_texto_cap = ''
         # ----
         #fichero_texto_cap = dict()
         #fichero_texto_cap['Fichero_Texto']= r'D:\EMR_Auditorias_Python\Conversion_Fichero_CAP\s0700_n0001_r00_GAL6100_JUMPING_CAP_V1\s0700_n0001_r00_GAL6100_JUMPING_CAP_V1_text.txt'
@@ -87,6 +84,13 @@ def principal(rootDir, rootResultados, nameFile, ficheros_respaldo):
     except Exception as e:
         print("Error en conversión de fichero CAP: ")
         logging.debug('Error en '  + e)
+
+    # Obtiene datos de Tecnico Competente
+    try:
+        r_datos_pdf = procesos_comunes.compara_tecnico_competente_pdf_texto(rootDir)
+    except Exception as e2:
+        print("Error en conversión de fichero TECNICO: ")
+        logging.debug('Error en ' + e2)
 
     for fichero in procesos_comunes.lista_xml(rootDir):
         logging.debug("Analizando fichero : " + fichero)
@@ -105,7 +109,7 @@ def principal(rootDir, rootResultados, nameFile, ficheros_respaldo):
 
             # GENERA FICHERO DE TEXTO DESDE PDF TECNICO
             print("Inicia conversión a texto de fichero: " + fichero.replace('xml', 'pdf'))
-            fichero_tecnico = procesos_comunes.fichero_pdf_imagen_texto(fichero.replace('xml', 'pdf'), ficheros_respaldo, rootDir , 'Conversion_Fichero_Tecnico')
+            fichero_tecnico = procesos_comunes.fichero_pdf_imagen_texto(fichero.replace('xml', 'pdf'), ficheros_respaldo, rootDir , 'Conversion_Fichero_Tecnico')['Fichero_Texto']
             print("Finaliza conversión a texto de fichero: " + fichero.replace('xml', 'pdf'))
             # ---
             #fichero_tecnico = dict()
@@ -115,13 +119,14 @@ def principal(rootDir, rootResultados, nameFile, ficheros_respaldo):
             print("Error en conversión de fichero TECNICO: ")
             logging.debug('Error en ' + e)
 
+
         lista = procesos_comunes.estructura_xml_completa(fichero)
         for elemento in lista:
             try:
                 dv = reglas_validacion_new.reglas_validacion_individual(elemento['Etiqueta'], elemento['Regla'],
                                                                         '' if elemento['Valor'] is None else elemento['Valor'],
                                                                         fichero, ficheros_respaldo, rootDir, ipdf,
-                                                                        fichero_texto_cap, fichero_tecnico)
+                                                                        fichero_texto_cap, fichero_tecnico, r_datos_pdf)
                 # Se agrega comparación desde el listado
                 for completa in listas_comunes.lista_completa :
                     if completa['Etiqueta'] == elemento['Etiqueta']:

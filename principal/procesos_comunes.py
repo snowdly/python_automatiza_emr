@@ -589,8 +589,78 @@ def obtiene_primer_xml(rootDir):
         r['OK_KO'] = 'KO'
     return r
 
+def compara_tecnico_competente_pdf_texto(carpeta_trabajo):
+    responsable_pdf = dict()
+    responsable_pdf['Fichero'] = ''
+    responsable_pdf['Paginas'] = 0
+    responsable_pdf['OK_KO'] = 'OK'
+    responsable_pdf['Error'] = ''
+    responsable_pdf['Texto'] = ''
+    r = lista_pdf(carpeta_trabajo)
+    if len(r) > 0:
+        encontrado = 0
+        for documento in r:
+            try:
+                pdf = open(documento, "rb")
+                pdf_reader = PyPDF2.PdfFileReader(pdf, strict=False)
+                if pdf_reader.numPages == 1:
+                    responsable_pdf['Paginas'] = pdf_reader.numPages
+                    fichero_nombre, fichero_extension = os.path.splitext(os.path.basename(documento))
+                    # print("Fichero a ser analizado: " + fichero_nombre + fichero_extension)
+                    responsable_pdf['Fichero'] = documento
+                    page = pdf_reader.getPage(0)
+                    texto = page.extractText().replace('\n', '')
+                    if texto == '':
+                        responsable_pdf['OK_KO'] = 'KO'
+                        responsable_pdf[
+                            'Error'] = 'El fichero PDF: ' + fichero_nombre + fichero_extension + ', no se han podido procesar'
+                    else:
+                        responsable_pdf['Texto'] = texto
+                        encontrado = encontrado + 1
+                # Closing the object.
+                pdf.close()
+                if encontrado >= 1: break
+            except:
+                responsable_pdf['OK_KO'] = 'KO'
+                responsable_pdf['Error'] = 'No se han podido procesar los ficheros pdf'
+    else:
+        responsable_pdf['OK_KO'] = 'KO'
+        responsable_pdf['Error'] = 'No se han podido encontrar ningún pdf, que contengan las características de ' \
+                                   'una Declaración de Responsable'
+    return responsable_pdf
 
-def compara_tecnico_competente_pdf(carpeta_trabajo, Dato):
+def compara_tecnico_competente_pdf(Dato, texto, documento):
+    responsable_pdf = dict()
+    responsable_pdf['Fichero'] = ''
+    responsable_pdf['Paginas'] = 0
+    responsable_pdf['Dato'] = Dato
+    responsable_pdf['OK_KO'] = 'OK'
+    responsable_pdf['Error'] = ''
+    try:
+        fichero_nombre, fichero_extension = os.path.splitext(os.path.basename(documento))
+        if texto == '':
+            responsable_pdf['OK_KO'] = 'KO'
+            responsable_pdf[
+                'Error'] = 'El fichero PDF: ' + fichero_nombre + fichero_extension + ', no se han podido procesar'
+        else:
+            if not re.findall(Dato, texto):
+                responsable_pdf['OK_KO'] = 'KO'
+                responsable_pdf['Error'] = 'Documento Revisado: ' + responsable_pdf[
+                    'Fichero'] + ': No coincide el dato del ' \
+                                 'Técnico Competente'
+            else:
+                responsable_pdf['Error'] = 'Fichero analizado: ' + responsable_pdf['Fichero']
+
+    except:
+        responsable_pdf['OK_KO'] = 'KO'
+        responsable_pdf['Error'] = 'No se han podido procesar los ficheros pdf'
+
+    return responsable_pdf
+
+
+
+
+def compara_tecnico_competente_pdf_old(carpeta_trabajo, Dato):
     responsable_pdf = dict()
     responsable_pdf['Fichero'] = ''
     responsable_pdf['Paginas'] = 0
@@ -752,7 +822,7 @@ def fichero_cap_a_texto(PDF_file, ficheros_respaldo, carpeta_trabajo, nameFile, 
         Part #1 : Converting PDF to images
         '''
         # Store all the pages of the PDF in a variable
-        pages = convert_from_path(PDF_file, poppler_path=os.path.join(ficheros_respaldo, 'poppler-0.68.0/bin'))
+        pages = convert_from_path(PDF_file, poppler_path=os.path.join(ficheros_respaldo, 'poppler-0.68.0/bin'), strict=False)
         # Counter to store images of each page of PDF to image
         image_counter = 1
         # Iterate through all the pages stored above
@@ -828,7 +898,7 @@ def fichero_pdf_imagen_texto(PDF_file, ficheros_respaldo, carpeta_trabajo, nameT
         Part #1 : Converting PDF to images
         '''
         # Store all the pages of the PDF in a variable
-        pages = convert_from_path(PDF_file, poppler_path=os.path.join(ficheros_respaldo, 'poppler-0.68.0/bin'))
+        pages = convert_from_path(PDF_file, poppler_path=os.path.join(ficheros_respaldo, 'poppler-0.68.0/bin'), strict=False)
         # Counter to store images of each page of PDF to image
         image_counter = 1
         # Iterate through all the pages stored above

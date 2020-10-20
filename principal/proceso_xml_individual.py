@@ -63,17 +63,30 @@ def genera_fichero_texto_desde_pdf_cap(rootDir, rootResultados, nameFile, ficher
 
 def principal(rootDir, rootResultados, nameFile, ficheros_respaldo):
     d = dict()
+    fichero_texto_cap = dict()
+    fichero_tecnico = dict()
+    fichero_tecnico['Fichero_Texto'] = ''
+    fichero_tecnico['Error'] = ''
 
     # GENERA FICHERO DE TEXTO DESDE PDF CAP
-    fichero_cap = procesos_comunes.busca_cap_pdf(rootDir)
-    if len(fichero_cap) > 0:
-        print("Inicia conversión a texto de fichero: " + fichero_cap[0])
-        fichero_texto_cap = procesos_comunes.fichero_pdf_imagen_texto(fichero_cap[0], ficheros_respaldo, rootDir, 'Conversion_Fichero_CAP')
-        print("Finaliza conversión a texto de fichero: " + fichero_cap[0])
-    # ----
-    #fichero_texto_cap = dict()
-    #fichero_texto_cap['Fichero_Texto']= r'D:\EMR_Auditorias_Python\Conversion_Fichero_CAP\s0700_n0001_r00_GAL6100_JUMPING_CAP_V1\s0700_n0001_r00_GAL6100_JUMPING_CAP_V1_text.txt'
-    #fichero_texto_cap['Error']=''
+    try:
+        fichero_cap = procesos_comunes.busca_cap_pdf(rootDir)
+        if len(fichero_cap) > 0:
+            print("Inicia conversión a texto de fichero: " + fichero_cap[0])
+            logging.debug("Inicia conversión a texto de fichero: " + fichero_cap[0])
+            fichero_texto_cap = procesos_comunes.fichero_pdf_imagen_texto(fichero_cap[0], ficheros_respaldo, rootDir, 'Conversion_Fichero_CAP')
+            print("Finaliza conversión a texto de fichero: " + fichero_cap[0])
+            logging.debug("Finaliza conversión a texto de fichero: " + fichero_cap[0])
+        else:
+            fichero_texto_cap['Fichero_Texto'] = ''
+            fichero_texto_cap['Error'] = ''
+        # ----
+        #fichero_texto_cap = dict()
+        #fichero_texto_cap['Fichero_Texto']= r'D:\EMR_Auditorias_Python\Conversion_Fichero_CAP\s0700_n0001_r00_GAL6100_JUMPING_CAP_V1\s0700_n0001_r00_GAL6100_JUMPING_CAP_V1_text.txt'
+        #fichero_texto_cap['Error']=''
+    except Exception as e:
+        print("Error en conversión de fichero CAP: ")
+        logging.debug('Error en '  + e)
 
     for fichero in procesos_comunes.lista_xml(rootDir):
         logging.debug("Analizando fichero : " + fichero)
@@ -85,18 +98,22 @@ def principal(rootDir, rootResultados, nameFile, ficheros_respaldo):
         #print(fichero_nombre, fichero_extension)
         analisis = pd.DataFrame(columns=('Etiqueta', 'Valor', 'OK_KO', 'Validacion', 'Fecha_Hora', 'Comparacion'))
 
-        # TRATAMIENTO DE IMÁGENES
-        epdf = procesos_comunes.extrae_imagenes_pdf(fichero, rootDir)
-        ipdf = procesos_comunes.extrae_texto_imagen(fichero, rootDir)
+        try:
+            # TRATAMIENTO DE IMÁGENES
+            epdf = procesos_comunes.extrae_imagenes_pdf(fichero, rootDir)
+            ipdf = procesos_comunes.extrae_texto_imagen(fichero, rootDir)
 
-        # GENERA FICHERO DE TEXTO DESDE PDF TECNICO
-        print("Inicia conversión a texto de fichero: " + fichero.replace('xml', 'pdf'))
-        fichero_tecnico = procesos_comunes.fichero_pdf_imagen_texto(fichero.replace('xml', 'pdf'), ficheros_respaldo, rootDir , 'Conversion_Fichero_Tecnico')
-        print("Finaliza conversión a texto de fichero: " + fichero.replace('xml', 'pdf'))
-        # ---
-        #fichero_tecnico = dict()
-        #fichero_tecnico['Fichero_Texto']=os.path.join(r'D:\EMR_Auditorias_Python','Conversion_Fichero_Tecnico', fichero_nombre, fichero_nombre + '_text.txt')
-        #fichero_tecnico['Error']=''
+            # GENERA FICHERO DE TEXTO DESDE PDF TECNICO
+            print("Inicia conversión a texto de fichero: " + fichero.replace('xml', 'pdf'))
+            fichero_tecnico = procesos_comunes.fichero_pdf_imagen_texto(fichero.replace('xml', 'pdf'), ficheros_respaldo, rootDir , 'Conversion_Fichero_Tecnico')
+            print("Finaliza conversión a texto de fichero: " + fichero.replace('xml', 'pdf'))
+            # ---
+            #fichero_tecnico = dict()
+            #fichero_tecnico['Fichero_Texto']=os.path.join(r'D:\EMR_Auditorias_Python','Conversion_Fichero_Tecnico', fichero_nombre, fichero_nombre + '_text.txt')
+            #fichero_tecnico['Error']=''
+        except Exception as e:
+            print("Error en conversión de fichero TECNICO: ")
+            logging.debug('Error en ' + e)
 
         lista = procesos_comunes.estructura_xml_completa(fichero)
         for elemento in lista:

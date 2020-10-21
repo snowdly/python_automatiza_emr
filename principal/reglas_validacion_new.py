@@ -447,10 +447,10 @@ def reglas_validacion_individual(etiqueta, regla, vdato, fichero, ficheros_respa
         r_api_catastro = procesos_comunes.consulta_api_catastro(RC)
         if r_api_catastro['OK_KO'] == 'OK':
             if str(r_api_catastro['nombre_municipio']).strip().upper() != str(vdato).strip().upper():
-                d['OK_KO'] = 'KO'
+                d['OK_KO'] = 'KO/VISUAL'
                 V.append('Datos no coinciden, revisar visualmente en web')
         else:
-            d['OK_KO'] = 'KO'
+            d['OK_KO'] = 'KO/VISUAL'
             V.append(r_api_catastro['ERROR'])
         '''        
         cod_municipio = procesos_comunes.valor_elemento_xml(fichero,
@@ -479,10 +479,10 @@ def reglas_validacion_individual(etiqueta, regla, vdato, fichero, ficheros_respa
         r_api_catastro = procesos_comunes.consulta_api_catastro(RC)
         if r_api_catastro['OK_KO'] == 'OK':
             if str(r_api_catastro['tipo_via']).strip().upper() != str(vdato).strip().upper():
-                d['OK_KO'] = 'KO'
+                d['OK_KO'] = 'KO/VISUAL'
                 V.append('Datos no coinciden, revisar visualmente en web')
         else:
-            d['OK_KO'] = 'KO'
+            d['OK_KO'] = 'KO/VISUAL'
             V.append(r_api_catastro['ERROR'])
         '''
         if not re.match("AV|BU|CL|CM|CR|GL|PJ|PS|PZ|RB|RD|TR|VP", vdato):
@@ -507,10 +507,10 @@ def reglas_validacion_individual(etiqueta, regla, vdato, fichero, ficheros_respa
         r_api_catastro = procesos_comunes.consulta_api_catastro(RC)
         if r_api_catastro['OK_KO'] == 'OK':
             if str(r_api_catastro['nombre_via']).strip().upper() != str(vdato).strip().upper():
-                d['OK_KO'] = 'KO'
+                d['OK_KO'] = 'KO/VISUAL'
                 V.append('Datos no coinciden, revisar visualmente en web')
         else:
-            d['OK_KO'] = 'KO'
+            d['OK_KO'] = 'KO/VISUAL'
             V.append(r_api_catastro['ERROR'])
         d['Validacion'] = V
         d['Fecha_Hora'] = datetime.datetime.now()
@@ -530,10 +530,10 @@ def reglas_validacion_individual(etiqueta, regla, vdato, fichero, ficheros_respa
         r_api_catastro = procesos_comunes.consulta_api_catastro(RC)
         if r_api_catastro['OK_KO'] == 'OK':
             if str(r_api_catastro['numero_portal']).strip().upper() != str(vdato).strip().upper():
-                d['OK_KO'] = 'KO'
+                d['OK_KO'] = 'KO/VISUAL'
                 V.append('Datos no coinciden, revisar visualmente en web')
         else:
-            d['OK_KO'] = 'KO'
+            d['OK_KO'] = 'KO/VISUAL'
             V.append(r_api_catastro['ERROR'])
         d['Validacion'] = V
         d['Fecha_Hora'] = datetime.datetime.now()

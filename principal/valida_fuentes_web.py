@@ -18,6 +18,8 @@ def principal(rootDir, ficheros_respaldo):
     # Obtener los xml
     rf = procesos_comunes.obtiene_primer_xml(rootDir)
     #print(rf)
+    municipio = ''
+    provincia= ''
     r = dict()
     if rf['OK_KO'] == 'OK':
         # Retorna ventanas de infoantenas

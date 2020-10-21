@@ -631,6 +631,7 @@ def compara_tecnico_competente_pdf_texto(carpeta_trabajo):
 
 def compara_tecnico_competente_pdf(Dato, texto, documento):
     responsable_pdf = dict()
+    responsable_pdf = dict()
     responsable_pdf['Fichero'] = ''
     responsable_pdf['Paginas'] = 0
     responsable_pdf['Dato'] = Dato

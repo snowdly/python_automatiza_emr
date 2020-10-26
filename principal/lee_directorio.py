@@ -5,7 +5,7 @@ import logging
 import datetime
 from principal import valida_xml_individual_base
 from principal import procesos_comunes
-from pyunpack import Archive
+#from pyunpack import Archive
 import patoolib
 
 # DECLARACION DE VARIABLES GLOBALES

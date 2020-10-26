@@ -174,7 +174,9 @@ def genera_resumen_xml(rootDirResultados, nameFile):
     array_df = []
     for fichero in procesos_comunes.lista_extension(rootDirResultados, 'xlsx'):
         fichero_nombre, fichero_extension = os.path.splitext(os.path.basename(fichero))
-        df = pd.read_excel(fichero, na_values=[''], ignore_index=True)
+        #df = pd.read_excel(fichero, na_values=[''], ignore_index=True)
+        df = pd.read_excel(fichero, na_values=[''])
+
         array_df.append(df)
 
     #Solo se realiza si existen 2 o mas excel

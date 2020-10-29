@@ -7,6 +7,7 @@ from principal import valida_xml_individual_base
 from principal import procesos_comunes
 #from pyunpack import Archive
 import patoolib
+import py7zr
 
 # DECLARACION DE VARIABLES GLOBALES
 #nameZip = ""
@@ -49,9 +50,14 @@ def extrae_datos(rootDir):
                 r.close()
             elif file.endswith(".7z"):
                 logging.debug("Es un 7z: " + rootDir + '/' + file)
-                (carpeta_7z, ext_7z) = os.path.splitext(file)
+
                 #Archive(rootDir + '/' + file).extractall(rootCarpetaTrabajo)
-                patoolib.extract_archive(rootDir + '/' + file, outdir=rootCarpetaTrabajo)
+                print(rootCarpetaTrabajo)
+                f=rootDir + '/' + file
+                with py7zr.SevenZipFile(f, mode='r') as z:
+                    z.extractall(rootCarpetaTrabajo)
+                #patoolib.extract_archive(rootDir + '/' + file, outdir=rootCarpetaTrabajo)
+
 
 def extrae_datos_recursivo(rootDir, nivel):
     for i in range(nivel):

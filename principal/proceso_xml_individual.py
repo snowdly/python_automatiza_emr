@@ -193,8 +193,12 @@ def principal_refactor(rootDir, rootResultados, nameFile, ficheros_respaldo):
     # 2. FICHERO TÉCNICO COMPETENTE -TRATAMIENTO
     # --------------------------------------------------------
     try:
-        r_datos_pdf = procesos_comunes.compara_tecnico_competente_pdf_texto(rootDir)
+        fichero_tecnico_competente = procesos_comunes.obtiene_pdf_tecnico_competente(rootDir)
+        if fichero_tecnico_competente!= '':
+            fichero_tecnico_competente = procesos_comunes.fichero_pdf_imagen_texto(fichero_tecnico_competente, ficheros_respaldo, rootDir, 'Conversion_Fichero_Tecnico_Competente')['Fichero_Texto']
+        #r_datos_pdf = procesos_comunes.compara_tecnico_competente_pdf_texto(rootDir)
     except Exception as e2:
+        fichero_tecnico_competente=''
         print("Error en conversión de fichero TECNICO: ")
         logging.debug("Error en conversión de fichero TECNICO: ")
         #logging.debug('Error en ' + e2)
@@ -244,7 +248,7 @@ def principal_refactor(rootDir, rootResultados, nameFile, ficheros_respaldo):
                 dv = reglas_validacion_new.reglas_validacion_individual(elemento['Etiqueta'], elemento['Regla'],
                                                                         '' if elemento['Valor'] is None else elemento['Valor'],
                                                                         fichero, ficheros_respaldo, rootDir, pdf_texto,
-                                                                        fichero_texto_cap, fichero_tecnico, r_datos_pdf)
+                                                                        fichero_texto_cap, fichero_tecnico, fichero_tecnico_competente)
                 # Se agrega comparación desde el listado
                 for completa in listas_comunes.lista_completa :
                     if completa['Etiqueta'] == elemento['Etiqueta']:

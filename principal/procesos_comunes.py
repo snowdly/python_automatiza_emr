@@ -589,6 +589,25 @@ def obtiene_primer_xml(rootDir):
         r['OK_KO'] = 'KO'
     return r
 
+def obtiene_pdf_tecnico_competente(carpeta_trabajo):
+    pdf_tecnico_competente=""
+    r = lista_pdf(carpeta_trabajo)
+    if len(r) > 0:
+        encontrado = 0
+        for documento in r:
+            try:
+                pdf = open(documento, "rb")
+                pdf_reader = PyPDF2.PdfFileReader(pdf, strict=False)
+                if pdf_reader.numPages == 1:
+                    pdf_tecnico_competente = documento
+                pdf.close()
+                if encontrado >= 1: break
+            except:
+                pdf_tecnico_competente=""
+    else:
+        pdf_tecnico_competente=""
+    return pdf_tecnico_competente
+
 def compara_tecnico_competente_pdf_texto(carpeta_trabajo):
     responsable_pdf = dict()
     responsable_pdf['Fichero'] = ''

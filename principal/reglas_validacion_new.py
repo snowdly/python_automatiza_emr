@@ -141,14 +141,19 @@ def reglas_validacion_individual(etiqueta, regla, vdato, fichero, ficheros_respa
         if not re.match("((([X-Z])|([LM])){1}([-]?)((\d){7})([-]?)([A-Z]{1}))|((\d{8})([-]?)([A-Z]))", vdato):
             d['OK_KO'] = "KO"
             V.append('DNI o NIE no tiene el formato correcto')
-        r_datos_pdf = procesos_comunes.compara_tecnico_competente_pdf(vdato,
-                                                                      '' if datos_pdf_tecnico['Texto'] is None else
-                                                                      datos_pdf_tecnico['Texto'],
-                                                                      '' if datos_pdf_tecnico['Fichero'] is None else
-                                                                      datos_pdf_tecnico['Fichero'])
-        if r_datos_pdf['OK_KO'] == 'KO':
+        #r_datos_pdf = procesos_comunes.compara_tecnico_competente_pdf(vdato,
+        #                                                              '' if datos_pdf_tecnico['Texto'] is None else
+        #                                                              datos_pdf_tecnico['Texto'],
+        #                                                              '' if datos_pdf_tecnico['Fichero'] is None else
+        #                                                              datos_pdf_tecnico['Fichero'])
+        if datos_pdf_tecnico == '':
             d['OK_KO'] = "KO"
-        V.append(r_datos_pdf['Error'])
+            V.append('No se ha encontrado fichero de Declaración de Responsable , o no ha sido posible leerlo. La revisión debe ser Visual')
+        else:
+            intll = procesos_comunes.busca_datos_pdf_texto(vdato, datos_pdf_tecnico)
+            if not (len(intll['ListaEncontrados']) >= 1):
+                d['OK_KO'] = "KO"
+                V.append('DNI o NIE no coincide con el fichero de Declaración de Responsable')
         d['Validacion'] = V
         d['Fecha_Hora'] = datetime.datetime.now()
         d['Comparacion'] = "Se compara con el documento PDF Declaración Responsable de Técnico competente"
@@ -166,6 +171,7 @@ def reglas_validacion_individual(etiqueta, regla, vdato, fichero, ficheros_respa
                 vdato):
             d['OK_KO'] = "KO"
             V.append('Nombre no tiene el formato correcto')
+        '''
         r_datos_pdf = procesos_comunes.compara_tecnico_competente_pdf(vdato,
                                                                       '' if datos_pdf_tecnico['Texto'] is None else
                                                                       datos_pdf_tecnico['Texto'],
@@ -174,6 +180,15 @@ def reglas_validacion_individual(etiqueta, regla, vdato, fichero, ficheros_respa
         if r_datos_pdf['OK_KO'] == 'KO':
             d['OK_KO'] = "KO"
         V.append(r_datos_pdf['Error'])
+        '''
+        if datos_pdf_tecnico == '':
+            d['OK_KO'] = "KO"
+            V.append('No se ha encontrado fichero de Declaración de Responsable , o no ha sido posible leerlo. La revisión debe ser Visual')
+        else:
+            intll = procesos_comunes.busca_datos_pdf_texto(vdato, datos_pdf_tecnico)
+            if not (len(intll['ListaEncontrados']) >= 1):
+                d['OK_KO'] = "KO"
+                V.append('Nombre del técnico no coincide con el fichero de Declaración de Responsable')
         d['Validacion'] = V
         d['Fecha_Hora'] = datetime.datetime.now()
         d['Comparacion'] = "Se compara con el documento PDF Declaración Responsable de Técnico competente"
@@ -191,6 +206,7 @@ def reglas_validacion_individual(etiqueta, regla, vdato, fichero, ficheros_respa
                 vdato):
             d['OK_KO'] = "KO"
             V.append('Apellido no tiene el formato correcto')
+        '''
         r_datos_pdf = procesos_comunes.compara_tecnico_competente_pdf(vdato,
                                                                       '' if datos_pdf_tecnico['Texto'] is None else
                                                                       datos_pdf_tecnico['Texto'],
@@ -199,6 +215,15 @@ def reglas_validacion_individual(etiqueta, regla, vdato, fichero, ficheros_respa
         if r_datos_pdf['OK_KO'] == 'KO':
             d['OK_KO'] = "KO"
         V.append(r_datos_pdf['Error'])
+        '''
+        if datos_pdf_tecnico == '':
+            d['OK_KO'] = "KO"
+            V.append('No se ha encontrado fichero de Declaración de Responsable , o no ha sido posible leerlo. La revisión debe ser Visual')
+        else:
+            intll = procesos_comunes.busca_datos_pdf_texto(vdato, datos_pdf_tecnico)
+            if not (len(intll['ListaEncontrados']) >= 1):
+                d['OK_KO'] = "KO"
+                V.append('Primer Apellido del técnico no coincide con el fichero de Declaración de Responsable')
         d['Validacion'] = V
         d['Fecha_Hora'] = datetime.datetime.now()
         d['Comparacion'] = "Se compara con el documento PDF Declaración Responsable de Técnico competente"
@@ -216,6 +241,7 @@ def reglas_validacion_individual(etiqueta, regla, vdato, fichero, ficheros_respa
                 vdato):
             d['OK_KO'] = "KO"
             V.append('Apellido no tiene el formato correcto')
+        '''
         r_datos_pdf = procesos_comunes.compara_tecnico_competente_pdf(vdato,
                                                                       '' if datos_pdf_tecnico['Texto'] is None else
                                                                       datos_pdf_tecnico['Texto'],
@@ -224,6 +250,15 @@ def reglas_validacion_individual(etiqueta, regla, vdato, fichero, ficheros_respa
         if r_datos_pdf['OK_KO'] == 'KO':
             d['OK_KO'] = "KO"
         V.append(r_datos_pdf['Error'])
+        '''
+        if datos_pdf_tecnico == '':
+            d['OK_KO'] = "KO"
+            V.append('No se ha encontrado fichero de Declaración de Responsable , o no ha sido posible leerlo. La revisión debe ser Visual')
+        else:
+            intll = procesos_comunes.busca_datos_pdf_texto(vdato, datos_pdf_tecnico)
+            if not (len(intll['ListaEncontrados']) >= 1):
+                d['OK_KO'] = "KO"
+                V.append('Segundo Apellido del técnico no coincide con el fichero de Declaración de Responsable')
         d['Validacion'] = V
         d['Fecha_Hora'] = datetime.datetime.now()
         d['Comparacion'] = "Se compara con el documento PDF Declaración Responsable de Técnico competente"
@@ -1242,7 +1277,7 @@ def reglas_validacion_individual(etiqueta, regla, vdato, fichero, ficheros_respa
             V.append(
                 'Valor: ' + vdato + '  no coincide con dato extraído de PDF: ' + encontrado + '  . La revisión debe ser VISUAL')
         if pdf_texto == '':
-            V.append(' El fichero técnico PDF no existe o no es posible ser procesado. La revisión debe ser VISUAL')
+            V.append(' El fichero técnico PDF no tiene el mismo nombre que el fichero XML o no existe. La revisión debe ser VISUAL')
         # V.append('Para la presente etapa, la validación debe ser visual')
         d['Validacion'] = V
         d['Fecha_Hora'] = datetime.datetime.now()
@@ -1289,7 +1324,7 @@ def reglas_validacion_individual(etiqueta, regla, vdato, fichero, ficheros_respa
         if d['OK_KO'] == "KO/VISUAL":
             V.append('Valor: '+ vdato + '  no coincide con dato extraído de PDF: ' + encontrado +'  . La revisión debe ser VISUAL')
         if pdf_texto == '':
-            V.append(' El fichero técnico PDF no existe o no es posible ser procesado. La revisión debe ser VISUAL')
+            V.append(' El fichero técnico PDF no tiene el mismo nombre que el fichero XML o no existe. La revisión debe ser VISUAL')
         #V.append('Para la presente etapa, la validación debe ser visual')
         d['Validacion'] = V
         d['Fecha_Hora'] = datetime.datetime.now()
@@ -1312,7 +1347,7 @@ def reglas_validacion_individual(etiqueta, regla, vdato, fichero, ficheros_respa
         if d['OK_KO'] == "KO/VISUAL":
             V.append('Valor: '+ vdato + '  no coincide con dato extraído de PDF: ' + encontrado +'  . La revisión debe ser VISUAL')
         if pdf_texto == '':
-            V.append(' El fichero técnico PDF no existe o no es posible ser procesado. La revisión debe ser VISUAL')
+            V.append(' El fichero técnico PDF no tiene el mismo nombre que el fichero XML o no existe. La revisión debe ser VISUAL')
         d['Validacion'] = V
         d['Fecha_Hora'] = datetime.datetime.now()
         return d
@@ -1334,7 +1369,7 @@ def reglas_validacion_individual(etiqueta, regla, vdato, fichero, ficheros_respa
         if d['OK_KO'] == "KO/VISUAL":
             V.append('Valor: '+ vdato + '  no coincide con dato extraído de PDF: ' + encontrado +'  . La revisión debe ser VISUAL')
         if pdf_texto == '':
-            V.append(' El fichero técnico PDF no existe o no es posible ser procesado. La revisión debe ser VISUAL')
+            V.append(' El fichero técnico PDF no tiene el mismo nombre que el fichero XML o no existe. La revisión debe ser VISUAL')
         d['Validacion'] = V
         d['Fecha_Hora'] = datetime.datetime.now()
         return d
@@ -1356,7 +1391,7 @@ def reglas_validacion_individual(etiqueta, regla, vdato, fichero, ficheros_respa
         if d['OK_KO'] == "KO/VISUAL":
             V.append('Valor: '+ vdato + '  no coincide con dato extraído de PDF: ' + encontrado +'  . La revisión debe ser VISUAL')
         if pdf_texto == '':
-            V.append(' El fichero técnico PDF no existe o no es posible ser procesado. La revisión debe ser VISUAL')
+            V.append(' El fichero técnico PDF no tiene el mismo nombre que el fichero XML o no existe. La revisión debe ser VISUAL')
         d['Validacion'] = V
         d['Fecha_Hora'] = datetime.datetime.now()
         return d
@@ -1378,7 +1413,7 @@ def reglas_validacion_individual(etiqueta, regla, vdato, fichero, ficheros_respa
         if d['OK_KO'] == "KO/VISUAL":
             V.append('Valor: '+ vdato + '  no coincide con dato extraído de PDF: ' + encontrado +'  . La revisión debe ser VISUAL')
         if pdf_texto == '':
-            V.append(' El fichero técnico PDF no existe o no es posible ser procesado. La revisión debe ser VISUAL')
+            V.append(' El fichero técnico PDF no tiene el mismo nombre que el fichero XML o no existe. La revisión debe ser VISUAL')
         d['Validacion'] = V
         d['Fecha_Hora'] = datetime.datetime.now()
         return d
@@ -1400,7 +1435,7 @@ def reglas_validacion_individual(etiqueta, regla, vdato, fichero, ficheros_respa
         if d['OK_KO'] == "KO/VISUAL":
             V.append('Valor: '+ vdato + '  no coincide con dato extraído de PDF: ' + encontrado +'  . La revisión debe ser VISUAL')
         if pdf_texto == '':
-            V.append(' El fichero técnico PDF no existe o no es posible ser procesado. La revisión debe ser VISUAL')
+            V.append(' El fichero técnico PDF no tiene el mismo nombre que el fichero XML o no existe. La revisión debe ser VISUAL')
         d['Validacion'] = V
         d['Fecha_Hora'] = datetime.datetime.now()
         return d

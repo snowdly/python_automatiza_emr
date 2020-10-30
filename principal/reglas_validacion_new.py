@@ -273,7 +273,7 @@ def reglas_validacion_individual(etiqueta, regla, vdato, fichero, ficheros_respa
             V.append('No existe valor')
         if fichero_tecnico == '':
             d['OK_KO'] = 'KO'
-            V.append('No existe fichero Técnico o no puede ser leido: ' + fichero_nombre + fichero_extension)
+            V.append('No existe fichero Técnico o no puede ser leido: ' + fichero_nombre + '.pdf')
         else:
             intll = procesos_comunes.busca_datos_pdf_texto(vdato, fichero_tecnico)
             if len(intll['ListaEncontrados']) > 1:
@@ -374,7 +374,7 @@ def reglas_validacion_individual(etiqueta, regla, vdato, fichero, ficheros_respa
         datoreg = 'LATITUD(\W)*' + vdato
         if fichero_tecnico == '':
             d['OK_KO'] = 'KO'
-            V.append('No existe fichero Técnico o no puede ser leido: ' + fichero_nombre + fichero_extension)
+            V.append('No existe fichero Técnico o no puede ser leido: ' + fichero_nombre + '.pdf')
         else:
             intll = procesos_comunes.busca_datos_pdf_texto(datoreg, fichero_tecnico)
             if len(intll['ListaEncontrados']) >= 1:
@@ -400,7 +400,7 @@ def reglas_validacion_individual(etiqueta, regla, vdato, fichero, ficheros_respa
         datoreg = 'LONGITUD(\W)*' + vdato
         if fichero_tecnico == '':
             d['OK_KO'] = 'KO'
-            V.append('No existe fichero Técnico o no puede ser leido: ' + fichero_nombre + fichero_extension)
+            V.append('No existe fichero Técnico o no puede ser leido: ' + fichero_nombre + '.pdf')
         else:
             intll = procesos_comunes.busca_datos_pdf_texto(datoreg, fichero_tecnico)
             if len(intll['ListaEncontrados']) >= 1:
@@ -1009,7 +1009,7 @@ def reglas_validacion_individual(etiqueta, regla, vdato, fichero, ficheros_respa
         # VALIDACION IA
         if fichero_tecnico == '':
             d['OK_KO'] = 'KO'
-            V.append('No existe fichero Técnico o no puede ser leido: ' + fichero_nombre + fichero_extension)
+            V.append('No existe fichero Técnico o no puede ser leido: ' + fichero_nombre + '.pdf')
         else:
             intll = procesos_comunes.busca_datos_pdf_texto(vdato.upper(), fichero_tecnico)
             if len(intll['ListaEncontrados']) >= 1:
@@ -1039,7 +1039,7 @@ def reglas_validacion_individual(etiqueta, regla, vdato, fichero, ficheros_respa
 
         if fichero_tecnico == '':
             d['OK_KO'] = 'KO'
-            V.append('No existe fichero Técnico o no puede ser leido: ' + fichero_nombre + fichero_extension)
+            V.append('No existe fichero Técnico o no puede ser leido: ' + fichero_nombre + '.pdf')
         else:
             intll = procesos_comunes.busca_datos_pdf_texto(nombrevia['Valor'].upper(), fichero_tecnico)
             if len(intll['ListaEncontrados']) >= 1:
@@ -1074,7 +1074,7 @@ def reglas_validacion_individual(etiqueta, regla, vdato, fichero, ficheros_respa
                                                         './/Informe_Medidas/Puntos_Medida/Punto_Medida/Punto_Sensible/Nombre_Via')
         if fichero_tecnico == '':
             d['OK_KO'] = 'KO'
-            V.append('No existe fichero Técnico o no puede ser leido: ' + fichero_nombre + fichero_extension)
+            V.append('No existe fichero Técnico o no puede ser leido: ' + fichero_nombre + '.pdf')
         else:
             intll = procesos_comunes.busca_datos_pdf_texto(nombrevia['Valor'].upper(), fichero_tecnico)
             if len(intll['ListaEncontrados']) >= 1:
@@ -1104,7 +1104,7 @@ def reglas_validacion_individual(etiqueta, regla, vdato, fichero, ficheros_respa
         # VALIDACION IA
         if fichero_tecnico == '':
             d['OK_KO'] = 'KO'
-            V.append('No existe fichero Técnico o no puede ser leido: ' + fichero_nombre + fichero_extension)
+            V.append('No existe fichero Técnico o no puede ser leido: ' + fichero_nombre + '.pdf')
         else:
             intll = procesos_comunes.busca_datos_pdf_texto(vdato.upper(), fichero_tecnico)
             if len(intll['ListaEncontrados']) >= 1:
@@ -1133,7 +1133,7 @@ def reglas_validacion_individual(etiqueta, regla, vdato, fichero, ficheros_respa
                                                         './/Informe_Medidas/Puntos_Medida/Punto_Medida/Punto_Sensible/Nombre_Via')
         if fichero_tecnico == '':
             d['OK_KO'] = 'KO'
-            V.append('No existe fichero Técnico o no puede ser leido: ' + fichero_nombre + fichero_extension)
+            V.append('No existe fichero Técnico o no puede ser leido: ' + fichero_nombre + '.pdf')
         else:
             intll = procesos_comunes.busca_datos_pdf_texto(nombrevia['Valor'].upper(), fichero_tecnico)
             if len(intll['ListaEncontrados']) >= 1:

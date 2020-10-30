@@ -83,14 +83,16 @@ def principal(rootDir, rootResultados, nameFile, ficheros_respaldo):
         #fichero_texto_cap['Error']=''
     except Exception as e:
         print("Error en conversión de fichero CAP: ")
-        logging.debug('Error en '  + e)
+        logging.debug("Error en conversión de fichero CAP: ")
+        #logging.debug('Error en '  + e)
 
     # Obtiene datos de Tecnico Competente
     try:
         r_datos_pdf = procesos_comunes.compara_tecnico_competente_pdf_texto(rootDir)
     except Exception as e2:
         print("Error en conversión de fichero TECNICO: ")
-        logging.debug('Error en ' + e2)
+        logging.debug("Error en conversión de fichero TECNICO: ")
+        #logging.debug('Error en ' + e2)
 
     for fichero in procesos_comunes.lista_xml(rootDir):
         logging.debug("Analizando fichero : " + fichero)
@@ -102,22 +104,26 @@ def principal(rootDir, rootResultados, nameFile, ficheros_respaldo):
         #print(fichero_nombre, fichero_extension)
         analisis = pd.DataFrame(columns=('Etiqueta', 'Valor', 'OK_KO', 'Validacion', 'Fecha_Hora', 'Comparacion'))
 
+        pdf_texto = ""
         try:
             # TRATAMIENTO DE IMÁGENES
             epdf = procesos_comunes.extrae_imagenes_pdf(fichero, rootDir)
-            ipdf = procesos_comunes.extrae_texto_imagen(fichero, rootDir)
+            pdf_texto = procesos_comunes.extrae_texto_imagen(fichero, rootDir)['Texto']
+        except Exception as e3:
+            print("Error en el Tratamiento de imágenes: ")
+            logging.debug("Error en el Tratamiento de imágenes: ")
+            #logging.debug('Error en ' + e3)
 
-            # GENERA FICHERO DE TEXTO DESDE PDF TECNICO
-            print("Inicia conversión a texto de fichero: " + fichero.replace('xml', 'pdf'))
-            fichero_tecnico = procesos_comunes.fichero_pdf_imagen_texto(fichero.replace('xml', 'pdf'), ficheros_respaldo, rootDir , 'Conversion_Fichero_Tecnico')['Fichero_Texto']
-            print("Finaliza conversión a texto de fichero: " + fichero.replace('xml', 'pdf'))
-            # ---
-            #fichero_tecnico = dict()
-            #fichero_tecnico['Fichero_Texto']=os.path.join(r'D:\EMR_Auditorias_Python','Conversion_Fichero_Tecnico', fichero_nombre, fichero_nombre + '_text.txt')
-            #fichero_tecnico['Error']=''
-        except Exception as e:
-            print("Error en conversión de fichero TECNICO: ")
-            logging.debug('Error en ' + e)
+
+        # GENERA FICHERO DE TEXTO DESDE PDF TECNICO
+        print("Inicia conversión a texto de fichero: " + fichero.replace('xml', 'pdf'))
+        fichero_tecnico = procesos_comunes.fichero_pdf_imagen_texto(fichero.replace('xml', 'pdf'), ficheros_respaldo, rootDir , 'Conversion_Fichero_Tecnico')['Fichero_Texto']
+        print("Finaliza conversión a texto de fichero: " + fichero.replace('xml', 'pdf'))
+        # ---
+        #fichero_tecnico = dict()
+        #fichero_tecnico['Fichero_Texto']=os.path.join(r'D:\EMR_Auditorias_Python','Conversion_Fichero_Tecnico', fichero_nombre, fichero_nombre + '_text.txt')
+        #fichero_tecnico['Error']=''
+
 
 
         lista = procesos_comunes.estructura_xml_completa(fichero)
@@ -125,7 +131,119 @@ def principal(rootDir, rootResultados, nameFile, ficheros_respaldo):
             try:
                 dv = reglas_validacion_new.reglas_validacion_individual(elemento['Etiqueta'], elemento['Regla'],
                                                                         '' if elemento['Valor'] is None else elemento['Valor'],
-                                                                        fichero, ficheros_respaldo, rootDir, ipdf,
+                                                                        fichero, ficheros_respaldo, rootDir, pdf_texto,
+                                                                        fichero_texto_cap, fichero_tecnico, r_datos_pdf)
+                # Se agrega comparación desde el listado
+                for completa in listas_comunes.lista_completa :
+                    if completa['Etiqueta'] == elemento['Etiqueta']:
+                        dv['Comparacion']=completa['Comparacion']
+                        break
+                # -----------------------------------------------
+
+                analisis = analisis.append(dv, ignore_index=True)
+            except Exception as err:
+                print('Error en ' + elemento['Etiqueta'] + '   ' + err)
+                logging.debug('Error en ' + elemento['Etiqueta'] + '   ' + err)
+
+        # ELIMINAR TEMPORALES
+        if os.path.exists(epdf['DirTemporal']):
+            shutil.rmtree(epdf['DirTemporal'], ignore_errors=True)
+
+        # GRABACION EN EL EXCEL
+        writer = pd.ExcelWriter(
+            os.path.join(rootResultados, nameFile + '_analisis_inidvidual_xml/', fichero_nombre + "_analisis.xlsx"))
+        analisis.to_excel(writer, 'Analisis_XML')
+        writer.save()
+        logging.debug("Analizando fichero : " + fichero + "   se ha grabado en: " + os.path.join(rootResultados,
+                                                                                                 nameFile + '_analisis_inidvidual_xml/',
+                                                                                                 fichero_nombre + "_analisis.xlsx"))
+
+    # Retorna resultado del proceso
+    r = dict()
+    r['Etapa_Validacion'] = 'Proceso de validación de XML individual'
+    r['Resultado'] = 'Finalizado'
+    r['Fecha'] = datetime.datetime.now()
+    return r
+
+
+def principal_refactor(rootDir, rootResultados, nameFile, ficheros_respaldo):
+    d = dict()
+    fichero_texto_cap = ''
+    fichero_tecnico_competente = ''
+    fichero_tecnico = ''
+
+    # 1. FICHERO CAB - TRATAMIENTO
+    # -------------------------------------------------------
+    try:
+        fichero_cap = procesos_comunes.busca_cap_pdf(rootDir)
+        if len(fichero_cap) > 0:
+            print("Inicia conversión a texto de fichero: " + fichero_cap[0])
+            logging.debug("Inicia conversión a texto de fichero: " + fichero_cap[0])
+            fichero_texto_cap = procesos_comunes.fichero_pdf_imagen_texto(fichero_cap[0], ficheros_respaldo, rootDir, 'Conversion_Fichero_CAP')['Fichero_Texto']
+            print("Finaliza conversión a texto de fichero: " + fichero_cap[0])
+            logging.debug("Finaliza conversión a texto de fichero: " + fichero_cap[0])
+        else:
+            fichero_texto_cap = ''
+    except Exception as e:
+        print("Error en conversión de fichero CAP: ")
+        logging.debug("Error en conversión de fichero CAP: ")
+        # logging.debug('Error en '  + e)
+    # --------------------------------------------------------
+
+    # 2. FICHERO TÉCNICO COMPETENTE -TRATAMIENTO
+    # --------------------------------------------------------
+    try:
+        r_datos_pdf = procesos_comunes.compara_tecnico_competente_pdf_texto(rootDir)
+    except Exception as e2:
+        print("Error en conversión de fichero TECNICO: ")
+        logging.debug("Error en conversión de fichero TECNICO: ")
+        #logging.debug('Error en ' + e2)
+    # --------------------------------------------------------
+
+    # 3. TRAMIENTO DE XML Y PDF TECNICO COMPETENTE
+    #   RECORRE TODOS LOS FICHEROS XML
+    for fichero in procesos_comunes.lista_xml(rootDir):
+        logging.debug("Analizando fichero : " + fichero)
+        # CREA EL DIRECTORIO SI NO EXISTE
+        if not os.path.exists(os.path.join(rootResultados, nameFile + '_analisis_inidvidual_xml/')):
+            os.makedirs(os.path.join(rootResultados, nameFile + '_analisis_inidvidual_xml/'))
+        fichero_nombre, fichero_extension = os.path.splitext(os.path.basename(fichero))
+
+        # ANALISIS DE CADA PDF
+        pdf_texto = ""
+        try:
+            # TRATAMIENTO DE IMÁGENES
+            epdf = procesos_comunes.extrae_imagenes_pdf(fichero, rootDir)
+            if epdf['Fichero'] != '':
+                pdf_texto = procesos_comunes.extrae_texto_imagen(fichero, rootDir)['Texto']
+            else:
+                pdf_texto = ''
+        except Exception as e3:
+            print("Error en el Tratamiento de imágenes: ")
+            logging.debug("Error en el Tratamiento de imágenes: ")
+            # logging.debug('Error en ' + e3)
+
+
+
+
+        # GENERA FICHERO DE TEXTO DESDE PDF TECNICO
+        if os.path.exists(fichero.replace('xml', 'pdf')):
+            print("Inicia conversión a texto de fichero: " + fichero.replace('xml', 'pdf'))
+            fichero_tecnico = procesos_comunes.fichero_pdf_imagen_texto(fichero.replace('xml', 'pdf'), ficheros_respaldo, rootDir , 'Conversion_Fichero_Tecnico')['Fichero_Texto']
+            print("Finaliza conversión a texto de fichero: " + fichero.replace('xml', 'pdf'))
+        else:
+            fichero_tecnico  = ""
+        # --------------------------------------------------------------------------------------
+
+        # print(fichero_nombre, fichero_extension)
+        analisis = pd.DataFrame(columns=('Etiqueta', 'Valor', 'OK_KO', 'Validacion', 'Fecha_Hora', 'Comparacion'))
+
+        lista = procesos_comunes.estructura_xml_completa(fichero)
+        for elemento in lista:
+            try:
+                dv = reglas_validacion_new.reglas_validacion_individual(elemento['Etiqueta'], elemento['Regla'],
+                                                                        '' if elemento['Valor'] is None else elemento['Valor'],
+                                                                        fichero, ficheros_respaldo, rootDir, pdf_texto,
                                                                         fichero_texto_cap, fichero_tecnico, r_datos_pdf)
                 # Se agrega comparación desde el listado
                 for completa in listas_comunes.lista_completa :

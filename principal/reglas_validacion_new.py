@@ -1232,7 +1232,7 @@ def reglas_validacion_individual(etiqueta, regla, vdato, fichero, ficheros_respa
         #V.append('Para la presente etapa, la validación debe ser visual')
         fecha_vdato = datetime.datetime.strptime(vdato, '%Y-%m-%d')
         vdato = fecha_vdato.strftime('%d/%m/%Y')
-        for encontrado in re.findall("CALIBRACION\s.+", pdf_texto['Texto']):
+        for encontrado in re.findall("CALIBRACION\s.+", pdf_texto):
             if encontrado.find(vdato.upper()) != -1:
                 d['OK_KO'] = "OK"
                 break
@@ -1241,6 +1241,8 @@ def reglas_validacion_individual(etiqueta, regla, vdato, fichero, ficheros_respa
         if d['OK_KO'] == "KO/VISUAL":
             V.append(
                 'Valor: ' + vdato + '  no coincide con dato extraído de PDF: ' + encontrado + '  . La revisión debe ser VISUAL')
+        if pdf_texto == '':
+            V.append(' El fichero técnico PDF no existe o no es posible ser procesado. La revisión debe ser VISUAL')
         # V.append('Para la presente etapa, la validación debe ser visual')
         d['Validacion'] = V
         d['Fecha_Hora'] = datetime.datetime.now()
@@ -1278,7 +1280,7 @@ def reglas_validacion_individual(etiqueta, regla, vdato, fichero, ficheros_respa
             d['OK_KO'] = 'KO'
             V.append('No existe valor en el xml')
         #V.append('Fichero analizado: ' + pdf_texto['Fichero'])
-        for encontrado in re.findall("MARCA\s.+", pdf_texto['Texto']):
+        for encontrado in re.findall("MARCA\s.+", pdf_texto):
             if encontrado.find(vdato.upper()) != -1:
                 d['OK_KO'] = "OK"
                 break
@@ -1286,6 +1288,8 @@ def reglas_validacion_individual(etiqueta, regla, vdato, fichero, ficheros_respa
                 d['OK_KO'] = "KO/VISUAL"
         if d['OK_KO'] == "KO/VISUAL":
             V.append('Valor: '+ vdato + '  no coincide con dato extraído de PDF: ' + encontrado +'  . La revisión debe ser VISUAL')
+        if pdf_texto == '':
+            V.append(' El fichero técnico PDF no existe o no es posible ser procesado. La revisión debe ser VISUAL')
         #V.append('Para la presente etapa, la validación debe ser visual')
         d['Validacion'] = V
         d['Fecha_Hora'] = datetime.datetime.now()
@@ -1299,7 +1303,7 @@ def reglas_validacion_individual(etiqueta, regla, vdato, fichero, ficheros_respa
             d['OK_KO'] = 'KO'
             V.append('No existe valor en el xml')
         #V.append('Fichero analizado: ' + pdf_texto['Fichero'])
-        for encontrado in re.findall("MODELO\s.+", pdf_texto['Texto']):
+        for encontrado in re.findall("MODELO\s.+", pdf_texto):
             if encontrado.find(vdato.upper()) != -1:
                 d['OK_KO'] = "OK"
                 break
@@ -1307,6 +1311,8 @@ def reglas_validacion_individual(etiqueta, regla, vdato, fichero, ficheros_respa
                 d['OK_KO'] = "KO/VISUAL"
         if d['OK_KO'] == "KO/VISUAL":
             V.append('Valor: '+ vdato + '  no coincide con dato extraído de PDF: ' + encontrado +'  . La revisión debe ser VISUAL')
+        if pdf_texto == '':
+            V.append(' El fichero técnico PDF no existe o no es posible ser procesado. La revisión debe ser VISUAL')
         d['Validacion'] = V
         d['Fecha_Hora'] = datetime.datetime.now()
         return d
@@ -1319,7 +1325,7 @@ def reglas_validacion_individual(etiqueta, regla, vdato, fichero, ficheros_respa
             d['OK_KO'] = 'KO'
             V.append('No existe valor en el xml')
         #V.append('Fichero analizado: ' + pdf_texto['Fichero'])
-        for encontrado in re.findall("IDENTIFICACION\s.+", pdf_texto['Texto']):
+        for encontrado in re.findall("IDENTIFICACION\s.+", pdf_texto):
             if encontrado.find(vdato.upper()) != -1:
                 d['OK_KO'] = "OK"
                 break
@@ -1327,6 +1333,8 @@ def reglas_validacion_individual(etiqueta, regla, vdato, fichero, ficheros_respa
                 d['OK_KO'] = "KO/VISUAL"
         if d['OK_KO'] == "KO/VISUAL":
             V.append('Valor: '+ vdato + '  no coincide con dato extraído de PDF: ' + encontrado +'  . La revisión debe ser VISUAL')
+        if pdf_texto == '':
+            V.append(' El fichero técnico PDF no existe o no es posible ser procesado. La revisión debe ser VISUAL')
         d['Validacion'] = V
         d['Fecha_Hora'] = datetime.datetime.now()
         return d
@@ -1339,7 +1347,7 @@ def reglas_validacion_individual(etiqueta, regla, vdato, fichero, ficheros_respa
             d['OK_KO'] = 'KO'
             V.append('No existe valor en el xml')
         #V.append('Fichero analizado: ' + pdf_texto['Fichero'])
-        for encontrado in re.findall("MARCA\s.+", pdf_texto['Texto']):
+        for encontrado in re.findall("MARCA\s.+", pdf_texto):
             if encontrado.find(vdato.upper()) != -1:
                 d['OK_KO'] = "OK"
                 break
@@ -1347,6 +1355,8 @@ def reglas_validacion_individual(etiqueta, regla, vdato, fichero, ficheros_respa
                 d['OK_KO'] = "KO/VISUAL"
         if d['OK_KO'] == "KO/VISUAL":
             V.append('Valor: '+ vdato + '  no coincide con dato extraído de PDF: ' + encontrado +'  . La revisión debe ser VISUAL')
+        if pdf_texto == '':
+            V.append(' El fichero técnico PDF no existe o no es posible ser procesado. La revisión debe ser VISUAL')
         d['Validacion'] = V
         d['Fecha_Hora'] = datetime.datetime.now()
         return d
@@ -1359,7 +1369,7 @@ def reglas_validacion_individual(etiqueta, regla, vdato, fichero, ficheros_respa
             d['OK_KO'] = 'KO'
             V.append('No existe valor en el xml')
         #V.append('Fichero analizado: ' + pdf_texto['Fichero'])
-        for encontrado in re.findall("SONDA\:.+", pdf_texto['Texto']):
+        for encontrado in re.findall("SONDA\:.+", pdf_texto):
             if encontrado.find(vdato.upper()) != -1:
                 d['OK_KO'] = "OK"
                 break
@@ -1367,6 +1377,8 @@ def reglas_validacion_individual(etiqueta, regla, vdato, fichero, ficheros_respa
                 d['OK_KO'] = "KO/VISUAL"
         if d['OK_KO'] == "KO/VISUAL":
             V.append('Valor: '+ vdato + '  no coincide con dato extraído de PDF: ' + encontrado +'  . La revisión debe ser VISUAL')
+        if pdf_texto == '':
+            V.append(' El fichero técnico PDF no existe o no es posible ser procesado. La revisión debe ser VISUAL')
         d['Validacion'] = V
         d['Fecha_Hora'] = datetime.datetime.now()
         return d
@@ -1379,7 +1391,7 @@ def reglas_validacion_individual(etiqueta, regla, vdato, fichero, ficheros_respa
             d['OK_KO'] = 'KO'
             V.append('No existe valor en el xml')
         #V.append('Fichero analizado: ' + pdf_texto['Fichero'])
-        for encontrado in re.findall("SONDA\:.+", pdf_texto['Texto']):
+        for encontrado in re.findall("SONDA\:.+", pdf_texto):
             if encontrado.find(vdato.upper()) != -1:
                 d['OK_KO'] = "OK"
                 break
@@ -1387,6 +1399,8 @@ def reglas_validacion_individual(etiqueta, regla, vdato, fichero, ficheros_respa
                 d['OK_KO'] = "KO/VISUAL"
         if d['OK_KO'] == "KO/VISUAL":
             V.append('Valor: '+ vdato + '  no coincide con dato extraído de PDF: ' + encontrado +'  . La revisión debe ser VISUAL')
+        if pdf_texto == '':
+            V.append(' El fichero técnico PDF no existe o no es posible ser procesado. La revisión debe ser VISUAL')
         d['Validacion'] = V
         d['Fecha_Hora'] = datetime.datetime.now()
         return d

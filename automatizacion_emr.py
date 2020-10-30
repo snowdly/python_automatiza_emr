@@ -41,6 +41,7 @@ try:
     print('Inicia: Descomprimir ficheros')
     r = lee_directorio.descomprime_todos_ficheros(rutas_trabajo['ruta_auditoria_carpeta_trabajo'], rutas_base['ruta_ficheros_respaldo'])
     resumen = resumen.append(r, ignore_index=True)
+
     logging.debug('Finaliza: Descomprimir ficheros')
 except Exception as e:
     logging.debug('Se ha producido un error descomprimiento los ficheros')
@@ -74,7 +75,7 @@ except Exception as e:
 try:
     logging.debug('Inicia: Validación de cada XML')
     print('Inicia: Validación de cada XML')
-    r = proceso_xml_individual.principal(rutas_trabajo['ruta_auditoria_carpeta_trabajo'], rutas_trabajo['ruta_auditoria_carpeta_reporte'], nameFile, rutas_base['ruta_ficheros_respaldo'])
+    r = proceso_xml_individual.principal_refactor(rutas_trabajo['ruta_auditoria_carpeta_trabajo'], rutas_trabajo['ruta_auditoria_carpeta_reporte'], nameFile, rutas_base['ruta_ficheros_respaldo'])
     resumen = resumen.append(r, ignore_index=True)
     logging.debug('Finaliza: Validación de cada XML')
 except Exception as e:

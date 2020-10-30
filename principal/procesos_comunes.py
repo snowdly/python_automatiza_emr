@@ -1,3 +1,4 @@
+import fitz
 import os
 import logging
 import shutil
@@ -15,7 +16,6 @@ import xml.dom.minidom
 import PyPDF2
 import pytesseract
 from PIL import Image
-import fitz
 import io
 from pdf2image import convert_from_path
 
@@ -732,48 +732,56 @@ def estructura_xml_completa(fichero_xml):
 
 def extrae_imagenes_pdf(fichero, rootDir):
     d = dict()
-    fichero_nombre, fichero_extension = os.path.splitext(os.path.basename(fichero))
-    fichero_pdf = fichero.replace('xml', 'pdf')
-    d['Fichero'] = fichero_pdf
+    d['Fichero'] = ''
+    d['DirTemporal'] = ''
+    d['Imagenes']= ''
     d['Error'] = ''
-    try:
-        # print(fichero_pdf)
-        pdf_file = fitz.open(fichero_pdf)
-        # print(pdf_file.pageCount)
-        V = []
-        for x in range(pdf_file.pageCount - 2, pdf_file.pageCount):
+    fichero_nombre, fichero_extension = os.path.splitext(os.path.basename(fichero))
+    fichero_pdf = (os.path.splitext(fichero)[0] + '.pdf').replace('/', '\\')
+    #fichero_pdf = fichero.replace('/', '\\')
+    if os.path.exists(fichero_pdf):
+        d['Fichero'] = fichero_pdf
+        try:
+            print(fichero_pdf)
+            pdf_file = fitz.open(fichero_pdf)
+            # print(pdf_file.pageCount)
+            V = []
+            for x in range(pdf_file.pageCount - 2, pdf_file.pageCount):
 
-            # print(x)
-            page = pdf_file[x]
-            image_list = page.getImageList()
-            for image_index, img in enumerate(page.getImageList(), start=1):
+                # print(x)
+                page = pdf_file[x]
+                image_list = page.getImageList()
+                for image_index, img in enumerate(page.getImageList(), start=1):
 
-                # get the XREF of the image
-                xref = img[0]
-                # extract the image bytes
-                base_image = pdf_file.extractImage(xref)
-                image_bytes = base_image["image"]
-                # get the image extension
-                image_ext = base_image["ext"]
-                # load it to PIL
-                image = Image.open(io.BytesIO(image_bytes))
+                    # get the XREF of the image
+                    xref = img[0]
+                    # extract the image bytes
+                    base_image = pdf_file.extractImage(xref)
+                    image_bytes = base_image["image"]
+                    # get the image extension
+                    image_ext = base_image["ext"]
+                    # load it to PIL
+                    image = Image.open(io.BytesIO(image_bytes))
 
-                # Creamos una nueva carpeta si no existe
-                if not os.path.exists(os.path.join(rootDir, 'Temporal_base', fichero_nombre)):
-                    os.makedirs(os.path.join(rootDir, 'Temporal_base', fichero_nombre))
+                    # Creamos una nueva carpeta si no existe
+                    if not os.path.exists(os.path.join(rootDir, 'Temporal_base', fichero_nombre)):
+                        os.makedirs(os.path.join(rootDir, 'Temporal_base', fichero_nombre))
 
-                # save it to local disk
-                ruta_graba = os.path.join(rootDir, 'Temporal_base', fichero_nombre,
-                                          'image_' + str(x) + '.' + image_ext)
-                image.save(open(ruta_graba, 'wb'))
-                V.append(ruta_graba)
-        V = list(dict.fromkeys(V))
-        d['DirTemporal'] = os.path.join(rootDir, 'Temporal_base')
-        d['Imagenes'] = V
-    except Exception as e:
-        d['DirTemporal'] = ''
-        d['Imagenes'] = ''
-        d['Error'] = 'Error al intentar extraer imágenes del fichero pdf ' + fichero + '  ' + e
+                    # save it to local disk
+                    ruta_graba = os.path.join(rootDir, 'Temporal_base', fichero_nombre,
+                                              'image_' + str(x) + '.' + image_ext)
+                    image.save(open(ruta_graba, 'wb'))
+                    V.append(ruta_graba)
+            V = list(dict.fromkeys(V))
+            d['DirTemporal'] = os.path.join(rootDir, 'Temporal_base')
+            d['Imagenes'] = V
+        except Exception as e:
+            d['DirTemporal'] = ''
+            d['Imagenes'] = ''
+            d['Error'] = 'Error al intentar extraer imágenes del fichero pdf ' + fichero + '  ' + e
+    else:
+        d['Error'] = 'No existe fichero ' + fichero_pdf
+
     return d
 
 

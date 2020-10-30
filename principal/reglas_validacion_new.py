@@ -273,7 +273,7 @@ def reglas_validacion_individual(etiqueta, regla, vdato, fichero, ficheros_respa
             V.append('No existe valor')
         if fichero_tecnico == '':
             d['OK_KO'] = 'KO'
-            V.append('No existe fichero Técnico o no puede ser leido: ' + fichero_nombre + '.pdf')
+            V.append('No existe fichero Técnico o no puede ser leido: ' + fichero_nombre + '.pdf' + '  La revisión debe ser VISUAL')
         else:
             intll = procesos_comunes.busca_datos_pdf_texto(vdato, fichero_tecnico)
             if len(intll['ListaEncontrados']) > 1:
@@ -374,7 +374,7 @@ def reglas_validacion_individual(etiqueta, regla, vdato, fichero, ficheros_respa
         datoreg = 'LATITUD(\W)*' + vdato
         if fichero_tecnico == '':
             d['OK_KO'] = 'KO'
-            V.append('No existe fichero Técnico o no puede ser leido: ' + fichero_nombre + '.pdf')
+            V.append('No existe fichero Técnico o no puede ser leido: ' + fichero_nombre + '.pdf' + '  La revisión debe ser VISUAL')
         else:
             intll = procesos_comunes.busca_datos_pdf_texto(datoreg, fichero_tecnico)
             if len(intll['ListaEncontrados']) >= 1:
@@ -400,7 +400,7 @@ def reglas_validacion_individual(etiqueta, regla, vdato, fichero, ficheros_respa
         datoreg = 'LONGITUD(\W)*' + vdato
         if fichero_tecnico == '':
             d['OK_KO'] = 'KO'
-            V.append('No existe fichero Técnico o no puede ser leido: ' + fichero_nombre + '.pdf')
+            V.append('No existe fichero Técnico o no puede ser leido: ' + fichero_nombre + '.pdf' + '  La revisión debe ser VISUAL')
         else:
             intll = procesos_comunes.busca_datos_pdf_texto(datoreg, fichero_tecnico)
             if len(intll['ListaEncontrados']) >= 1:
@@ -1009,7 +1009,7 @@ def reglas_validacion_individual(etiqueta, regla, vdato, fichero, ficheros_respa
         # VALIDACION IA
         if fichero_tecnico == '':
             d['OK_KO'] = 'KO'
-            V.append('No existe fichero Técnico o no puede ser leido: ' + fichero_nombre + '.pdf')
+            V.append('No existe fichero Técnico o no puede ser leido: ' + fichero_nombre + '.pdf' + '  La revisión debe ser VISUAL')
         else:
             intll = procesos_comunes.busca_datos_pdf_texto(vdato.upper(), fichero_tecnico)
             if len(intll['ListaEncontrados']) >= 1:
@@ -1039,7 +1039,7 @@ def reglas_validacion_individual(etiqueta, regla, vdato, fichero, ficheros_respa
 
         if fichero_tecnico == '':
             d['OK_KO'] = 'KO'
-            V.append('No existe fichero Técnico o no puede ser leido: ' + fichero_nombre + '.pdf')
+            V.append('No existe fichero Técnico o no puede ser leido: ' + fichero_nombre + '.pdf' + '  La revisión debe ser VISUAL')
         else:
             intll = procesos_comunes.busca_datos_pdf_texto(nombrevia['Valor'].upper(), fichero_tecnico)
             if len(intll['ListaEncontrados']) >= 1:
@@ -1074,7 +1074,7 @@ def reglas_validacion_individual(etiqueta, regla, vdato, fichero, ficheros_respa
                                                         './/Informe_Medidas/Puntos_Medida/Punto_Medida/Punto_Sensible/Nombre_Via')
         if fichero_tecnico == '':
             d['OK_KO'] = 'KO'
-            V.append('No existe fichero Técnico o no puede ser leido: ' + fichero_nombre + '.pdf')
+            V.append('No existe fichero Técnico o no puede ser leido: ' + fichero_nombre + '.pdf' + '  La revisión debe ser VISUAL')
         else:
             intll = procesos_comunes.busca_datos_pdf_texto(nombrevia['Valor'].upper(), fichero_tecnico)
             if len(intll['ListaEncontrados']) >= 1:
@@ -1104,7 +1104,7 @@ def reglas_validacion_individual(etiqueta, regla, vdato, fichero, ficheros_respa
         # VALIDACION IA
         if fichero_tecnico == '':
             d['OK_KO'] = 'KO'
-            V.append('No existe fichero Técnico o no puede ser leido: ' + fichero_nombre + '.pdf')
+            V.append('No existe fichero Técnico o no puede ser leido: ' + fichero_nombre + '.pdf' + '  La revisión debe ser VISUAL')
         else:
             intll = procesos_comunes.busca_datos_pdf_texto(vdato.upper(), fichero_tecnico)
             if len(intll['ListaEncontrados']) >= 1:
@@ -1133,7 +1133,7 @@ def reglas_validacion_individual(etiqueta, regla, vdato, fichero, ficheros_respa
                                                         './/Informe_Medidas/Puntos_Medida/Punto_Medida/Punto_Sensible/Nombre_Via')
         if fichero_tecnico == '':
             d['OK_KO'] = 'KO'
-            V.append('No existe fichero Técnico o no puede ser leido: ' + fichero_nombre + '.pdf')
+            V.append('No existe fichero Técnico o no puede ser leido: ' + fichero_nombre + '.pdf' + '  La revisión debe ser VISUAL')
         else:
             intll = procesos_comunes.busca_datos_pdf_texto(nombrevia['Valor'].upper(), fichero_tecnico)
             if len(intll['ListaEncontrados']) >= 1:
@@ -1277,7 +1277,7 @@ def reglas_validacion_individual(etiqueta, regla, vdato, fichero, ficheros_respa
             V.append(
                 'Valor: ' + vdato + '  no coincide con dato extraído de PDF: ' + encontrado + '  . La revisión debe ser VISUAL')
         if pdf_texto == '':
-            V.append(' El fichero técnico PDF no tiene el mismo nombre que el fichero XML o no existe. La revisión debe ser VISUAL')
+            V.append('No existe fichero Técnico o no puede ser leido: ' + fichero_nombre + '.pdf' + '  La revisión debe ser VISUAL')
         # V.append('Para la presente etapa, la validación debe ser visual')
         d['Validacion'] = V
         d['Fecha_Hora'] = datetime.datetime.now()
@@ -1324,7 +1324,7 @@ def reglas_validacion_individual(etiqueta, regla, vdato, fichero, ficheros_respa
         if d['OK_KO'] == "KO/VISUAL":
             V.append('Valor: '+ vdato + '  no coincide con dato extraído de PDF: ' + encontrado +'  . La revisión debe ser VISUAL')
         if pdf_texto == '':
-            V.append(' El fichero técnico PDF no tiene el mismo nombre que el fichero XML o no existe. La revisión debe ser VISUAL')
+            V.append('No existe fichero Técnico o no puede ser leido: ' + fichero_nombre + '.pdf' + '  La revisión debe ser VISUAL')
         #V.append('Para la presente etapa, la validación debe ser visual')
         d['Validacion'] = V
         d['Fecha_Hora'] = datetime.datetime.now()
@@ -1347,7 +1347,7 @@ def reglas_validacion_individual(etiqueta, regla, vdato, fichero, ficheros_respa
         if d['OK_KO'] == "KO/VISUAL":
             V.append('Valor: '+ vdato + '  no coincide con dato extraído de PDF: ' + encontrado +'  . La revisión debe ser VISUAL')
         if pdf_texto == '':
-            V.append(' El fichero técnico PDF no tiene el mismo nombre que el fichero XML o no existe. La revisión debe ser VISUAL')
+            V.append('No existe fichero Técnico o no puede ser leido: ' + fichero_nombre + '.pdf' + '  La revisión debe ser VISUAL')
         d['Validacion'] = V
         d['Fecha_Hora'] = datetime.datetime.now()
         return d
@@ -1369,7 +1369,7 @@ def reglas_validacion_individual(etiqueta, regla, vdato, fichero, ficheros_respa
         if d['OK_KO'] == "KO/VISUAL":
             V.append('Valor: '+ vdato + '  no coincide con dato extraído de PDF: ' + encontrado +'  . La revisión debe ser VISUAL')
         if pdf_texto == '':
-            V.append(' El fichero técnico PDF no tiene el mismo nombre que el fichero XML o no existe. La revisión debe ser VISUAL')
+            V.append('No existe fichero Técnico o no puede ser leido: ' + fichero_nombre + '.pdf' + '  La revisión debe ser VISUAL')
         d['Validacion'] = V
         d['Fecha_Hora'] = datetime.datetime.now()
         return d
@@ -1391,7 +1391,7 @@ def reglas_validacion_individual(etiqueta, regla, vdato, fichero, ficheros_respa
         if d['OK_KO'] == "KO/VISUAL":
             V.append('Valor: '+ vdato + '  no coincide con dato extraído de PDF: ' + encontrado +'  . La revisión debe ser VISUAL')
         if pdf_texto == '':
-            V.append(' El fichero técnico PDF no tiene el mismo nombre que el fichero XML o no existe. La revisión debe ser VISUAL')
+            V.append('No existe fichero Técnico o no puede ser leido: ' + fichero_nombre + '.pdf' + '  La revisión debe ser VISUAL')
         d['Validacion'] = V
         d['Fecha_Hora'] = datetime.datetime.now()
         return d
@@ -1413,7 +1413,7 @@ def reglas_validacion_individual(etiqueta, regla, vdato, fichero, ficheros_respa
         if d['OK_KO'] == "KO/VISUAL":
             V.append('Valor: '+ vdato + '  no coincide con dato extraído de PDF: ' + encontrado +'  . La revisión debe ser VISUAL')
         if pdf_texto == '':
-            V.append(' El fichero técnico PDF no tiene el mismo nombre que el fichero XML o no existe. La revisión debe ser VISUAL')
+            V.append('No existe fichero Técnico o no puede ser leido: ' + fichero_nombre + '.pdf' + '  La revisión debe ser VISUAL')
         d['Validacion'] = V
         d['Fecha_Hora'] = datetime.datetime.now()
         return d
@@ -1435,7 +1435,7 @@ def reglas_validacion_individual(etiqueta, regla, vdato, fichero, ficheros_respa
         if d['OK_KO'] == "KO/VISUAL":
             V.append('Valor: '+ vdato + '  no coincide con dato extraído de PDF: ' + encontrado +'  . La revisión debe ser VISUAL')
         if pdf_texto == '':
-            V.append(' El fichero técnico PDF no tiene el mismo nombre que el fichero XML o no existe. La revisión debe ser VISUAL')
+            V.append('No existe fichero Técnico o no puede ser leido: ' + fichero_nombre + '.pdf' + '  La revisión debe ser VISUAL')
         d['Validacion'] = V
         d['Fecha_Hora'] = datetime.datetime.now()
         return d

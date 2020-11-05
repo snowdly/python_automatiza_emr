@@ -36,7 +36,7 @@ def genera_rutas_trabajo():
     auditoria_carpeta = 'Auditorias/'
     ficheros_respaldo_carpeta = 'Ficheros_Respaldo/'
     logs_carpeta = 'Logs/'
-    #parentDir = os.getcwd()
+    # parentDir = os.getcwd()
     parentDir = os.path.dirname(os.path.abspath('D:/EMR_Auditorias_Python/automatizacion_emr.exe'))
     rutas_base = dict()
     rutas_base['ruta_base'] = parentDir
@@ -69,7 +69,7 @@ def consulta_api_catastro(RC):
         response = requests.get(url=URL, params=PARAMS)
         # print(response.content)
         # guardar fichero temporal
-        #parentDir = os.getcwd()
+        # parentDir = os.getcwd()
         parentDir = os.path.dirname(os.path.abspath('D:/EMR_Auditorias_Python/automatizacion_emr.exe'))
         fichero_xml = os.path.join(parentDir, 'Consulta_DNPRC.xml')
         with open(fichero_xml, 'wb') as f:
@@ -589,8 +589,9 @@ def obtiene_primer_xml(rootDir):
         r['OK_KO'] = 'KO'
     return r
 
+
 def obtiene_pdf_tecnico_competente(carpeta_trabajo):
-    pdf_tecnico_competente=""
+    pdf_tecnico_competente = ""
     r = lista_pdf(carpeta_trabajo)
     if len(r) > 0:
         encontrado = 0
@@ -603,10 +604,11 @@ def obtiene_pdf_tecnico_competente(carpeta_trabajo):
                 pdf.close()
                 if encontrado >= 1: break
             except:
-                pdf_tecnico_competente=""
+                pdf_tecnico_competente = ""
     else:
-        pdf_tecnico_competente=""
+        pdf_tecnico_competente = ""
     return pdf_tecnico_competente
+
 
 def compara_tecnico_competente_pdf_texto(carpeta_trabajo):
     responsable_pdf = dict()
@@ -648,6 +650,7 @@ def compara_tecnico_competente_pdf_texto(carpeta_trabajo):
                                    'una Declaración de Responsable'
     return responsable_pdf
 
+
 def compara_tecnico_competente_pdf(Dato, texto, documento):
     responsable_pdf = dict()
     responsable_pdf = dict()
@@ -676,8 +679,6 @@ def compara_tecnico_competente_pdf(Dato, texto, documento):
         responsable_pdf['Error'] = 'No se han podido procesar los ficheros pdf'
 
     return responsable_pdf
-
-
 
 
 def compara_tecnico_competente_pdf_old(carpeta_trabajo, Dato):
@@ -728,24 +729,29 @@ def compara_tecnico_competente_pdf_old(carpeta_trabajo, Dato):
 
 
 def estructura_xml_completa(fichero_xml):
-    tree = ElementTree.parse(fichero_xml)
-    root = tree.getroot()
     lista_d_xml = []
-    for elemento in listas_comunes.etiqueta_xml:
-        for child in root.findall(elemento):
-            try:
-                if not child.text == '\n':
-                    d_xml = dict()
-                    d_xml['Etiqueta'] = elemento + child.tag
-                    res = next(
-                        (sub for sub in listas_comunes.lista_completa if sub['Etiqueta'] == elemento + child.tag), None)
-                    d_xml['Regla'] = str(res['Regla'])
-                    d_xml['Valor'] = child.text
-                    # print(d_xml)
-                    lista_d_xml.append(d_xml)
-            except Exception as e:
-                print("Error en " + elemento + child.tag)
-                print(e)
+    try:
+        tree = ElementTree.parse(fichero_xml)
+        root = tree.getroot()
+        for elemento in listas_comunes.etiqueta_xml:
+            for child in root.findall(elemento):
+                try:
+                    if not child.text == '\n':
+                        d_xml = dict()
+                        d_xml['Etiqueta'] = elemento + child.tag
+                        res = next(
+                            (sub for sub in listas_comunes.lista_completa if sub['Etiqueta'] == elemento + child.tag),
+                            None)
+                        d_xml['Regla'] = str(res['Regla'])
+                        d_xml['Valor'] = child.text
+                        # print(d_xml)
+                        lista_d_xml.append(d_xml)
+                except Exception as e:
+                    print("Error en " + elemento + child.tag)
+                    print(e)
+    except Exception as er:
+        print(
+            "No es posible procesar el fichero " + fichero_xml + " , revise si la esctructura y/o nombre son correctos")
     return lista_d_xml
 
 
@@ -753,11 +759,11 @@ def extrae_imagenes_pdf(fichero, rootDir):
     d = dict()
     d['Fichero'] = ''
     d['DirTemporal'] = ''
-    d['Imagenes']= ''
+    d['Imagenes'] = ''
     d['Error'] = ''
     fichero_nombre, fichero_extension = os.path.splitext(os.path.basename(fichero))
     fichero_pdf = (os.path.splitext(fichero)[0] + '.pdf').replace('/', '\\')
-    #fichero_pdf = fichero.replace('/', '\\')
+    # fichero_pdf = fichero.replace('/', '\\')
     if os.path.exists(fichero_pdf):
         d['Fichero'] = fichero_pdf
         try:
@@ -850,14 +856,15 @@ def fichero_cap_a_texto(PDF_file, ficheros_respaldo, carpeta_trabajo, nameFile, 
         Part #1 : Converting PDF to images
         '''
         # Store all the pages of the PDF in a variable
-        pages = convert_from_path(PDF_file, poppler_path=os.path.join(ficheros_respaldo, 'poppler-0.68.0/bin'), strict=False)
+        pages = convert_from_path(PDF_file, poppler_path=os.path.join(ficheros_respaldo, 'poppler-0.68.0/bin'),
+                                  strict=False)
         # Counter to store images of each page of PDF to image
         image_counter = 1
         # Iterate through all the pages stored above
         for page in pages:
             filename = "page_" + str(image_counter) + ".jpg"
             # Save the image of the page in system
-            page.save(os.path.join(tempDir, nameFile + '_'+ filename), 'JPEG')
+            page.save(os.path.join(tempDir, nameFile + '_' + filename), 'JPEG')
             # Increment the counter to update filename
             image_counter = image_counter + 1
 
@@ -886,7 +893,7 @@ def fichero_cap_a_texto(PDF_file, ficheros_respaldo, carpeta_trabajo, nameFile, 
             filename = "page_" + str(i) + ".jpg"
 
             # Recognize the text as string in image using pytesserct
-            text = str(((pytesseract.image_to_string(Image.open(os.path.join(tempDir, nameFile + '_'+ filename))))))
+            text = str(((pytesseract.image_to_string(Image.open(os.path.join(tempDir, nameFile + '_' + filename))))))
 
             # The recognized text is stored in variable text
             # Any string processing may be applied on text
@@ -926,14 +933,15 @@ def fichero_pdf_imagen_texto(PDF_file, ficheros_respaldo, carpeta_trabajo, nameT
         Part #1 : Converting PDF to images
         '''
         # Store all the pages of the PDF in a variable
-        pages = convert_from_path(PDF_file, poppler_path=os.path.join(ficheros_respaldo, 'poppler-0.68.0/bin'), strict=False)
+        pages = convert_from_path(PDF_file, poppler_path=os.path.join(ficheros_respaldo, 'poppler-0.68.0/bin'),
+                                  strict=False)
         # Counter to store images of each page of PDF to image
         image_counter = 1
         # Iterate through all the pages stored above
         for page in pages:
             filename = "page_" + str(image_counter) + ".jpg"
             # Save the image of the page in system
-            page.save(os.path.join(tempDir, fichero_nombre + '_'+ filename), 'JPEG')
+            page.save(os.path.join(tempDir, fichero_nombre + '_' + filename), 'JPEG')
             # Increment the counter to update filename
             image_counter = image_counter + 1
 
@@ -962,7 +970,8 @@ def fichero_pdf_imagen_texto(PDF_file, ficheros_respaldo, carpeta_trabajo, nameT
             filename = "page_" + str(i) + ".jpg"
 
             # Recognize the text as string in image using pytesserct
-            text = str(((pytesseract.image_to_string(Image.open(os.path.join(tempDir, fichero_nombre + '_'+ filename)))))).upper()
+            text = str(((pytesseract.image_to_string(
+                Image.open(os.path.join(tempDir, fichero_nombre + '_' + filename)))))).upper()
 
             # The recognized text is stored in variable text
             # Any string processing may be applied on text
@@ -988,6 +997,7 @@ def fichero_pdf_imagen_texto(PDF_file, ficheros_respaldo, carpeta_trabajo, nameT
         d['Error'] = 'Error al convertir en texto el fichero ' + PDF_file + '   ' + e
 
     return d
+
 
 # BUSCA DATOS EN EL TEXTO OBTENIDO POR IA
 def busca_datos_pdf_texto(datoreg, filename):

@@ -36,19 +36,19 @@ def extrae_datos(rootDir):
             rootDir_sub = rootDir_sub + "/" + file
             extrae_datos(rootDir_sub)
         else:
-            if file.endswith(".zip"):
+            if file.lower().endswith(".zip"):
                 logging.debug("Es un zip: " + rootDir + '/' + file)
                 #print("Es un zip: " + rootDir + '/' + file)
                 (carpeta_zip, ext_zip) = os.path.splitext(file)
                 with zipfile.ZipFile(rootDir + '/' + file, 'r') as zip_ref_zip:
                     zip_ref_zip.extractall(rootCarpetaTrabajo)
-            elif file.endswith(".rar"):
+            elif file.lower().endswith(".rar"):
                 logging.debug("Es un rar: " + rootDir + '/' + file)
                 (carpeta_rar, ext_rar) = os.path.splitext(file)
                 r = rarfile.RarFile(rootDir + '/' + file)
                 r.extractall(rootCarpetaTrabajo)
                 r.close()
-            elif file.endswith(".7z"):
+            elif file.lower().endswith(".7z"):
                 logging.debug("Es un 7z: " + rootDir + '/' + file)
 
                 #Archive(rootDir + '/' + file).extractall(rootCarpetaTrabajo)

@@ -36,7 +36,7 @@ def genera_rutas_trabajo():
     auditoria_carpeta = 'Auditorias/'
     ficheros_respaldo_carpeta = 'Ficheros_Respaldo/'
     logs_carpeta = 'Logs/'
-    # parentDir = os.getcwd()
+    #parentDir = os.getcwd()
     parentDir = os.path.dirname(os.path.abspath('D:/EMR_Auditorias_Python/automatizacion_emr.exe'))
     rutas_base = dict()
     rutas_base['ruta_base'] = parentDir
@@ -69,7 +69,7 @@ def consulta_api_catastro(RC):
         response = requests.get(url=URL, params=PARAMS)
         # print(response.content)
         # guardar fichero temporal
-        # parentDir = os.getcwd()
+        #parentDir = os.getcwd()
         parentDir = os.path.dirname(os.path.abspath('D:/EMR_Auditorias_Python/automatizacion_emr.exe'))
         fichero_xml = os.path.join(parentDir, 'Consulta_DNPRC.xml')
         with open(fichero_xml, 'wb') as f:
@@ -1001,6 +1001,23 @@ def fichero_pdf_imagen_texto(PDF_file, ficheros_respaldo, carpeta_trabajo, nameT
 
 # BUSCA DATOS EN EL TEXTO OBTENIDO POR IA
 def busca_datos_pdf_texto(datoreg, filename):
+    d = dict()
+    lista_encontrados = []
+    d['Error'] = ''
+    try:
+        pattern = re.compile(datoreg, re.IGNORECASE)
+        with open(filename, "rt") as myfile:
+            for line in myfile:
+                if pattern.search(line) != None:
+                    # print(line, end='')
+                    lista_encontrados.append(line)
+    except Exception as e:
+        d['ListaEncontrados'] = lista_encontrados
+        d['Error'] = 'Error al buscar datos en  ' + filename + '   ' + e
+    d['ListaEncontrados'] = lista_encontrados
+    return d
+
+def busca_datos_pdf_texto_b(datoreg, filename):
     d = dict()
     lista_encontrados = []
     d['Error'] = ''

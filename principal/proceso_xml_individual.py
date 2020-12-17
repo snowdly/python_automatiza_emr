@@ -107,7 +107,9 @@ def principal(rootDir, rootResultados, nameFile, ficheros_respaldo):
         # print(fichero_nombre, fichero_extension)
         analisis = pd.DataFrame(columns=('Etiqueta', 'Valor', 'OK_KO', 'Validacion', 'Fecha_Hora', 'Comparacion'))
 
+
         pdf_texto = ""
+        '''
         try:
             # TRATAMIENTO DE IMÁGENES
             epdf = procesos_comunes.extrae_imagenes_pdf(fichero, rootDir)
@@ -116,6 +118,7 @@ def principal(rootDir, rootResultados, nameFile, ficheros_respaldo):
             print("Error en el Tratamiento de imágenes: ")
             logging.debug("Error en el Tratamiento de imágenes: ")
             # logging.debug('Error en ' + e3)
+        '''
 
         # GENERA FICHERO DE TEXTO DESDE PDF TECNICO
         print("Inicia conversión a texto de fichero: " + fichero.replace('xml', 'pdf'))
@@ -134,7 +137,7 @@ def principal(rootDir, rootResultados, nameFile, ficheros_respaldo):
                 dv = reglas_validacion_new.reglas_validacion_individual(elemento['Etiqueta'], elemento['Regla'],
                                                                         '' if elemento['Valor'] is None else elemento[
                                                                             'Valor'],
-                                                                        fichero, ficheros_respaldo, rootDir, pdf_texto,
+                                                                        fichero, ficheros_respaldo, rootDir,
                                                                         fichero_texto_cap, fichero_tecnico, r_datos_pdf)
                 # Se agrega comparación desde el listado
                 for completa in listas_comunes.lista_completa:
@@ -149,8 +152,8 @@ def principal(rootDir, rootResultados, nameFile, ficheros_respaldo):
                 logging.debug('Error en ' + elemento['Etiqueta'] + '   ' + err)
 
         # ELIMINAR TEMPORALES
-        if os.path.exists(epdf['DirTemporal']):
-            shutil.rmtree(epdf['DirTemporal'], ignore_errors=True)
+        #if os.path.exists(epdf['DirTemporal']):
+        #    shutil.rmtree(epdf['DirTemporal'], ignore_errors=True)
 
         # GRABACION EN EL EXCEL
         writer = pd.ExcelWriter(
@@ -226,12 +229,13 @@ def principal_refactor(rootDir, rootResultados, nameFile, ficheros_respaldo):
             # ANALISIS DE CADA PDF
             pdf_texto = ""
             try:
+                pdf_texto = ""
                 # TRATAMIENTO DE IMÁGENES
                 epdf = procesos_comunes.extrae_imagenes_pdf(fichero, rootDir)
                 if epdf['Fichero'] != '':
                     pdf_texto = procesos_comunes.extrae_texto_imagen(fichero, rootDir)['Texto']
                 else:
-                    pdf_texto = ''
+                   pdf_texto = ''
             except Exception as e3:
                 print("Error en el Tratamiento de imágenes: ")
                 logging.debug("Error en el Tratamiento de imágenes: ")

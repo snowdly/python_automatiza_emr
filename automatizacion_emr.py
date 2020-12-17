@@ -10,6 +10,10 @@ from validacion_ine_bbdd import valida_ine_bd
 from principal import valida_fuentes_web
 from principal import valida_fuentes_pdf
 from principal import proceso_xml_individual
+from Interfaz import Ventana_Principal
+
+yyy= Ventana_Principal.ventana()
+print(yyy)
 
 # Asignación de variables
 #print (os.path.dirname(os.path.abspath(__file__)))
@@ -26,8 +30,8 @@ logging.basicConfig(level=logging.DEBUG
 resumen = pd.DataFrame(columns=('Etapa_Validacion', 'Resultado', 'Fecha'))
 
 try:
-    logging.debug('Comienza el programa version 1.0')
-    print('Comienza el programa version 1.0')
+    logging.debug('Comienza el programa version 1.5')
+    print('Comienza el programa version 1.5')
     fichero_auditable = procesos_comunes.obtiene_fichero_auditable(rootDirAuditoria)
     nameFile = os.path.splitext(fichero_auditable)[0]
     rutas_trabajo = procesos_comunes.prepara_carpetas_trabajo(rootDirAuditoria)
@@ -51,6 +55,7 @@ except Exception as e:
 try:
     logging.debug('Inicia: Audita estructura de ficheros')
     print('Inicia: Audita estructura de ficheros')
+    # Se usará para la consideraciones
     r = audita_comprimidos.audita_principal()
     resumen = resumen.append(r, ignore_index=True)
     logging.debug('Finaliza: Finaliza estructura de ficheros')

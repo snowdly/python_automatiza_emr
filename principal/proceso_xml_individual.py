@@ -172,12 +172,12 @@ def principal(rootDir, rootResultados, nameFile, ficheros_respaldo):
     return r
 
 
-def principal_refactor(rootDir, rootResultados, nameFile, ficheros_respaldo):
+def principal_refactor(rootDir, rootResultados, nameFile, ficheros_respaldo, Array_Ventana):
     d = dict()
     fichero_texto_cap = ''
     fichero_tecnico_competente = ''
     fichero_tecnico = ''
-
+    print(Array_Ventana)
     # 1. FICHERO CAB - TRATAMIENTO
     # -------------------------------------------------------
     try:
@@ -215,7 +215,7 @@ def principal_refactor(rootDir, rootResultados, nameFile, ficheros_respaldo):
 
     # 3. TRAMIENTO DE XML Y PDF TECNICO COMPETENTE
     #   RECORRE TODOS LOS FICHEROS XML
-    for fichero in procesos_comunes.lista_xml(rootDir):
+    for fichero in procesos_comunes.lista_xml_sectores(rootDir):
         logging.debug("Analizando fichero : " + fichero)
 
         # CREA EL DIRECTORIO SI NO EXISTE
@@ -264,7 +264,8 @@ def principal_refactor(rootDir, rootResultados, nameFile, ficheros_respaldo):
                                                                             fichero, ficheros_respaldo, rootDir,
                                                                             pdf_texto,
                                                                             fichero_texto_cap, fichero_tecnico,
-                                                                            fichero_tecnico_competente)
+                                                                            fichero_tecnico_competente,
+                                                                            Array_Ventana)
                     # Se agrega comparación desde el listado
                     for completa in listas_comunes.lista_completa:
                         if completa['Etiqueta'] == elemento['Etiqueta']:

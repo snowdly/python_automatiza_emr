@@ -43,7 +43,7 @@ def genera_rutas_trabajo():
     rutas_base['ruta_auditoria'] = os.path.join(parentDir, auditoria_carpeta)
     rutas_base['ruta_ficheros_respaldo'] = os.path.join(parentDir, ficheros_respaldo_carpeta)
     rutas_base['ruta_logs'] = os.path.join(parentDir, logs_carpeta)
-    print(rutas_base)
+    #print(rutas_base)
     return rutas_base
 
 
@@ -1033,3 +1033,47 @@ def busca_datos_pdf_texto_b(datoreg, filename):
         d['Error'] = 'Error al buscar datos en  ' + filename + '   ' + e
     d['ListaEncontrados'] = lista_encontrados
     return d
+
+
+def asigna_numeracion_sectores(fichero_xml, ruta_temporal, etiquetas):
+    respuesta = dict()
+    respuesta['Ruta_XML_Temporal'] = ''
+    respuesta['Resultado'] = 'OK'
+    respuesta['Error'] = ''
+    fichero_nombre, fichero_extension = os.path.splitext(os.path.basename(fichero_xml))
+    try:
+        xmlDoc = ElementTree.parse(fichero_xml)
+        rootElement = xmlDoc.getroot()
+        for etiqueta in etiquetas:
+            cantidad = 1
+            for element in rootElement.iter(etiqueta):
+                element.tag = element.tag + str(cantidad)
+                #print(element.tag)
+                cantidad = cantidad + 1
+        # Saving the xml
+        xmlDoc.write(os.path.join(ruta_temporal, fichero_nombre  + fichero_extension))
+        respuesta['Ruta_XML_Temporal'] = os.path.join(ruta_temporal, fichero_nombre +  fichero_extension)
+    except Exception as e:
+        respuesta['Ruta_XML_Temporal'] = ''
+        respuesta['Error'] = 'KO'
+        respuesta['Error'] = 'Error: ' + e
+    return respuesta
+
+
+# Función para ubicar cada xml, retorna una lista
+def lista_xml_sectores(rootDir):
+    etiquetas = ['Sector', 'Antena_Directiva', 'Volumen_Referencia']
+    # Creamos una nueva carpeta si no existe
+    ruta_temporal = os.path.join(rootDir, 'Temporal_base')
+    if not os.path.exists(ruta_temporal):
+        os.makedirs(ruta_temporal)
+    # r=>root, d=>directories, f=>files
+    files_in_dir = []
+    for r, d, f in os.walk(rootDir):
+        for item in f:
+            if '.xml' in item:
+                fichero = os.path.join(r, item)
+                a = asigna_numeracion_sectores(fichero, ruta_temporal, etiquetas)
+                if a['Error'] != 'KO':
+                    files_in_dir.append(a['Ruta_XML_Temporal'])
+    return files_in_dir

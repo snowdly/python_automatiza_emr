@@ -2,10 +2,12 @@ import re
 import datetime
 from principal import procesos_comunes
 from principal import listas_comunes
+from principal import procesos_comunes_segunda_etapa
+from principal import base_datos
 import os
 
 
-def reglas_validacion_individual(etiqueta, regla, vdato, fichero, ficheros_respaldo, carpeta_trabajo, pdf_texto, fichero_texto_cap, fichero_tecnico, datos_pdf_tecnico):
+def reglas_validacion_individual(etiqueta, regla, vdato, fichero, ficheros_respaldo, carpeta_trabajo, pdf_texto, fichero_texto_cap, fichero_tecnico, datos_pdf_tecnico, Array_Ventana):
     fichero_nombre, fichero_extension = os.path.splitext(os.path.basename(fichero))
     d = dict()
     V = []
@@ -36,6 +38,10 @@ def reglas_validacion_individual(etiqueta, regla, vdato, fichero, ficheros_respa
         if not re.match("ALT|MOD", vdato):
             d['OK_KO'] = "KO"
             V.append('Valor debe ser igual a ALT ó MOD')
+        tipo_solicitud, tecnologia = procesos_comunes_segunda_etapa.valida_tipo_solicitud(Array_Ventana)
+        if vdato != tipo_solicitud:
+            d['OK_KO'] = "KO"
+            V.append('Valor encontrado en XML ' + vdato + ' NO coincide con lo indicado en la pantalla inicial ' + tipo_solicitud)
         d['Validacion'] = V
         d['Fecha_Hora'] = datetime.datetime.now()
         d['Comparacion'] = "Se compara con el parámetro Tipo_Solicitud del documento XML"
@@ -135,25 +141,38 @@ def reglas_validacion_individual(etiqueta, regla, vdato, fichero, ficheros_respa
         d['Valor'] = vdato
         d['OK_KO'] = 'OK'
         d['Validacion'] = ''
-        if vdato is None:
-            d['OK_KO'] = 'KO'
-            V.append('No existe valor')
-        if not re.match("((([X-Z])|([LM])){1}([-]?)((\d){7})([-]?)([A-Z]{1}))|((\d{8})([-]?)([A-Z]))", vdato):
-            d['OK_KO'] = "KO"
-            V.append('DNI o NIE no tiene el formato correcto')
-        #r_datos_pdf = procesos_comunes.compara_tecnico_competente_pdf(vdato,
-        #                                                              '' if datos_pdf_tecnico['Texto'] is None else
-        #                                                              datos_pdf_tecnico['Texto'],
-        #                                                              '' if datos_pdf_tecnico['Fichero'] is None else
-        #                                                              datos_pdf_tecnico['Fichero'])
-        if datos_pdf_tecnico == '':
-            d['OK_KO'] = "KO"
-            V.append('No se ha encontrado fichero de Declaración de Responsable , o no ha sido posible leerlo. La revisión debe ser Visual')
+        tipo_estacion = procesos_comunes.valor_elemento_xml(fichero,
+                                                            './/Estacion_Certificada/Datos_Estacion/Tipo_Estacion')[
+            'Valor']
+        if tipo_estacion.upper() == 'ER2' or tipo_estacion == 'ER4' or tipo_estacion == 'ER5':
+            d['OK_KO'] = 'OK'
+            V.append('Cuando Tipo Estación es ' + tipo_estacion + '  NO se comprueban los datos del técnico competente')
         else:
-            intll = procesos_comunes.busca_datos_pdf_texto(vdato, datos_pdf_tecnico)
-            if not (len(intll['ListaEncontrados']) >= 1):
+            if vdato is None:
+                d['OK_KO'] = 'KO'
+                V.append('No existe valor')
+            tipo_estacion = procesos_comunes.valor_elemento_xml(fichero,
+                                                                './/Estacion_Certificada/Datos_Estacion/Tipo_Estacion')[
+                'Valor']
+            if tipo_estacion.upper() == 'ER2' or tipo_estacion == 'ER4' or tipo_estacion == 'ER5':
+                d['OK_KO'] = 'KO'
+                V.append('Cuando Tipo Estación es ' + tipo_estacion + '  NO deben existir datos del técnico competente')
+            if not re.match("((([X-Z])|([LM])){1}([-]?)((\d){7})([-]?)([A-Z]{1}))|((\d{8})([-]?)([A-Z]))", vdato):
                 d['OK_KO'] = "KO"
-                V.append('DNI o NIE no coincide con el fichero de Declaración de Responsable')
+                V.append('DNI o NIE no tiene el formato correcto')
+            #r_datos_pdf = procesos_comunes.compara_tecnico_competente_pdf(vdato,
+            #                                                              '' if datos_pdf_tecnico['Texto'] is None else
+            #                                                              datos_pdf_tecnico['Texto'],
+            #                                                              '' if datos_pdf_tecnico['Fichero'] is None else
+            #                                                              datos_pdf_tecnico['Fichero'])
+            if datos_pdf_tecnico == '':
+                d['OK_KO'] = "KO"
+                V.append('No se ha encontrado fichero de Declaración de Responsable , o no ha sido posible leerlo. La revisión debe ser Visual')
+            else:
+                intll = procesos_comunes.busca_datos_pdf_texto(vdato, datos_pdf_tecnico)
+                if not (len(intll['ListaEncontrados']) >= 1):
+                    d['OK_KO'] = "KO"
+                    V.append('DNI o NIE no coincide con el fichero de Declaración de Responsable')
         d['Validacion'] = V
         d['Fecha_Hora'] = datetime.datetime.now()
         d['Comparacion'] = "Se compara con el documento PDF Declaración Responsable de Técnico competente"
@@ -163,32 +182,45 @@ def reglas_validacion_individual(etiqueta, regla, vdato, fichero, ficheros_respa
         d['Valor'] = vdato
         d['OK_KO'] = 'OK'
         d['Validacion'] = ''
-        if vdato is None:
-            d['OK_KO'] = 'KO'
-            V.append('No existe valor')
-        if not re.match(
-                "^[a-zA-ZàáâäãåąčćęèéêëėįìíîïłńòóôöõøùúûüųūÿýżźñçčšžÀÁÂÄÃÅĄĆČĖĘÈÉÊËÌÍÎÏĮŁŃÒÓÔÖÕØÙÚÛÜŲŪŸÝŻŹÑßÇŒÆČŠŽ∂ð '-]+$",
-                vdato):
-            d['OK_KO'] = "KO"
-            V.append('Nombre no tiene el formato correcto')
-        '''
-        r_datos_pdf = procesos_comunes.compara_tecnico_competente_pdf(vdato,
-                                                                      '' if datos_pdf_tecnico['Texto'] is None else
-                                                                      datos_pdf_tecnico['Texto'],
-                                                                      '' if datos_pdf_tecnico['Fichero'] is None else
-                                                                      datos_pdf_tecnico['Fichero'])
-        if r_datos_pdf['OK_KO'] == 'KO':
-            d['OK_KO'] = "KO"
-        V.append(r_datos_pdf['Error'])
-        '''
-        if datos_pdf_tecnico == '':
-            d['OK_KO'] = "KO"
-            V.append('No se ha encontrado fichero de Declaración de Responsable , o no ha sido posible leerlo. La revisión debe ser Visual')
+        tipo_estacion = procesos_comunes.valor_elemento_xml(fichero,
+                                                            './/Estacion_Certificada/Datos_Estacion/Tipo_Estacion')[
+            'Valor']
+        if tipo_estacion.upper() == 'ER2' or tipo_estacion == 'ER4' or tipo_estacion == 'ER5':
+            d['OK_KO'] = 'OK'
+            V.append('Cuando Tipo Estación es ' + tipo_estacion + '  NO se comprueban los datos del técnico competente')
         else:
-            intll = procesos_comunes.busca_datos_pdf_texto(vdato, datos_pdf_tecnico)
-            if not (len(intll['ListaEncontrados']) >= 1):
+            if vdato is None:
+                d['OK_KO'] = 'KO'
+                V.append('No existe valor')
+            tipo_estacion = procesos_comunes.valor_elemento_xml(fichero,
+                                                                './/Estacion_Certificada/Datos_Estacion/Tipo_Estacion')[
+                'Valor']
+            if tipo_estacion.upper() == 'ER2' or tipo_estacion == 'ER4' or tipo_estacion == 'ER5':
+                d['OK_KO'] = 'KO'
+                V.append('Cuando Tipo Estación es ' + tipo_estacion + '  NO deben existir datos del técnico competente')
+            if not re.match(
+                    "^[a-zA-ZàáâäãåąčćęèéêëėįìíîïłńòóôöõøùúûüųūÿýżźñçčšžÀÁÂÄÃÅĄĆČĖĘÈÉÊËÌÍÎÏĮŁŃÒÓÔÖÕØÙÚÛÜŲŪŸÝŻŹÑßÇŒÆČŠŽ∂ð '-]+$",
+                    vdato):
                 d['OK_KO'] = "KO"
-                V.append('Nombre del técnico no coincide con el fichero de Declaración de Responsable')
+                V.append('Nombre no tiene el formato correcto')
+            '''
+            r_datos_pdf = procesos_comunes.compara_tecnico_competente_pdf(vdato,
+                                                                          '' if datos_pdf_tecnico['Texto'] is None else
+                                                                          datos_pdf_tecnico['Texto'],
+                                                                          '' if datos_pdf_tecnico['Fichero'] is None else
+                                                                          datos_pdf_tecnico['Fichero'])
+            if r_datos_pdf['OK_KO'] == 'KO':
+                d['OK_KO'] = "KO"
+            V.append(r_datos_pdf['Error'])
+            '''
+            if datos_pdf_tecnico == '':
+                d['OK_KO'] = "KO"
+                V.append('No se ha encontrado fichero de Declaración de Responsable , o no ha sido posible leerlo. La revisión debe ser Visual')
+            else:
+                intll = procesos_comunes.busca_datos_pdf_texto(vdato, datos_pdf_tecnico)
+                if not (len(intll['ListaEncontrados']) >= 1):
+                    d['OK_KO'] = "KO"
+                    V.append('Nombre del técnico no coincide con el fichero de Declaración de Responsable')
         d['Validacion'] = V
         d['Fecha_Hora'] = datetime.datetime.now()
         d['Comparacion'] = "Se compara con el documento PDF Declaración Responsable de Técnico competente"
@@ -198,32 +230,45 @@ def reglas_validacion_individual(etiqueta, regla, vdato, fichero, ficheros_respa
         d['Valor'] = vdato
         d['OK_KO'] = 'OK'
         d['Validacion'] = ''
-        if vdato is None:
-            d['OK_KO'] = 'KO'
-            V.append('No existe valor')
-        if not re.match(
-                "^[a-zA-ZàáâäãåąčćęèéêëėįìíîïłńòóôöõøùúûüųūÿýżźñçčšžÀÁÂÄÃÅĄĆČĖĘÈÉÊËÌÍÎÏĮŁŃÒÓÔÖÕØÙÚÛÜŲŪŸÝŻŹÑßÇŒÆČŠŽ∂ð '-]+$",
-                vdato):
-            d['OK_KO'] = "KO"
-            V.append('Apellido no tiene el formato correcto')
-        '''
-        r_datos_pdf = procesos_comunes.compara_tecnico_competente_pdf(vdato,
-                                                                      '' if datos_pdf_tecnico['Texto'] is None else
-                                                                      datos_pdf_tecnico['Texto'],
-                                                                      '' if datos_pdf_tecnico['Fichero'] is None else
-                                                                      datos_pdf_tecnico['Fichero'])
-        if r_datos_pdf['OK_KO'] == 'KO':
-            d['OK_KO'] = "KO"
-        V.append(r_datos_pdf['Error'])
-        '''
-        if datos_pdf_tecnico == '':
-            d['OK_KO'] = "KO"
-            V.append('No se ha encontrado fichero de Declaración de Responsable , o no ha sido posible leerlo. La revisión debe ser Visual')
+        tipo_estacion = procesos_comunes.valor_elemento_xml(fichero,
+                                                            './/Estacion_Certificada/Datos_Estacion/Tipo_Estacion')[
+            'Valor']
+        if tipo_estacion.upper() == 'ER2' or tipo_estacion == 'ER4' or tipo_estacion == 'ER5':
+            d['OK_KO'] = 'OK'
+            V.append('Cuando Tipo Estación es ' + tipo_estacion + '  NO se comprueban los datos del técnico competente')
         else:
-            intll = procesos_comunes.busca_datos_pdf_texto(vdato, datos_pdf_tecnico)
-            if not (len(intll['ListaEncontrados']) >= 1):
+            if vdato is None:
+                d['OK_KO'] = 'KO'
+                V.append('No existe valor')
+            tipo_estacion = procesos_comunes.valor_elemento_xml(fichero,
+                                                                './/Estacion_Certificada/Datos_Estacion/Tipo_Estacion')[
+                'Valor']
+            if tipo_estacion.upper() == 'ER2' or tipo_estacion == 'ER4' or tipo_estacion == 'ER5':
+                d['OK_KO'] = 'KO'
+                V.append('Cuando Tipo Estación es ' + tipo_estacion + '  NO deben existir datos del técnico competente')
+            if not re.match(
+                    "^[a-zA-ZàáâäãåąčćęèéêëėįìíîïłńòóôöõøùúûüųūÿýżźñçčšžÀÁÂÄÃÅĄĆČĖĘÈÉÊËÌÍÎÏĮŁŃÒÓÔÖÕØÙÚÛÜŲŪŸÝŻŹÑßÇŒÆČŠŽ∂ð '-]+$",
+                    vdato):
                 d['OK_KO'] = "KO"
-                V.append('Primer Apellido del técnico no coincide con el fichero de Declaración de Responsable')
+                V.append('Apellido no tiene el formato correcto')
+            '''
+            r_datos_pdf = procesos_comunes.compara_tecnico_competente_pdf(vdato,
+                                                                          '' if datos_pdf_tecnico['Texto'] is None else
+                                                                          datos_pdf_tecnico['Texto'],
+                                                                          '' if datos_pdf_tecnico['Fichero'] is None else
+                                                                          datos_pdf_tecnico['Fichero'])
+            if r_datos_pdf['OK_KO'] == 'KO':
+                d['OK_KO'] = "KO"
+            V.append(r_datos_pdf['Error'])
+            '''
+            if datos_pdf_tecnico == '':
+                d['OK_KO'] = "KO"
+                V.append('No se ha encontrado fichero de Declaración de Responsable , o no ha sido posible leerlo. La revisión debe ser Visual')
+            else:
+                intll = procesos_comunes.busca_datos_pdf_texto(vdato, datos_pdf_tecnico)
+                if not (len(intll['ListaEncontrados']) >= 1):
+                    d['OK_KO'] = "KO"
+                    V.append('Primer Apellido del técnico no coincide con el fichero de Declaración de Responsable')
         d['Validacion'] = V
         d['Fecha_Hora'] = datetime.datetime.now()
         d['Comparacion'] = "Se compara con el documento PDF Declaración Responsable de Técnico competente"
@@ -233,32 +278,29 @@ def reglas_validacion_individual(etiqueta, regla, vdato, fichero, ficheros_respa
         d['Valor'] = vdato
         d['OK_KO'] = 'OK'
         d['Validacion'] = ''
-        if vdato is None:
-            d['OK_KO'] = 'KO'
-            V.append('No existe valor')
-        if not re.match(
-                "^[a-zA-ZàáâäãåąčćęèéêëėįìíîïłńòóôöõøùúûüųūÿýżźñçčšžÀÁÂÄÃÅĄĆČĖĘÈÉÊËÌÍÎÏĮŁŃÒÓÔÖÕØÙÚÛÜŲŪŸÝŻŹÑßÇŒÆČŠŽ∂ð '-]+$",
-                vdato):
-            d['OK_KO'] = "KO"
-            V.append('Apellido no tiene el formato correcto')
-        '''
-        r_datos_pdf = procesos_comunes.compara_tecnico_competente_pdf(vdato,
-                                                                      '' if datos_pdf_tecnico['Texto'] is None else
-                                                                      datos_pdf_tecnico['Texto'],
-                                                                      '' if datos_pdf_tecnico['Fichero'] is None else
-                                                                      datos_pdf_tecnico['Fichero'])
-        if r_datos_pdf['OK_KO'] == 'KO':
-            d['OK_KO'] = "KO"
-        V.append(r_datos_pdf['Error'])
-        '''
-        if datos_pdf_tecnico == '':
-            d['OK_KO'] = "KO"
-            V.append('No se ha encontrado fichero de Declaración de Responsable , o no ha sido posible leerlo. La revisión debe ser Visual')
+        tipo_estacion = procesos_comunes.valor_elemento_xml(fichero,
+                                                            './/Estacion_Certificada/Datos_Estacion/Tipo_Estacion')['Valor']
+        if tipo_estacion.upper() == 'ER2' or tipo_estacion == 'ER4' or tipo_estacion == 'ER5':
+            d['OK_KO'] = 'OK'
+            V.append('Cuando Tipo Estación es ' + tipo_estacion + '  NO se comprueban los datos del técnico competente')
         else:
-            intll = procesos_comunes.busca_datos_pdf_texto(vdato, datos_pdf_tecnico)
-            if not (len(intll['ListaEncontrados']) >= 1):
+            if vdato is None:
+                d['OK_KO'] = 'KO'
+                V.append('No existe valor')
+            if not re.match(
+                    "^[a-zA-ZàáâäãåąčćęèéêëėįìíîïłńòóôöõøùúûüųūÿýżźñçčšžÀÁÂÄÃÅĄĆČĖĘÈÉÊËÌÍÎÏĮŁŃÒÓÔÖÕØÙÚÛÜŲŪŸÝŻŹÑßÇŒÆČŠŽ∂ð '-]+$",
+                    vdato):
                 d['OK_KO'] = "KO"
-                V.append('Segundo Apellido del técnico no coincide con el fichero de Declaración de Responsable')
+                V.append('Apellido no tiene el formato correcto')
+
+            if datos_pdf_tecnico == '':
+                d['OK_KO'] = "KO"
+                V.append('No se ha encontrado fichero de Declaración de Responsable , o no ha sido posible leerlo. La revisión debe ser Visual')
+            else:
+                intll = procesos_comunes.busca_datos_pdf_texto(vdato, datos_pdf_tecnico)
+                if not (len(intll['ListaEncontrados']) >= 1):
+                    d['OK_KO'] = "KO"
+                    V.append('Segundo Apellido del técnico no coincide con el fichero de Declaración de Responsable')
         d['Validacion'] = V
         d['Fecha_Hora'] = datetime.datetime.now()
         d['Comparacion'] = "Se compara con el documento PDF Declaración Responsable de Técnico competente"
@@ -297,6 +339,11 @@ def reglas_validacion_individual(etiqueta, regla, vdato, fichero, ficheros_respa
         if not re.match("SI|NO", vdato):
             d['OK_KO'] = "KO"
             V.append('Valor debe ser igual a SI ó NO')
+        em = procesos_comunes_segunda_etapa.valida_emplazamiento_compartido(Array_Ventana)
+        if em != vdato.upper():
+            d['OK_KO'] = "KO"
+            V.append('Valor encontrado en XML ' + vdato + ' NO coincide con lo indicado en la pantalla inicial ' + em)
+        '''
         #VALIDACION IA
         datoreg=''
         valor_tipo_sistema = procesos_comunes.valor_elemento_xml(fichero,
@@ -315,6 +362,7 @@ def reglas_validacion_individual(etiqueta, regla, vdato, fichero, ficheros_respa
                 d['OK_KO'] = 'KO/VISUAL'
                 V.append('Valor no coincide con información del documento CAP. Realizar validación VISUAL')
         #V.append('Para la presente etapa, la validación debe ser visual')
+        '''
         d['Validacion'] = V
         d['Fecha_Hora'] = datetime.datetime.now()
         d['Comparacion'] = "Se compara con información del documento CAP"
@@ -617,6 +665,10 @@ def reglas_validacion_individual(etiqueta, regla, vdato, fichero, ficheros_respa
         if vdato is None:
             d['OK_KO'] = 'KO'
             V.append('No existe valor')
+        tipo_sistema = procesos_comunes_segunda_etapa.valida_tipo_sistema(Array_Ventana)
+        if tipo_sistema!=vdato.upper():
+            d['OK_KO'] = 'KO'
+            V.append('Valor encontrado en XML ' + vdato + ' NO coincide con lo indicado en la pantalla inicial ' + tipo_sistema)
         if not re.match("UMTS|GSM|DCS|RB|LTE|WIMAX|LMDS3.5", vdato):
             d['OK_KO'] = "KO"
             V.append('Valores UMTS|GSM|DCS|RB|LTE|WIMAX|LMDS3.5')
@@ -648,6 +700,13 @@ def reglas_validacion_individual(etiqueta, regla, vdato, fichero, ficheros_respa
         if vdato is None:
             d['OK_KO'] = 'KO'
             V.append('No existe valor')
+        tipo_estacion = procesos_comunes.valor_elemento_xml(fichero,
+                                                            './/Estacion_Certificada/Datos_Estacion/Tipo_Estacion')[
+            'Valor']
+        if tipo_estacion.upper() == 'ER1' or tipo_estacion.upper() == 'ER2':
+            if vdato.upper() != "SI":
+                d['OK_KO'] = "KO"
+                V.append('Cuando es ER1 y ER2 deber ser SI')
         if not re.match("SI|NO", vdato):
             d['OK_KO'] = "KO"
             V.append('Valor debe ser igual a SI|NO')
@@ -672,11 +731,15 @@ def reglas_validacion_individual(etiqueta, regla, vdato, fichero, ficheros_respa
     elif regla == 'R_Estacion_Certificada_Datos_Estacion_Num_Sectores_Interiores':
         d['Etiqueta'] = etiqueta
         d['Valor'] = vdato
-        d['OK_KO'] = 'OK/VISUAL'
+        d['OK_KO'] = 'OK'
         d['Validacion'] = ''
         if vdato is None:
             d['OK_KO'] = 'KO'
             V.append('No existe valor')
+        num_interiores = procesos_comunes_segunda_etapa.cantidad_sectores(Array_Ventana, 3)
+        if num_interiores != vdato:
+            d['OK_KO'] = "KO"
+            V.append('Valor encontrado en XML ' + vdato + ' NO coincide con lo indicado en la pantalla inicial ' + num_interiores)
         sector_interior = procesos_comunes.valor_elemento_xml(fichero,
                                                               './/Estacion_Certificada/Datos_Estacion/Num_Sectores_Interiores')[
             'Valor']
@@ -691,18 +754,23 @@ def reglas_validacion_individual(etiqueta, regla, vdato, fichero, ficheros_respa
             d['OK_KO'] = "KO"
             V.append(
                 'El valor de Num_Sectores_Interiores más Num_Sectores_Exteriores, es diferente a la cantidad de Sectores')
-        V.append('Dato con coherencia, pendiente validarse visualmente')
+        #V.append('Dato con coherencia, pendiente validarse visualmente')
         d['Validacion'] = V
         d['Fecha_Hora'] = datetime.datetime.now()
         return d
     elif regla == 'R_Estacion_Certificada_Datos_Estacion_Num_Sectores_Exteriores':
         d['Etiqueta'] = etiqueta
         d['Valor'] = vdato
-        d['OK_KO'] = 'OK/VISUAL'
+        d['OK_KO'] = 'OK'
         d['Validacion'] = ''
         if vdato is None:
             d['OK_KO'] = 'KO'
             V.append('No existe valor')
+        num_exteriores = procesos_comunes_segunda_etapa.cantidad_sectores(Array_Ventana, 4)
+        if num_exteriores != vdato:
+            d['OK_KO'] = "KO"
+            V.append(
+                'Valor encontrado en XML ' + vdato + ' NO coincide con lo indicado en la pantalla inicial ' + num_exteriores)
         sector_interior = procesos_comunes.valor_elemento_xml(fichero,
                                                               './/Estacion_Certificada/Datos_Estacion/Num_Sectores_Interiores')[
             'Valor']
@@ -717,7 +785,7 @@ def reglas_validacion_individual(etiqueta, regla, vdato, fichero, ficheros_respa
             d['OK_KO'] = "KO"
             V.append(
                 'El valor de Num_Sectores_Interiores más Num_Sectores_Exteriores, es diferente a la cantidad de Sectores')
-        V.append('Dato con coherencia, pendiente validarse visualmente')
+        #V.append('Dato con coherencia, pendiente validarse visualmente')
         d['Validacion'] = V
         d['Fecha_Hora'] = datetime.datetime.now()
         return d
@@ -746,6 +814,24 @@ def reglas_validacion_individual(etiqueta, regla, vdato, fichero, ficheros_respa
         if not re.match("\d{1,}\.{0,1}\d{1,}", vdato):
             d['OK_KO'] = 'KO'
             V.append('Debe ser número')
+        tipo_estacion = procesos_comunes.valor_elemento_xml(fichero,
+                                                            './/Estacion_Certificada/Datos_Estacion/Tipo_Estacion')['Valor']
+        if tipo_estacion.upper() == 'ER1' or tipo_estacion == 'ER3':
+            try:
+                if int(vdato) <= 10000:
+                    d['OK_KO'] = 'KO'
+                    V.append('Cuando Tipo Estación es ' + tipo_estacion + '  debe ser PIRE > 10W')
+            except:
+                d['OK_KO'] = 'KO'
+                V.append('El valor no es numérico')
+        if tipo_estacion.upper() == 'ER2' or tipo_estacion == 'ER4':
+            try:
+                if int(vdato) > 10000:
+                    d['OK_KO'] = 'KO'
+                    V.append('Cuando Tipo Estación es ' + tipo_estacion + '  debe ser PIRE <= 10W')
+            except:
+                d['OK_KO'] = 'KO'
+                V.append('El valor no es numérico')
         d['Validacion'] = V
         d['Fecha_Hora'] = datetime.datetime.now()
         return d
@@ -766,15 +852,25 @@ def reglas_validacion_individual(etiqueta, regla, vdato, fichero, ficheros_respa
     elif regla == 'R_Estacion_Certificada_Datos_Estacion_Sectores_Sector_Localizacion_Antena':
         d['Etiqueta'] = etiqueta
         d['Valor'] = vdato
-        d['OK_KO'] = 'VISUAL'
+        d['OK_KO'] = 'OK'
         d['Validacion'] = ''
+        if vdato == "INTERIOR":
+            interior = procesos_comunes_segunda_etapa.cantidad_sectores(Array_Ventana, 3)
+            if interior == '0':
+                d['OK_KO'] = 'KO'
+                V.append('En la pantalla inicial no se ha seleccionado sectores interiores')
+        if vdato == "EXTERIOR":
+            interior = procesos_comunes_segunda_etapa.cantidad_sectores(Array_Ventana, 4)
+            if interior == '0':
+                d['OK_KO'] = 'KO'
+                V.append('En la pantalla inicial no se ha seleccionado sectores exteriores')
         if vdato is None:
             d['OK_KO'] = 'KO'
             V.append('No existe valor')
         if not re.match("EXTERIOR|INTERIOR", vdato):
             d['OK_KO'] = "KO"
             V.append('Valor debe ser igual a EXTERIOR ó INTERIOR')
-        V.append('Para la presente etapa, la validación debe ser visual')
+        #V.append('Para la presente etapa, la validación debe ser visual')
         d['Validacion'] = V
         d['Fecha_Hora'] = datetime.datetime.now()
         return d
@@ -798,6 +894,11 @@ def reglas_validacion_individual(etiqueta, regla, vdato, fichero, ficheros_respa
         d['Valor'] = vdato
         d['OK_KO'] = 'OK'
         d['Validacion'] = ''
+        modelo_antena = procesos_comunes_segunda_etapa.modelo_antena(Array_Ventana)
+        r = base_datos.obtiene_polarizacion(modelo_antena)
+        if r["Polarizacion"] != vdato :
+            d['OK_KO'] = 'KO'
+            V.append('Para el modelo de Antena '+ modelo_antena +' no existe dato de Polarización en la Base de Datos')
         if vdato is None:
             d['OK_KO'] = 'KO'
             V.append('No existe valor')
@@ -919,12 +1020,19 @@ def reglas_validacion_individual(etiqueta, regla, vdato, fichero, ficheros_respa
         d['Valor'] = vdato
         d['OK_KO'] = 'OK'
         d['Validacion'] = ''
-        if vdato is None:
+        tipo_estacion = procesos_comunes.valor_elemento_xml(fichero,
+                                                            './/Estacion_Certificada/Datos_Estacion/Tipo_Estacion')[
+            'Valor']
+        if tipo_estacion.upper() == 'ER2' or tipo_estacion == 'ER4' or tipo_estacion == 'ER5':
             d['OK_KO'] = 'KO'
-            V.append('No existe valor')
-        if not re.match("ESFERA|CILINDRO|PARALELEPIPEDO|TOROIDE|OTRA", vdato):
-            d['OK_KO'] = "KO"
-            V.append('Valores ESFERA|CILINDRO|PARALELEPIPEDO|TOROIDE|OTRA')
+            V.append('Cuando Tipo Estación es ' + tipo_estacion + '  NO deben aparecer datos del Volumen de referencia')
+        else:
+            if vdato is None:
+                d['OK_KO'] = 'KO'
+                V.append('No existe valor')
+            if not re.match("ESFERA|CILINDRO|PARALELEPIPEDO|TOROIDE|OTRA", vdato):
+                d['OK_KO'] = "KO"
+                V.append('Valores ESFERA|CILINDRO|PARALELEPIPEDO|TOROIDE|OTRA')
         d['Validacion'] = V
         d['Fecha_Hora'] = datetime.datetime.now()
         return d
@@ -933,10 +1041,17 @@ def reglas_validacion_individual(etiqueta, regla, vdato, fichero, ficheros_respa
         d['Valor'] = vdato
         d['OK_KO'] = 'VISUAL'
         d['Validacion'] = ''
-        if vdato is None:
+        tipo_estacion = procesos_comunes.valor_elemento_xml(fichero,
+                                                            './/Estacion_Certificada/Datos_Estacion/Tipo_Estacion')[
+            'Valor']
+        if tipo_estacion.upper() == 'ER2' or tipo_estacion == 'ER4' or tipo_estacion == 'ER5':
             d['OK_KO'] = 'KO'
-            V.append('No existe valor')
-        V.append('Para la presente etapa, la validación debe ser visual')
+            V.append('Cuando Tipo Estación es ' + tipo_estacion + '  NO deben aparecer datos del Volumen de referencia')
+        else:
+            if vdato is None:
+                d['OK_KO'] = 'KO'
+                V.append('No existe valor')
+            V.append('Para la presente etapa, la validación debe ser visual')
         d['Validacion'] = V
         d['Fecha_Hora'] = datetime.datetime.now()
         return d
@@ -945,12 +1060,19 @@ def reglas_validacion_individual(etiqueta, regla, vdato, fichero, ficheros_respa
         d['Valor'] = vdato
         d['OK_KO'] = 'VISUAL'
         d['Validacion'] = ''
-        if vdato is None:
+        tipo_estacion = procesos_comunes.valor_elemento_xml(fichero,
+                                                            './/Estacion_Certificada/Datos_Estacion/Tipo_Estacion')[
+            'Valor']
+        if tipo_estacion.upper() == 'ER2' or tipo_estacion == 'ER4' or tipo_estacion == 'ER5':
             d['OK_KO'] = 'KO'
-            V.append('No existe valor')
-        if not re.match('1|2.56|4', vdato):
-            d['OK_KO'] = 'KO'
-            V.append('Valor debe ser igual a 1 ó 2.56 ó 4')
+            V.append('Cuando Tipo Estación es ' + tipo_estacion + ' NO deben aparecer datos del Volumen de referencia')
+        else:
+            if vdato is None:
+                d['OK_KO'] = 'KO'
+                V.append('No existe valor')
+            if not re.match('1|2.56|4', vdato):
+                d['OK_KO'] = 'KO'
+                V.append('Valor debe ser igual a 1 ó 2.56 ó 4')
         V.append('Para la presente etapa, la validación debe ser visual')
         d['Validacion'] = V
         d['Fecha_Hora'] = datetime.datetime.now()
@@ -1005,7 +1127,12 @@ def reglas_validacion_individual(etiqueta, regla, vdato, fichero, ficheros_respa
         d['Valor'] = vdato
         d['OK_KO'] = 'OK'
         d['Validacion'] = ''
-
+        tipo_estacion = procesos_comunes.valor_elemento_xml(fichero,
+                                                            './/Estacion_Certificada/Datos_Estacion/Tipo_Estacion')[
+            'Valor']
+        if tipo_estacion.upper() == 'ER3' or tipo_estacion == 'ER4' or tipo_estacion == 'ER5':
+            d['OK_KO'] = 'KO'
+            V.append('Cuando Tipo Estación es ' + tipo_estacion + '  NO deben existir puntos sensibles')
         # VALIDACION IA
         if fichero_tecnico == '':
             d['OK_KO'] = 'KO'
@@ -1027,6 +1154,12 @@ def reglas_validacion_individual(etiqueta, regla, vdato, fichero, ficheros_respa
         d['Valor'] = vdato
         d['OK_KO'] = 'OK'
         d['Validacion'] = ''
+        tipo_estacion = procesos_comunes.valor_elemento_xml(fichero,
+                                                            './/Estacion_Certificada/Datos_Estacion/Tipo_Estacion')[
+            'Valor']
+        if tipo_estacion.upper() == 'ER3' or tipo_estacion == 'ER4' or tipo_estacion == 'ER5':
+            d['OK_KO'] = 'KO'
+            V.append('Cuando Tipo Estación es ' + tipo_estacion + '  NO deben existir puntos sensibles')
         if vdato is None:
             d['OK_KO'] = 'KO'
             V.append('No existe valor')
@@ -1062,6 +1195,12 @@ def reglas_validacion_individual(etiqueta, regla, vdato, fichero, ficheros_respa
         d['Valor'] = vdato
         d['OK_KO'] = 'OK'
         d['Validacion'] = ''
+        tipo_estacion = procesos_comunes.valor_elemento_xml(fichero,
+                                                            './/Estacion_Certificada/Datos_Estacion/Tipo_Estacion')[
+            'Valor']
+        if tipo_estacion.upper() == 'ER3' or tipo_estacion == 'ER4' or tipo_estacion == 'ER5':
+            d['OK_KO'] = 'KO'
+            V.append('Cuando Tipo Estación es ' + tipo_estacion + '  NO deben existir puntos sensibles')
         if vdato is None:
             d['OK_KO'] = 'KO'
             V.append('No existe valor')
@@ -1098,6 +1237,12 @@ def reglas_validacion_individual(etiqueta, regla, vdato, fichero, ficheros_respa
         d['Valor'] = vdato
         d['OK_KO'] = 'OK'
         d['Validacion'] = ''
+        tipo_estacion = procesos_comunes.valor_elemento_xml(fichero,
+                                                            './/Estacion_Certificada/Datos_Estacion/Tipo_Estacion')[
+            'Valor']
+        if tipo_estacion.upper() == 'ER3' or tipo_estacion == 'ER4' or tipo_estacion == 'ER5':
+            d['OK_KO'] = 'KO'
+            V.append('Cuando Tipo Estación es ' + tipo_estacion + '  NO deben existir puntos sensibles')
         if vdato is None:
             d['OK_KO'] = 'KO'
             V.append('No existe valor')
@@ -1121,6 +1266,12 @@ def reglas_validacion_individual(etiqueta, regla, vdato, fichero, ficheros_respa
         d['Valor'] = vdato
         d['OK_KO'] = 'OK'
         d['Validacion'] = ''
+        tipo_estacion = procesos_comunes.valor_elemento_xml(fichero,
+                                                            './/Estacion_Certificada/Datos_Estacion/Tipo_Estacion')[
+            'Valor']
+        if tipo_estacion.upper() == 'ER3' or tipo_estacion == 'ER4' or tipo_estacion == 'ER5':
+            d['OK_KO'] = 'KO'
+            V.append('Cuando Tipo Estación es ' + tipo_estacion + '  NO deben existir puntos sensibles')
         if vdato is None:
             d['OK_KO'] = 'KO'
             V.append('No existe valor')
@@ -1156,6 +1307,12 @@ def reglas_validacion_individual(etiqueta, regla, vdato, fichero, ficheros_respa
         d['Valor'] = vdato
         d['OK_KO'] = 'VISUAL'
         d['Validacion'] = ''
+        tipo_estacion = procesos_comunes.valor_elemento_xml(fichero,
+                                                            './/Estacion_Certificada/Datos_Estacion/Tipo_Estacion')[
+            'Valor']
+        if tipo_estacion.upper() == 'ER3' or tipo_estacion == 'ER4' or tipo_estacion == 'ER5':
+            d['OK_KO'] = 'KO'
+            V.append('Cuando Tipo Estación es ' + tipo_estacion + '  NO deben existir puntos sensibles')
         if vdato is None:
             d['OK_KO'] = 'KO'
             V.append('No existe valor')
@@ -1171,6 +1328,12 @@ def reglas_validacion_individual(etiqueta, regla, vdato, fichero, ficheros_respa
         d['Valor'] = vdato
         d['OK_KO'] = 'OK'
         d['Validacion'] = ''
+        tipo_estacion = procesos_comunes.valor_elemento_xml(fichero,
+                                                            './/Estacion_Certificada/Datos_Estacion/Tipo_Estacion')[
+            'Valor']
+        if tipo_estacion.upper() == 'ER3' or tipo_estacion == 'ER4' or tipo_estacion == 'ER5':
+            d['OK_KO'] = 'KO'
+            V.append('Cuando Tipo Estación es ' + tipo_estacion + '  NO deben existir puntos sensibles')
         if vdato is None:
             d['OK_KO'] = 'KO'
             V.append('No existe valor')
@@ -1188,6 +1351,12 @@ def reglas_validacion_individual(etiqueta, regla, vdato, fichero, ficheros_respa
         d['Valor'] = vdato
         d['OK_KO'] = 'OK'
         d['Validacion'] = ''
+        tipo_estacion = procesos_comunes.valor_elemento_xml(fichero,
+                                                            './/Estacion_Certificada/Datos_Estacion/Tipo_Estacion')[
+            'Valor']
+        if tipo_estacion.upper() == 'ER3' or tipo_estacion == 'ER4' or tipo_estacion == 'ER5':
+            d['OK_KO'] = 'KO'
+            V.append('Cuando Tipo Estación es ' + tipo_estacion + '  NO deben existir puntos sensibles')
         if vdato is None:
             d['OK_KO'] = 'KO'
             V.append('No existe valor')
@@ -1205,6 +1374,12 @@ def reglas_validacion_individual(etiqueta, regla, vdato, fichero, ficheros_respa
         d['Valor'] = vdato
         d['OK_KO'] = 'OK'
         d['Validacion'] = ''
+        tipo_estacion = procesos_comunes.valor_elemento_xml(fichero,
+                                                            './/Estacion_Certificada/Datos_Estacion/Tipo_Estacion')[
+            'Valor']
+        if tipo_estacion.upper() == 'ER3' or tipo_estacion == 'ER4' or tipo_estacion == 'ER5':
+            d['OK_KO'] = 'KO'
+            V.append('Cuando Tipo Estación es ' + tipo_estacion + '  NO deben existir puntos sensibles')
         if vdato is None:
             d['OK_KO'] = 'KO'
             V.append('No existe valor')

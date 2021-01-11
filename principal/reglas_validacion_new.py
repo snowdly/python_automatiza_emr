@@ -308,21 +308,25 @@ def reglas_validacion_individual(etiqueta, regla, vdato, fichero, ficheros_respa
     elif regla == 'R_Estacion_Certificada_Datos_Emplazamiento_Codigo_Emplazamiento':
         d['Etiqueta'] = etiqueta
         d['Valor'] = vdato
-        d['OK_KO'] = 'OK'
-        d['Validacion'] = ''
+        d['OK_KO'] = 'OK/VISUAL'
+        d['Validacion'] = 'Para la presente versión se debe revisar Infoantenas Visualmente'
         if vdato is None:
             d['OK_KO'] = 'KO'
             V.append('No existe valor')
-        if fichero_tecnico == '':
+        c = procesos_comunes.busca_texto_titulo_documento(fichero_nombre.strip(), vdato.strip())
+        if vdato.strip() != c['Elemento_Encontrado']:
             d['OK_KO'] = 'KO'
-            V.append('No existe fichero Técnico o no puede ser leido: ' + fichero_nombre + '.pdf' + '  La revisión debe ser VISUAL')
-        else:
-            intll = procesos_comunes.busca_datos_pdf_texto(vdato, fichero_tecnico)
-            if len(intll['ListaEncontrados']) > 1:
-                d['OK_KO'] = 'OK'
-            else:
-                d['OK_KO'] = 'KO/VISUAL'
-                V.append('Valor no coincide con información del documento Técnico. Realizar validación VISUAL')
+            V.append('El dato no coincide con el nombre del documento')
+        # if fichero_tecnico == '':
+        #     d['OK_KO'] = 'KO'
+        #     V.append('No existe fichero Técnico o no puede ser leido: ' + fichero_nombre + '.pdf' + '  La revisión debe ser VISUAL')
+        # else:
+        #     intll = procesos_comunes.busca_datos_pdf_texto(vdato, fichero_tecnico)
+        #     if len(intll['ListaEncontrados']) > 1:
+        #         d['OK_KO'] = 'OK'
+        #     else:
+        #         d['OK_KO'] = 'KO/VISUAL'
+        #         V.append('Valor no coincide con información del documento Técnico. Realizar validación VISUAL')
 
         d['Validacion'] = V
         d['Fecha_Hora'] = datetime.datetime.now()
@@ -412,8 +416,8 @@ def reglas_validacion_individual(etiqueta, regla, vdato, fichero, ficheros_respa
     elif regla == 'R_Estacion_Certificada_Datos_Emplazamiento_Latitud':
         d['Etiqueta'] = etiqueta
         d['Valor'] = vdato
-        d['OK_KO'] = 'OK'
-        d['Validacion'] = ''
+        d['OK_KO'] = 'OK/VISUAL'
+        d['Validacion'] = 'Para la presente versión se debe revisar Infoantenas Visualmente'
         if vdato is None:
             d['OK_KO'] = 'KO'
             V.append('No existe valor')
@@ -438,8 +442,8 @@ def reglas_validacion_individual(etiqueta, regla, vdato, fichero, ficheros_respa
     elif regla == 'R_Estacion_Certificada_Datos_Emplazamiento_Longitud':
         d['Etiqueta'] = etiqueta
         d['Valor'] = vdato
-        d['OK_KO'] = 'OK'
-        d['Validacion'] = ''
+        d['OK_KO'] = 'OK/VISUAL'
+        d['Validacion'] = 'Para la presente versión se debe revisar Infoantenas Visualmente'
         if vdato is None:
             d['OK_KO'] = 'KO'
             V.append('No existe valor')
@@ -506,8 +510,8 @@ def reglas_validacion_individual(etiqueta, regla, vdato, fichero, ficheros_respa
     elif regla == 'R_Estacion_Certificada_Datos_Emplazamiento_Cota_Terreno_Sobre_Nivel_Mar':
         d['Etiqueta'] = etiqueta
         d['Valor'] = vdato
-        d['OK_KO'] = 'VISUAL'
-        d['Validacion'] = ''
+        d['OK_KO'] = 'OK/VISUAL'
+        d['Validacion'] = 'Para la presente versión se debe revisar Iberpix Visualmente'
         if vdato is None:
             d['OK_KO'] = 'KO'
             V.append('No existe valor')
@@ -789,7 +793,7 @@ def reglas_validacion_individual(etiqueta, regla, vdato, fichero, ficheros_respa
         d['Validacion'] = V
         d['Fecha_Hora'] = datetime.datetime.now()
         return d
-    elif regla == 'R_Estacion_Certificada_Datos_Estacion_Sectores_Sector_Tipo_Potencia_Radiada':
+    elif regla == 'R_Estacion_Certificada_Datos_Estacion_Sectores_Sector1_Tipo_Potencia_Radiada':
         d['Etiqueta'] = etiqueta
         d['Valor'] = vdato
         d['OK_KO'] = 'OK'
@@ -803,7 +807,49 @@ def reglas_validacion_individual(etiqueta, regla, vdato, fichero, ficheros_respa
         d['Validacion'] = V
         d['Fecha_Hora'] = datetime.datetime.now()
         return d
-    elif regla == 'R_Estacion_Certificada_Datos_Estacion_Sectores_Sector_Potencia_Maxima_Total':
+    elif regla == 'R_Estacion_Certificada_Datos_Estacion_Sectores_Sector2_Tipo_Potencia_Radiada':
+        d['Etiqueta'] = etiqueta
+        d['Valor'] = vdato
+        d['OK_KO'] = 'OK'
+        d['Validacion'] = ''
+        if vdato is None:
+            d['OK_KO'] = 'KO'
+            V.append('No existe valor')
+        if not re.match("PIRE", vdato):
+            d['OK_KO'] = "KO"
+            V.append('Valor debe ser igual a PIRE')
+        d['Validacion'] = V
+        d['Fecha_Hora'] = datetime.datetime.now()
+        return d
+    elif regla == 'R_Estacion_Certificada_Datos_Estacion_Sectores_Sector3_Tipo_Potencia_Radiada':
+        d['Etiqueta'] = etiqueta
+        d['Valor'] = vdato
+        d['OK_KO'] = 'OK'
+        d['Validacion'] = ''
+        if vdato is None:
+            d['OK_KO'] = 'KO'
+            V.append('No existe valor')
+        if not re.match("PIRE", vdato):
+            d['OK_KO'] = "KO"
+            V.append('Valor debe ser igual a PIRE')
+        d['Validacion'] = V
+        d['Fecha_Hora'] = datetime.datetime.now()
+        return d
+    elif regla == 'R_Estacion_Certificada_Datos_Estacion_Sectores_Sector4_Tipo_Potencia_Radiada':
+        d['Etiqueta'] = etiqueta
+        d['Valor'] = vdato
+        d['OK_KO'] = 'OK'
+        d['Validacion'] = ''
+        if vdato is None:
+            d['OK_KO'] = 'KO'
+            V.append('No existe valor')
+        if not re.match("PIRE", vdato):
+            d['OK_KO'] = "KO"
+            V.append('Valor debe ser igual a PIRE')
+        d['Validacion'] = V
+        d['Fecha_Hora'] = datetime.datetime.now()
+        return d
+    elif regla == 'R_Estacion_Certificada_Datos_Estacion_Sectores_Sector1_Potencia_Maxima_Total':
         d['Etiqueta'] = etiqueta
         d['Valor'] = vdato
         d['OK_KO'] = 'OK'
@@ -835,7 +881,103 @@ def reglas_validacion_individual(etiqueta, regla, vdato, fichero, ficheros_respa
         d['Validacion'] = V
         d['Fecha_Hora'] = datetime.datetime.now()
         return d
-    elif regla == 'R_Estacion_Certificada_Datos_Estacion_Sectores_Sector_Unidad_Potencia_Maxima_Total':
+    elif regla == 'R_Estacion_Certificada_Datos_Estacion_Sectores_Sector2_Potencia_Maxima_Total':
+        d['Etiqueta'] = etiqueta
+        d['Valor'] = vdato
+        d['OK_KO'] = 'OK'
+        d['Validacion'] = ''
+        if vdato is None:
+            d['OK_KO'] = 'KO'
+            V.append('No existe valor')
+        if not re.match("\d{1,}\.{0,1}\d{1,}", vdato):
+            d['OK_KO'] = 'KO'
+            V.append('Debe ser número')
+        tipo_estacion = procesos_comunes.valor_elemento_xml(fichero,
+                                                            './/Estacion_Certificada/Datos_Estacion/Tipo_Estacion')['Valor']
+        if tipo_estacion.upper() == 'ER1' or tipo_estacion == 'ER3':
+            try:
+                if int(vdato) <= 10000:
+                    d['OK_KO'] = 'KO'
+                    V.append('Cuando Tipo Estación es ' + tipo_estacion + '  debe ser PIRE > 10W')
+            except:
+                d['OK_KO'] = 'KO'
+                V.append('El valor no es numérico')
+        if tipo_estacion.upper() == 'ER2' or tipo_estacion == 'ER4':
+            try:
+                if int(vdato) > 10000:
+                    d['OK_KO'] = 'KO'
+                    V.append('Cuando Tipo Estación es ' + tipo_estacion + '  debe ser PIRE <= 10W')
+            except:
+                d['OK_KO'] = 'KO'
+                V.append('El valor no es numérico')
+        d['Validacion'] = V
+        d['Fecha_Hora'] = datetime.datetime.now()
+        return d
+    elif regla == 'R_Estacion_Certificada_Datos_Estacion_Sectores_Sector3_Potencia_Maxima_Total':
+        d['Etiqueta'] = etiqueta
+        d['Valor'] = vdato
+        d['OK_KO'] = 'OK'
+        d['Validacion'] = ''
+        if vdato is None:
+            d['OK_KO'] = 'KO'
+            V.append('No existe valor')
+        if not re.match("\d{1,}\.{0,1}\d{1,}", vdato):
+            d['OK_KO'] = 'KO'
+            V.append('Debe ser número')
+        tipo_estacion = procesos_comunes.valor_elemento_xml(fichero,
+                                                            './/Estacion_Certificada/Datos_Estacion/Tipo_Estacion')['Valor']
+        if tipo_estacion.upper() == 'ER1' or tipo_estacion == 'ER3':
+            try:
+                if int(vdato) <= 10000:
+                    d['OK_KO'] = 'KO'
+                    V.append('Cuando Tipo Estación es ' + tipo_estacion + '  debe ser PIRE > 10W')
+            except:
+                d['OK_KO'] = 'KO'
+                V.append('El valor no es numérico')
+        if tipo_estacion.upper() == 'ER2' or tipo_estacion == 'ER4':
+            try:
+                if int(vdato) > 10000:
+                    d['OK_KO'] = 'KO'
+                    V.append('Cuando Tipo Estación es ' + tipo_estacion + '  debe ser PIRE <= 10W')
+            except:
+                d['OK_KO'] = 'KO'
+                V.append('El valor no es numérico')
+        d['Validacion'] = V
+        d['Fecha_Hora'] = datetime.datetime.now()
+        return d
+    elif regla == 'R_Estacion_Certificada_Datos_Estacion_Sectores_Sector4_Potencia_Maxima_Total':
+        d['Etiqueta'] = etiqueta
+        d['Valor'] = vdato
+        d['OK_KO'] = 'OK'
+        d['Validacion'] = ''
+        if vdato is None:
+            d['OK_KO'] = 'KO'
+            V.append('No existe valor')
+        if not re.match("\d{1,}\.{0,1}\d{1,}", vdato):
+            d['OK_KO'] = 'KO'
+            V.append('Debe ser número')
+        tipo_estacion = procesos_comunes.valor_elemento_xml(fichero,
+                                                            './/Estacion_Certificada/Datos_Estacion/Tipo_Estacion')['Valor']
+        if tipo_estacion.upper() == 'ER1' or tipo_estacion == 'ER3':
+            try:
+                if int(vdato) <= 10000:
+                    d['OK_KO'] = 'KO'
+                    V.append('Cuando Tipo Estación es ' + tipo_estacion + '  debe ser PIRE > 10W')
+            except:
+                d['OK_KO'] = 'KO'
+                V.append('El valor no es numérico')
+        if tipo_estacion.upper() == 'ER2' or tipo_estacion == 'ER4':
+            try:
+                if int(vdato) > 10000:
+                    d['OK_KO'] = 'KO'
+                    V.append('Cuando Tipo Estación es ' + tipo_estacion + '  debe ser PIRE <= 10W')
+            except:
+                d['OK_KO'] = 'KO'
+                V.append('El valor no es numérico')
+        d['Validacion'] = V
+        d['Fecha_Hora'] = datetime.datetime.now()
+        return d
+    elif regla == 'R_Estacion_Certificada_Datos_Estacion_Sectores_Sector1_Unidad_Potencia_Maxima_Total':
         d['Etiqueta'] = etiqueta
         d['Valor'] = vdato
         d['OK_KO'] = 'OK'
@@ -849,7 +991,49 @@ def reglas_validacion_individual(etiqueta, regla, vdato, fichero, ficheros_respa
         d['Validacion'] = V
         d['Fecha_Hora'] = datetime.datetime.now()
         return d
-    elif regla == 'R_Estacion_Certificada_Datos_Estacion_Sectores_Sector_Localizacion_Antena':
+    elif regla == 'R_Estacion_Certificada_Datos_Estacion_Sectores_Sector2_Unidad_Potencia_Maxima_Total':
+        d['Etiqueta'] = etiqueta
+        d['Valor'] = vdato
+        d['OK_KO'] = 'OK'
+        d['Validacion'] = ''
+        if vdato is None:
+            d['OK_KO'] = 'KO'
+            V.append('No existe valor')
+        if not re.match("W", vdato):
+            d['OK_KO'] = "KO"
+            V.append('Valor debe ser igual a W')
+        d['Validacion'] = V
+        d['Fecha_Hora'] = datetime.datetime.now()
+        return d
+    elif regla == 'R_Estacion_Certificada_Datos_Estacion_Sectores_Sector3_Unidad_Potencia_Maxima_Total':
+        d['Etiqueta'] = etiqueta
+        d['Valor'] = vdato
+        d['OK_KO'] = 'OK'
+        d['Validacion'] = ''
+        if vdato is None:
+            d['OK_KO'] = 'KO'
+            V.append('No existe valor')
+        if not re.match("W", vdato):
+            d['OK_KO'] = "KO"
+            V.append('Valor debe ser igual a W')
+        d['Validacion'] = V
+        d['Fecha_Hora'] = datetime.datetime.now()
+        return d
+    elif regla == 'R_Estacion_Certificada_Datos_Estacion_Sectores_Sector4_Unidad_Potencia_Maxima_Total':
+        d['Etiqueta'] = etiqueta
+        d['Valor'] = vdato
+        d['OK_KO'] = 'OK'
+        d['Validacion'] = ''
+        if vdato is None:
+            d['OK_KO'] = 'KO'
+            V.append('No existe valor')
+        if not re.match("W", vdato):
+            d['OK_KO'] = "KO"
+            V.append('Valor debe ser igual a W')
+        d['Validacion'] = V
+        d['Fecha_Hora'] = datetime.datetime.now()
+        return d
+    elif regla == 'R_Estacion_Certificada_Datos_Estacion_Sectores_Sector1_Localizacion_Antena':
         d['Etiqueta'] = etiqueta
         d['Valor'] = vdato
         d['OK_KO'] = 'OK'
@@ -874,7 +1058,82 @@ def reglas_validacion_individual(etiqueta, regla, vdato, fichero, ficheros_respa
         d['Validacion'] = V
         d['Fecha_Hora'] = datetime.datetime.now()
         return d
-    elif regla == 'R_Estacion_Certificada_Datos_Estacion_Sectores_Sector_Tipo_Antena':
+    elif regla == 'R_Estacion_Certificada_Datos_Estacion_Sectores_Sector2_Localizacion_Antena':
+        d['Etiqueta'] = etiqueta
+        d['Valor'] = vdato
+        d['OK_KO'] = 'OK'
+        d['Validacion'] = ''
+        if vdato == "INTERIOR":
+            interior = procesos_comunes_segunda_etapa.cantidad_sectores(Array_Ventana, 3)
+            if interior == '0':
+                d['OK_KO'] = 'KO'
+                V.append('En la pantalla inicial no se ha seleccionado sectores interiores')
+        if vdato == "EXTERIOR":
+            interior = procesos_comunes_segunda_etapa.cantidad_sectores(Array_Ventana, 4)
+            if interior == '0':
+                d['OK_KO'] = 'KO'
+                V.append('En la pantalla inicial no se ha seleccionado sectores exteriores')
+        if vdato is None:
+            d['OK_KO'] = 'KO'
+            V.append('No existe valor')
+        if not re.match("EXTERIOR|INTERIOR", vdato):
+            d['OK_KO'] = "KO"
+            V.append('Valor debe ser igual a EXTERIOR ó INTERIOR')
+        # V.append('Para la presente etapa, la validación debe ser visual')
+        d['Validacion'] = V
+        d['Fecha_Hora'] = datetime.datetime.now()
+        return d
+    elif regla == 'R_Estacion_Certificada_Datos_Estacion_Sectores_Sector3_Localizacion_Antena':
+        d['Etiqueta'] = etiqueta
+        d['Valor'] = vdato
+        d['OK_KO'] = 'OK'
+        d['Validacion'] = ''
+        if vdato == "INTERIOR":
+            interior = procesos_comunes_segunda_etapa.cantidad_sectores(Array_Ventana, 3)
+            if interior == '0':
+                d['OK_KO'] = 'KO'
+                V.append('En la pantalla inicial no se ha seleccionado sectores interiores')
+        if vdato == "EXTERIOR":
+            interior = procesos_comunes_segunda_etapa.cantidad_sectores(Array_Ventana, 4)
+            if interior == '0':
+                d['OK_KO'] = 'KO'
+                V.append('En la pantalla inicial no se ha seleccionado sectores exteriores')
+        if vdato is None:
+            d['OK_KO'] = 'KO'
+            V.append('No existe valor')
+        if not re.match("EXTERIOR|INTERIOR", vdato):
+            d['OK_KO'] = "KO"
+            V.append('Valor debe ser igual a EXTERIOR ó INTERIOR')
+        # V.append('Para la presente etapa, la validación debe ser visual')
+        d['Validacion'] = V
+        d['Fecha_Hora'] = datetime.datetime.now()
+        return d
+    elif regla == 'R_Estacion_Certificada_Datos_Estacion_Sectores_Sector4_Localizacion_Antena':
+        d['Etiqueta'] = etiqueta
+        d['Valor'] = vdato
+        d['OK_KO'] = 'OK'
+        d['Validacion'] = ''
+        if vdato == "INTERIOR":
+            interior = procesos_comunes_segunda_etapa.cantidad_sectores(Array_Ventana, 3)
+            if interior == '0':
+                d['OK_KO'] = 'KO'
+                V.append('En la pantalla inicial no se ha seleccionado sectores interiores')
+        if vdato == "EXTERIOR":
+            interior = procesos_comunes_segunda_etapa.cantidad_sectores(Array_Ventana, 4)
+            if interior == '0':
+                d['OK_KO'] = 'KO'
+                V.append('En la pantalla inicial no se ha seleccionado sectores exteriores')
+        if vdato is None:
+            d['OK_KO'] = 'KO'
+            V.append('No existe valor')
+        if not re.match("EXTERIOR|INTERIOR", vdato):
+            d['OK_KO'] = "KO"
+            V.append('Valor debe ser igual a EXTERIOR ó INTERIOR')
+        # V.append('Para la presente etapa, la validación debe ser visual')
+        d['Validacion'] = V
+        d['Fecha_Hora'] = datetime.datetime.now()
+        return d
+    elif regla == 'R_Estacion_Certificada_Datos_Estacion_Sectores_Sector1_Tipo_Antena':
         d['Etiqueta'] = etiqueta
         d['Valor'] = vdato
         d['OK_KO'] = 'VISUAL'
@@ -889,7 +1148,52 @@ def reglas_validacion_individual(etiqueta, regla, vdato, fichero, ficheros_respa
         d['Validacion'] = V
         d['Fecha_Hora'] = datetime.datetime.now()
         return d
-    elif regla == 'R_Estacion_Certificada_Datos_Estacion_Sectores_Sector_Polarizacion':
+    elif regla == 'R_Estacion_Certificada_Datos_Estacion_Sectores_Sector2_Tipo_Antena':
+        d['Etiqueta'] = etiqueta
+        d['Valor'] = vdato
+        d['OK_KO'] = 'VISUAL'
+        d['Validacion'] = ''
+        if vdato is None:
+            d['OK_KO'] = 'KO'
+            V.append('No existe valor')
+        if not re.match("D|N", vdato):
+            d['OK_KO'] = "KO"
+            V.append('Valor debe ser igual a D ó N')
+        V.append('Para la presente etapa, la validación debe ser visual')
+        d['Validacion'] = V
+        d['Fecha_Hora'] = datetime.datetime.now()
+        return d
+    elif regla == 'R_Estacion_Certificada_Datos_Estacion_Sectores_Sector3_Tipo_Antena':
+        d['Etiqueta'] = etiqueta
+        d['Valor'] = vdato
+        d['OK_KO'] = 'VISUAL'
+        d['Validacion'] = ''
+        if vdato is None:
+            d['OK_KO'] = 'KO'
+            V.append('No existe valor')
+        if not re.match("D|N", vdato):
+            d['OK_KO'] = "KO"
+            V.append('Valor debe ser igual a D ó N')
+        V.append('Para la presente etapa, la validación debe ser visual')
+        d['Validacion'] = V
+        d['Fecha_Hora'] = datetime.datetime.now()
+        return d
+    elif regla == 'R_Estacion_Certificada_Datos_Estacion_Sectores_Sector4_Tipo_Antena':
+        d['Etiqueta'] = etiqueta
+        d['Valor'] = vdato
+        d['OK_KO'] = 'VISUAL'
+        d['Validacion'] = ''
+        if vdato is None:
+            d['OK_KO'] = 'KO'
+            V.append('No existe valor')
+        if not re.match("D|N", vdato):
+            d['OK_KO'] = "KO"
+            V.append('Valor debe ser igual a D ó N')
+        V.append('Para la presente etapa, la validación debe ser visual')
+        d['Validacion'] = V
+        d['Fecha_Hora'] = datetime.datetime.now()
+        return d
+    elif regla == 'R_Estacion_Certificada_Datos_Estacion_Sectores_Sector1_Polarizacion':
         d['Etiqueta'] = etiqueta
         d['Valor'] = vdato
         d['OK_KO'] = 'OK'
@@ -908,7 +1212,64 @@ def reglas_validacion_individual(etiqueta, regla, vdato, fichero, ficheros_respa
         d['Validacion'] = V
         d['Fecha_Hora'] = datetime.datetime.now()
         return d
-    elif regla == 'R_Estacion_Certificada_Datos_Estacion_Sectores_Sector_Altura_Antena_Sobre_Terreno':
+    elif regla == 'R_Estacion_Certificada_Datos_Estacion_Sectores_Sector2_Polarizacion':
+        d['Etiqueta'] = etiqueta
+        d['Valor'] = vdato
+        d['OK_KO'] = 'OK'
+        d['Validacion'] = ''
+        modelo_antena = procesos_comunes_segunda_etapa.modelo_antena(Array_Ventana)
+        r = base_datos.obtiene_polarizacion(modelo_antena)
+        if r["Polarizacion"] != vdato :
+            d['OK_KO'] = 'KO'
+            V.append('Para el modelo de Antena '+ modelo_antena +' no existe dato de Polarización en la Base de Datos')
+        if vdato is None:
+            d['OK_KO'] = 'KO'
+            V.append('No existe valor')
+        if not re.match("V|H|M|L|CR|CL", vdato):
+            d['OK_KO'] = "KO"
+            V.append('Valor debe ser igual a V|H|M|L|CR|CL')
+        d['Validacion'] = V
+        d['Fecha_Hora'] = datetime.datetime.now()
+        return d
+    elif regla == 'R_Estacion_Certificada_Datos_Estacion_Sectores_Sector3_Polarizacion':
+        d['Etiqueta'] = etiqueta
+        d['Valor'] = vdato
+        d['OK_KO'] = 'OK'
+        d['Validacion'] = ''
+        modelo_antena = procesos_comunes_segunda_etapa.modelo_antena(Array_Ventana)
+        r = base_datos.obtiene_polarizacion(modelo_antena)
+        if r["Polarizacion"] != vdato :
+            d['OK_KO'] = 'KO'
+            V.append('Para el modelo de Antena '+ modelo_antena +' no existe dato de Polarización en la Base de Datos')
+        if vdato is None:
+            d['OK_KO'] = 'KO'
+            V.append('No existe valor')
+        if not re.match("V|H|M|L|CR|CL", vdato):
+            d['OK_KO'] = "KO"
+            V.append('Valor debe ser igual a V|H|M|L|CR|CL')
+        d['Validacion'] = V
+        d['Fecha_Hora'] = datetime.datetime.now()
+        return d
+    elif regla == 'R_Estacion_Certificada_Datos_Estacion_Sectores_Sector4_Polarizacion':
+        d['Etiqueta'] = etiqueta
+        d['Valor'] = vdato
+        d['OK_KO'] = 'OK'
+        d['Validacion'] = ''
+        modelo_antena = procesos_comunes_segunda_etapa.modelo_antena(Array_Ventana)
+        r = base_datos.obtiene_polarizacion(modelo_antena)
+        if r["Polarizacion"] != vdato :
+            d['OK_KO'] = 'KO'
+            V.append('Para el modelo de Antena '+ modelo_antena +' no existe dato de Polarización en la Base de Datos')
+        if vdato is None:
+            d['OK_KO'] = 'KO'
+            V.append('No existe valor')
+        if not re.match("V|H|M|L|CR|CL", vdato):
+            d['OK_KO'] = "KO"
+            V.append('Valor debe ser igual a V|H|M|L|CR|CL')
+        d['Validacion'] = V
+        d['Fecha_Hora'] = datetime.datetime.now()
+        return d
+    elif regla == 'R_Estacion_Certificada_Datos_Estacion_Sectores_Sector1_Altura_Antena_Sobre_Terreno':
         d['Etiqueta'] = etiqueta
         d['Valor'] = vdato
         d['OK_KO'] = 'VISUAL'
@@ -920,7 +1281,7 @@ def reglas_validacion_individual(etiqueta, regla, vdato, fichero, ficheros_respa
         d['Validacion'] = V
         d['Fecha_Hora'] = datetime.datetime.now()
         return d
-    elif regla == 'R_Estacion_Certificada_Datos_Estacion_Sectores_Sector_Inclinacion_Haz_Sobre_Horizontal':
+    elif regla == 'R_Estacion_Certificada_Datos_Estacion_Sectores_Sector2_Altura_Antena_Sobre_Terreno':
         d['Etiqueta'] = etiqueta
         d['Valor'] = vdato
         d['OK_KO'] = 'VISUAL'
@@ -932,7 +1293,79 @@ def reglas_validacion_individual(etiqueta, regla, vdato, fichero, ficheros_respa
         d['Validacion'] = V
         d['Fecha_Hora'] = datetime.datetime.now()
         return d
-    elif regla == 'R_Estacion_Certificada_Datos_Estacion_Sectores_Sector_Antena_Directiva_Tipo_Ganancia':
+    elif regla == 'R_Estacion_Certificada_Datos_Estacion_Sectores_Sector3_Altura_Antena_Sobre_Terreno':
+        d['Etiqueta'] = etiqueta
+        d['Valor'] = vdato
+        d['OK_KO'] = 'VISUAL'
+        d['Validacion'] = ''
+        if vdato is None:
+            d['OK_KO'] = 'KO'
+            V.append('No existe valor')
+        V.append('Para la presente etapa, la validación debe ser visual')
+        d['Validacion'] = V
+        d['Fecha_Hora'] = datetime.datetime.now()
+        return d
+    elif regla == 'R_Estacion_Certificada_Datos_Estacion_Sectores_Sector4_Altura_Antena_Sobre_Terreno':
+        d['Etiqueta'] = etiqueta
+        d['Valor'] = vdato
+        d['OK_KO'] = 'VISUAL'
+        d['Validacion'] = ''
+        if vdato is None:
+            d['OK_KO'] = 'KO'
+            V.append('No existe valor')
+        V.append('Para la presente etapa, la validación debe ser visual')
+        d['Validacion'] = V
+        d['Fecha_Hora'] = datetime.datetime.now()
+        return d
+    elif regla == 'R_Estacion_Certificada_Datos_Estacion_Sectores_Sector1_Inclinacion_Haz_Sobre_Horizontal':
+        d['Etiqueta'] = etiqueta
+        d['Valor'] = vdato
+        d['OK_KO'] = 'VISUAL'
+        d['Validacion'] = ''
+        if vdato is None:
+            d['OK_KO'] = 'KO'
+            V.append('No existe valor')
+        V.append('Para la presente etapa, la validación debe ser visual')
+        d['Validacion'] = V
+        d['Fecha_Hora'] = datetime.datetime.now()
+        return d
+    elif regla == 'R_Estacion_Certificada_Datos_Estacion_Sectores_Sector2_Inclinacion_Haz_Sobre_Horizontal':
+        d['Etiqueta'] = etiqueta
+        d['Valor'] = vdato
+        d['OK_KO'] = 'VISUAL'
+        d['Validacion'] = ''
+        if vdato is None:
+            d['OK_KO'] = 'KO'
+            V.append('No existe valor')
+        V.append('Para la presente etapa, la validación debe ser visual')
+        d['Validacion'] = V
+        d['Fecha_Hora'] = datetime.datetime.now()
+        return d
+    elif regla == 'R_Estacion_Certificada_Datos_Estacion_Sectores_Sector3_Inclinacion_Haz_Sobre_Horizontal':
+        d['Etiqueta'] = etiqueta
+        d['Valor'] = vdato
+        d['OK_KO'] = 'VISUAL'
+        d['Validacion'] = ''
+        if vdato is None:
+            d['OK_KO'] = 'KO'
+            V.append('No existe valor')
+        V.append('Para la presente etapa, la validación debe ser visual')
+        d['Validacion'] = V
+        d['Fecha_Hora'] = datetime.datetime.now()
+        return d
+    elif regla == 'R_Estacion_Certificada_Datos_Estacion_Sectores_Sector4_Inclinacion_Haz_Sobre_Horizontal':
+        d['Etiqueta'] = etiqueta
+        d['Valor'] = vdato
+        d['OK_KO'] = 'VISUAL'
+        d['Validacion'] = ''
+        if vdato is None:
+            d['OK_KO'] = 'KO'
+            V.append('No existe valor')
+        V.append('Para la presente etapa, la validación debe ser visual')
+        d['Validacion'] = V
+        d['Fecha_Hora'] = datetime.datetime.now()
+        return d
+    elif regla == 'R_Estacion_Certificada_Datos_Estacion_Sectores_Sector1_Antena_Directiva_Tipo_Ganancia':
         d['Etiqueta'] = etiqueta
         d['Valor'] = vdato
         d['OK_KO'] = 'OK'
@@ -946,7 +1379,49 @@ def reglas_validacion_individual(etiqueta, regla, vdato, fichero, ficheros_respa
         d['Validacion'] = V
         d['Fecha_Hora'] = datetime.datetime.now()
         return d
-    elif regla == 'R_Estacion_Certificada_Datos_Estacion_Sectores_Sector_Antena_Directiva_Ganancia_Antena':
+    elif regla == 'R_Estacion_Certificada_Datos_Estacion_Sectores_Sector2_Antena_Directiva_Tipo_Ganancia':
+        d['Etiqueta'] = etiqueta
+        d['Valor'] = vdato
+        d['OK_KO'] = 'OK'
+        d['Validacion'] = ''
+        if vdato is None:
+            d['OK_KO'] = 'KO'
+            V.append('No existe valor')
+        if not re.match("ISO", vdato):
+            d['OK_KO'] = "KO"
+            V.append('Valor debe ser igual a ISO')
+        d['Validacion'] = V
+        d['Fecha_Hora'] = datetime.datetime.now()
+        return d
+    elif regla == 'R_Estacion_Certificada_Datos_Estacion_Sectores_Sector3_Antena_Directiva_Tipo_Ganancia':
+        d['Etiqueta'] = etiqueta
+        d['Valor'] = vdato
+        d['OK_KO'] = 'OK'
+        d['Validacion'] = ''
+        if vdato is None:
+            d['OK_KO'] = 'KO'
+            V.append('No existe valor')
+        if not re.match("ISO", vdato):
+            d['OK_KO'] = "KO"
+            V.append('Valor debe ser igual a ISO')
+        d['Validacion'] = V
+        d['Fecha_Hora'] = datetime.datetime.now()
+        return d
+    elif regla == 'R_Estacion_Certificada_Datos_Estacion_Sectores_Sector4_Antena_Directiva_Tipo_Ganancia':
+        d['Etiqueta'] = etiqueta
+        d['Valor'] = vdato
+        d['OK_KO'] = 'OK'
+        d['Validacion'] = ''
+        if vdato is None:
+            d['OK_KO'] = 'KO'
+            V.append('No existe valor')
+        if not re.match("ISO", vdato):
+            d['OK_KO'] = "KO"
+            V.append('Valor debe ser igual a ISO')
+        d['Validacion'] = V
+        d['Fecha_Hora'] = datetime.datetime.now()
+        return d
+    elif regla == 'R_Estacion_Certificada_Datos_Estacion_Sectores_Sector1_Antena_Directiva_Ganancia_Antena':
         d['Etiqueta'] = etiqueta
         d['Valor'] = vdato
         d['OK_KO'] = 'OK'
@@ -957,7 +1432,40 @@ def reglas_validacion_individual(etiqueta, regla, vdato, fichero, ficheros_respa
         d['Validacion'] = V
         d['Fecha_Hora'] = datetime.datetime.now()
         return d
-    elif regla == 'R_Estacion_Certificada_Datos_Estacion_Sectores_Sector_Antena_Directiva_Apertura_Horizontal_Haz':
+    elif regla == 'R_Estacion_Certificada_Datos_Estacion_Sectores_Sector2_Antena_Directiva_Ganancia_Antena':
+        d['Etiqueta'] = etiqueta
+        d['Valor'] = vdato
+        d['OK_KO'] = 'OK'
+        d['Validacion'] = ''
+        if vdato is None:
+            d['OK_KO'] = 'KO'
+            V.append('No existe valor')
+        d['Validacion'] = V
+        d['Fecha_Hora'] = datetime.datetime.now()
+        return d
+    elif regla == 'R_Estacion_Certificada_Datos_Estacion_Sectores_Sector3_Antena_Directiva_Ganancia_Antena':
+        d['Etiqueta'] = etiqueta
+        d['Valor'] = vdato
+        d['OK_KO'] = 'OK'
+        d['Validacion'] = ''
+        if vdato is None:
+            d['OK_KO'] = 'KO'
+            V.append('No existe valor')
+        d['Validacion'] = V
+        d['Fecha_Hora'] = datetime.datetime.now()
+        return d
+    elif regla == 'R_Estacion_Certificada_Datos_Estacion_Sectores_Sector4_Antena_Directiva_Ganancia_Antena':
+        d['Etiqueta'] = etiqueta
+        d['Valor'] = vdato
+        d['OK_KO'] = 'OK'
+        d['Validacion'] = ''
+        if vdato is None:
+            d['OK_KO'] = 'KO'
+            V.append('No existe valor')
+        d['Validacion'] = V
+        d['Fecha_Hora'] = datetime.datetime.now()
+        return d
+    elif regla == 'R_Estacion_Certificada_Datos_Estacion_Sectores_Sector1_Antena_Directiva_Apertura_Horizontal_Haz':
         d['Etiqueta'] = etiqueta
         d['Valor'] = vdato
         d['OK_KO'] = 'VISUAL'
@@ -969,7 +1477,7 @@ def reglas_validacion_individual(etiqueta, regla, vdato, fichero, ficheros_respa
         d['Validacion'] = V
         d['Fecha_Hora'] = datetime.datetime.now()
         return d
-    elif regla == 'R_Estacion_Certificada_Datos_Estacion_Sectores_Sector_Antena_Directiva_Apertura_Vertical_Haz':
+    elif regla == 'R_Estacion_Certificada_Datos_Estacion_Sectores_Sector2_Antena_Directiva_Apertura_Horizontal_Haz':
         d['Etiqueta'] = etiqueta
         d['Valor'] = vdato
         d['OK_KO'] = 'VISUAL'
@@ -981,7 +1489,7 @@ def reglas_validacion_individual(etiqueta, regla, vdato, fichero, ficheros_respa
         d['Validacion'] = V
         d['Fecha_Hora'] = datetime.datetime.now()
         return d
-    elif regla == 'R_Estacion_Certificada_Datos_Estacion_Sectores_Sector_Antena_Directiva_Acimut_Maxima_Radiacion':
+    elif regla == 'R_Estacion_Certificada_Datos_Estacion_Sectores_Sector3_Antena_Directiva_Apertura_Horizontal_Haz':
         d['Etiqueta'] = etiqueta
         d['Valor'] = vdato
         d['OK_KO'] = 'VISUAL'
@@ -993,7 +1501,115 @@ def reglas_validacion_individual(etiqueta, regla, vdato, fichero, ficheros_respa
         d['Validacion'] = V
         d['Fecha_Hora'] = datetime.datetime.now()
         return d
-    elif regla == 'R_Estacion_Certificada_Datos_Estacion_Sectores_Sector_Antena_Directiva_Apertura_Horizontal_Haz':
+    elif regla == 'R_Estacion_Certificada_Datos_Estacion_Sectores_Sector4_Antena_Directiva_Apertura_Horizontal_Haz':
+        d['Etiqueta'] = etiqueta
+        d['Valor'] = vdato
+        d['OK_KO'] = 'VISUAL'
+        d['Validacion'] = ''
+        if vdato is None:
+            d['OK_KO'] = 'KO'
+            V.append('No existe valor')
+        V.append('Para la presente etapa, la validación debe ser visual')
+        d['Validacion'] = V
+        d['Fecha_Hora'] = datetime.datetime.now()
+        return d
+    elif regla == 'R_Estacion_Certificada_Datos_Estacion_Sectores_Sector1_Antena_Directiva_Apertura_Vertical_Haz':
+        d['Etiqueta'] = etiqueta
+        d['Valor'] = vdato
+        d['OK_KO'] = 'VISUAL'
+        d['Validacion'] = ''
+        if vdato is None:
+            d['OK_KO'] = 'KO'
+            V.append('No existe valor')
+        V.append('Para la presente etapa, la validación debe ser visual')
+        d['Validacion'] = V
+        d['Fecha_Hora'] = datetime.datetime.now()
+        return d
+    elif regla == 'R_Estacion_Certificada_Datos_Estacion_Sectores_Sector2_Antena_Directiva_Apertura_Vertical_Haz':
+        d['Etiqueta'] = etiqueta
+        d['Valor'] = vdato
+        d['OK_KO'] = 'VISUAL'
+        d['Validacion'] = ''
+        if vdato is None:
+            d['OK_KO'] = 'KO'
+            V.append('No existe valor')
+        V.append('Para la presente etapa, la validación debe ser visual')
+        d['Validacion'] = V
+        d['Fecha_Hora'] = datetime.datetime.now()
+        return d
+    elif regla == 'R_Estacion_Certificada_Datos_Estacion_Sectores_Sector3_Antena_Directiva_Apertura_Vertical_Haz':
+        d['Etiqueta'] = etiqueta
+        d['Valor'] = vdato
+        d['OK_KO'] = 'VISUAL'
+        d['Validacion'] = ''
+        if vdato is None:
+            d['OK_KO'] = 'KO'
+            V.append('No existe valor')
+        V.append('Para la presente etapa, la validación debe ser visual')
+        d['Validacion'] = V
+        d['Fecha_Hora'] = datetime.datetime.now()
+        return d
+    elif regla == 'R_Estacion_Certificada_Datos_Estacion_Sectores_Sector4_Antena_Directiva_Apertura_Vertical_Haz':
+        d['Etiqueta'] = etiqueta
+        d['Valor'] = vdato
+        d['OK_KO'] = 'VISUAL'
+        d['Validacion'] = ''
+        if vdato is None:
+            d['OK_KO'] = 'KO'
+            V.append('No existe valor')
+        V.append('Para la presente etapa, la validación debe ser visual')
+        d['Validacion'] = V
+        d['Fecha_Hora'] = datetime.datetime.now()
+        return d
+    elif regla == 'R_Estacion_Certificada_Datos_Estacion_Sectores_Sector1_Antena_Directiva_Acimut_Maxima_Radiacion':
+        d['Etiqueta'] = etiqueta
+        d['Valor'] = vdato
+        d['OK_KO'] = 'VISUAL'
+        d['Validacion'] = ''
+        if vdato is None:
+            d['OK_KO'] = 'KO'
+            V.append('No existe valor')
+        V.append('Para la presente etapa, la validación debe ser visual')
+        d['Validacion'] = V
+        d['Fecha_Hora'] = datetime.datetime.now()
+        return d
+    elif regla == 'R_Estacion_Certificada_Datos_Estacion_Sectores_Sector2_Antena_Directiva_Acimut_Maxima_Radiacion':
+        d['Etiqueta'] = etiqueta
+        d['Valor'] = vdato
+        d['OK_KO'] = 'VISUAL'
+        d['Validacion'] = ''
+        if vdato is None:
+            d['OK_KO'] = 'KO'
+            V.append('No existe valor')
+        V.append('Para la presente etapa, la validación debe ser visual')
+        d['Validacion'] = V
+        d['Fecha_Hora'] = datetime.datetime.now()
+        return d
+    elif regla == 'R_Estacion_Certificada_Datos_Estacion_Sectores_Sector3_Antena_Directiva_Acimut_Maxima_Radiacion':
+        d['Etiqueta'] = etiqueta
+        d['Valor'] = vdato
+        d['OK_KO'] = 'VISUAL'
+        d['Validacion'] = ''
+        if vdato is None:
+            d['OK_KO'] = 'KO'
+            V.append('No existe valor')
+        V.append('Para la presente etapa, la validación debe ser visual')
+        d['Validacion'] = V
+        d['Fecha_Hora'] = datetime.datetime.now()
+        return d
+    elif regla == 'R_Estacion_Certificada_Datos_Estacion_Sectores_Sector4_Antena_Directiva_Acimut_Maxima_Radiacion':
+        d['Etiqueta'] = etiqueta
+        d['Valor'] = vdato
+        d['OK_KO'] = 'VISUAL'
+        d['Validacion'] = ''
+        if vdato is None:
+            d['OK_KO'] = 'KO'
+            V.append('No existe valor')
+        V.append('Para la presente etapa, la validación debe ser visual')
+        d['Validacion'] = V
+        d['Fecha_Hora'] = datetime.datetime.now()
+        return d
+    elif regla == 'R_Estacion_Certificada_Datos_Estacion_Sectores_Sector1_Antena_Directiva_Apertura_Horizontal_Haz':
         d['Etiqueta'] = etiqueta
         d['Valor'] = vdato
         d['OK_KO'] = 'OK'
@@ -1004,7 +1620,7 @@ def reglas_validacion_individual(etiqueta, regla, vdato, fichero, ficheros_respa
         d['Validacion'] = V
         d['Fecha_Hora'] = datetime.datetime.now()
         return d
-    elif regla == 'R_Estacion_Certificada_Datos_Estacion_Sectores_Sector_Antena_Directiva_Nivel_Lobulos_Secundarios':
+    elif regla == 'R_Estacion_Certificada_Datos_Estacion_Sectores_Sector2_Antena_Directiva_Apertura_Horizontal_Haz':
         d['Etiqueta'] = etiqueta
         d['Valor'] = vdato
         d['OK_KO'] = 'OK'
@@ -1015,7 +1631,73 @@ def reglas_validacion_individual(etiqueta, regla, vdato, fichero, ficheros_respa
         d['Validacion'] = V
         d['Fecha_Hora'] = datetime.datetime.now()
         return d
-    elif regla == 'R_Estacion_Certificada_Datos_Estacion_Sectores_Sector_Volumen_Referencia_Forma_Volumen':
+    elif regla == 'R_Estacion_Certificada_Datos_Estacion_Sectores_Sector3_Antena_Directiva_Apertura_Horizontal_Haz':
+        d['Etiqueta'] = etiqueta
+        d['Valor'] = vdato
+        d['OK_KO'] = 'OK'
+        d['Validacion'] = ''
+        if vdato is None:
+            d['OK_KO'] = 'KO'
+            V.append('No existe valor')
+        d['Validacion'] = V
+        d['Fecha_Hora'] = datetime.datetime.now()
+        return d
+    elif regla == 'R_Estacion_Certificada_Datos_Estacion_Sectores_Sector4_Antena_Directiva_Apertura_Horizontal_Haz':
+        d['Etiqueta'] = etiqueta
+        d['Valor'] = vdato
+        d['OK_KO'] = 'OK'
+        d['Validacion'] = ''
+        if vdato is None:
+            d['OK_KO'] = 'KO'
+            V.append('No existe valor')
+        d['Validacion'] = V
+        d['Fecha_Hora'] = datetime.datetime.now()
+        return d
+    elif regla == 'R_Estacion_Certificada_Datos_Estacion_Sectores_Sector1_Antena_Directiva_Nivel_Lobulos_Secundarios':
+        d['Etiqueta'] = etiqueta
+        d['Valor'] = vdato
+        d['OK_KO'] = 'OK'
+        d['Validacion'] = ''
+        if vdato is None:
+            d['OK_KO'] = 'KO'
+            V.append('No existe valor')
+        d['Validacion'] = V
+        d['Fecha_Hora'] = datetime.datetime.now()
+        return d
+    elif regla == 'R_Estacion_Certificada_Datos_Estacion_Sectores_Sector2_Antena_Directiva_Nivel_Lobulos_Secundarios':
+        d['Etiqueta'] = etiqueta
+        d['Valor'] = vdato
+        d['OK_KO'] = 'OK'
+        d['Validacion'] = ''
+        if vdato is None:
+            d['OK_KO'] = 'KO'
+            V.append('No existe valor')
+        d['Validacion'] = V
+        d['Fecha_Hora'] = datetime.datetime.now()
+        return d
+    elif regla == 'R_Estacion_Certificada_Datos_Estacion_Sectores_Sector3_Antena_Directiva_Nivel_Lobulos_Secundarios':
+        d['Etiqueta'] = etiqueta
+        d['Valor'] = vdato
+        d['OK_KO'] = 'OK'
+        d['Validacion'] = ''
+        if vdato is None:
+            d['OK_KO'] = 'KO'
+            V.append('No existe valor')
+        d['Validacion'] = V
+        d['Fecha_Hora'] = datetime.datetime.now()
+        return d
+    elif regla == 'R_Estacion_Certificada_Datos_Estacion_Sectores_Sector4_Antena_Directiva_Nivel_Lobulos_Secundarios':
+        d['Etiqueta'] = etiqueta
+        d['Valor'] = vdato
+        d['OK_KO'] = 'OK'
+        d['Validacion'] = ''
+        if vdato is None:
+            d['OK_KO'] = 'KO'
+            V.append('No existe valor')
+        d['Validacion'] = V
+        d['Fecha_Hora'] = datetime.datetime.now()
+        return d
+    elif regla == 'R_Estacion_Certificada_Datos_Estacion_Sectores_Sector1_Volumen_Referencia_Forma_Volumen':
         d['Etiqueta'] = etiqueta
         d['Valor'] = vdato
         d['OK_KO'] = 'OK'
@@ -1036,7 +1718,70 @@ def reglas_validacion_individual(etiqueta, regla, vdato, fichero, ficheros_respa
         d['Validacion'] = V
         d['Fecha_Hora'] = datetime.datetime.now()
         return d
-    elif regla == 'R_Estacion_Certificada_Datos_Estacion_Sectores_Sector_Volumen_Referencia_Distancia_Referencia':
+    elif regla == 'R_Estacion_Certificada_Datos_Estacion_Sectores_Sector2_Volumen_Referencia_Forma_Volumen':
+        d['Etiqueta'] = etiqueta
+        d['Valor'] = vdato
+        d['OK_KO'] = 'OK'
+        d['Validacion'] = ''
+        tipo_estacion = procesos_comunes.valor_elemento_xml(fichero,
+                                                            './/Estacion_Certificada/Datos_Estacion/Tipo_Estacion')[
+            'Valor']
+        if tipo_estacion.upper() == 'ER2' or tipo_estacion == 'ER4' or tipo_estacion == 'ER5':
+            d['OK_KO'] = 'KO'
+            V.append('Cuando Tipo Estación es ' + tipo_estacion + '  NO deben aparecer datos del Volumen de referencia')
+        else:
+            if vdato is None:
+                d['OK_KO'] = 'KO'
+                V.append('No existe valor')
+            if not re.match("ESFERA|CILINDRO|PARALELEPIPEDO|TOROIDE|OTRA", vdato):
+                d['OK_KO'] = "KO"
+                V.append('Valores ESFERA|CILINDRO|PARALELEPIPEDO|TOROIDE|OTRA')
+        d['Validacion'] = V
+        d['Fecha_Hora'] = datetime.datetime.now()
+        return d
+    elif regla == 'R_Estacion_Certificada_Datos_Estacion_Sectores_Sector3_Volumen_Referencia_Forma_Volumen':
+        d['Etiqueta'] = etiqueta
+        d['Valor'] = vdato
+        d['OK_KO'] = 'OK'
+        d['Validacion'] = ''
+        tipo_estacion = procesos_comunes.valor_elemento_xml(fichero,
+                                                            './/Estacion_Certificada/Datos_Estacion/Tipo_Estacion')[
+            'Valor']
+        if tipo_estacion.upper() == 'ER2' or tipo_estacion == 'ER4' or tipo_estacion == 'ER5':
+            d['OK_KO'] = 'KO'
+            V.append('Cuando Tipo Estación es ' + tipo_estacion + '  NO deben aparecer datos del Volumen de referencia')
+        else:
+            if vdato is None:
+                d['OK_KO'] = 'KO'
+                V.append('No existe valor')
+            if not re.match("ESFERA|CILINDRO|PARALELEPIPEDO|TOROIDE|OTRA", vdato):
+                d['OK_KO'] = "KO"
+                V.append('Valores ESFERA|CILINDRO|PARALELEPIPEDO|TOROIDE|OTRA')
+        d['Validacion'] = V
+        d['Fecha_Hora'] = datetime.datetime.now()
+        return d
+    elif regla == 'R_Estacion_Certificada_Datos_Estacion_Sectores_Sector4_Volumen_Referencia_Forma_Volumen':
+        d['Etiqueta'] = etiqueta
+        d['Valor'] = vdato
+        d['OK_KO'] = 'OK'
+        d['Validacion'] = ''
+        tipo_estacion = procesos_comunes.valor_elemento_xml(fichero,
+                                                            './/Estacion_Certificada/Datos_Estacion/Tipo_Estacion')[
+            'Valor']
+        if tipo_estacion.upper() == 'ER2' or tipo_estacion == 'ER4' or tipo_estacion == 'ER5':
+            d['OK_KO'] = 'KO'
+            V.append('Cuando Tipo Estación es ' + tipo_estacion + '  NO deben aparecer datos del Volumen de referencia')
+        else:
+            if vdato is None:
+                d['OK_KO'] = 'KO'
+                V.append('No existe valor')
+            if not re.match("ESFERA|CILINDRO|PARALELEPIPEDO|TOROIDE|OTRA", vdato):
+                d['OK_KO'] = "KO"
+                V.append('Valores ESFERA|CILINDRO|PARALELEPIPEDO|TOROIDE|OTRA')
+        d['Validacion'] = V
+        d['Fecha_Hora'] = datetime.datetime.now()
+        return d
+    elif regla == 'R_Estacion_Certificada_Datos_Estacion_Sectores_Sector1_Volumen_Referencia_Distancia_Referencia':
         d['Etiqueta'] = etiqueta
         d['Valor'] = vdato
         d['OK_KO'] = 'VISUAL'
@@ -1055,7 +1800,130 @@ def reglas_validacion_individual(etiqueta, regla, vdato, fichero, ficheros_respa
         d['Validacion'] = V
         d['Fecha_Hora'] = datetime.datetime.now()
         return d
-    elif regla == 'R_Estacion_Certificada_Datos_Estacion_Sectores_Sector_Volumen_Referencia_Coeficiente_Reflexion':
+    elif regla == 'R_Estacion_Certificada_Datos_Estacion_Sectores_Sector2_Volumen_Referencia_Distancia_Referencia':
+        d['Etiqueta'] = etiqueta
+        d['Valor'] = vdato
+        d['OK_KO'] = 'VISUAL'
+        d['Validacion'] = ''
+        tipo_estacion = procesos_comunes.valor_elemento_xml(fichero,
+                                                            './/Estacion_Certificada/Datos_Estacion/Tipo_Estacion')[
+            'Valor']
+        if tipo_estacion.upper() == 'ER2' or tipo_estacion == 'ER4' or tipo_estacion == 'ER5':
+            d['OK_KO'] = 'KO'
+            V.append('Cuando Tipo Estación es ' + tipo_estacion + '  NO deben aparecer datos del Volumen de referencia')
+        else:
+            if vdato is None:
+                d['OK_KO'] = 'KO'
+                V.append('No existe valor')
+            V.append('Para la presente etapa, la validación debe ser visual')
+        d['Validacion'] = V
+        d['Fecha_Hora'] = datetime.datetime.now()
+        return d
+    elif regla == 'R_Estacion_Certificada_Datos_Estacion_Sectores_Sector3_Volumen_Referencia_Distancia_Referencia':
+        d['Etiqueta'] = etiqueta
+        d['Valor'] = vdato
+        d['OK_KO'] = 'VISUAL'
+        d['Validacion'] = ''
+        tipo_estacion = procesos_comunes.valor_elemento_xml(fichero,
+                                                            './/Estacion_Certificada/Datos_Estacion/Tipo_Estacion')[
+            'Valor']
+        if tipo_estacion.upper() == 'ER2' or tipo_estacion == 'ER4' or tipo_estacion == 'ER5':
+            d['OK_KO'] = 'KO'
+            V.append('Cuando Tipo Estación es ' + tipo_estacion + '  NO deben aparecer datos del Volumen de referencia')
+        else:
+            if vdato is None:
+                d['OK_KO'] = 'KO'
+                V.append('No existe valor')
+            V.append('Para la presente etapa, la validación debe ser visual')
+        d['Validacion'] = V
+        d['Fecha_Hora'] = datetime.datetime.now()
+        return d
+    elif regla == 'R_Estacion_Certificada_Datos_Estacion_Sectores_Sector4_Volumen_Referencia_Distancia_Referencia':
+        d['Etiqueta'] = etiqueta
+        d['Valor'] = vdato
+        d['OK_KO'] = 'VISUAL'
+        d['Validacion'] = ''
+        tipo_estacion = procesos_comunes.valor_elemento_xml(fichero,
+                                                            './/Estacion_Certificada/Datos_Estacion/Tipo_Estacion')[
+            'Valor']
+        if tipo_estacion.upper() == 'ER2' or tipo_estacion == 'ER4' or tipo_estacion == 'ER5':
+            d['OK_KO'] = 'KO'
+            V.append('Cuando Tipo Estación es ' + tipo_estacion + '  NO deben aparecer datos del Volumen de referencia')
+        else:
+            if vdato is None:
+                d['OK_KO'] = 'KO'
+                V.append('No existe valor')
+            V.append('Para la presente etapa, la validación debe ser visual')
+        d['Validacion'] = V
+        d['Fecha_Hora'] = datetime.datetime.now()
+        return d
+    elif regla == 'R_Estacion_Certificada_Datos_Estacion_Sectores_Sector1_Volumen_Referencia_Coeficiente_Reflexion':
+        d['Etiqueta'] = etiqueta
+        d['Valor'] = vdato
+        d['OK_KO'] = 'VISUAL'
+        d['Validacion'] = ''
+        tipo_estacion = procesos_comunes.valor_elemento_xml(fichero,
+                                                            './/Estacion_Certificada/Datos_Estacion/Tipo_Estacion')[
+            'Valor']
+        if tipo_estacion.upper() == 'ER2' or tipo_estacion == 'ER4' or tipo_estacion == 'ER5':
+            d['OK_KO'] = 'KO'
+            V.append('Cuando Tipo Estación es ' + tipo_estacion + ' NO deben aparecer datos del Volumen de referencia')
+        else:
+            if vdato is None:
+                d['OK_KO'] = 'KO'
+                V.append('No existe valor')
+            if not re.match('1|2.56|4', vdato):
+                d['OK_KO'] = 'KO'
+                V.append('Valor debe ser igual a 1 ó 2.56 ó 4')
+        V.append('Para la presente etapa, la validación debe ser visual')
+        d['Validacion'] = V
+        d['Fecha_Hora'] = datetime.datetime.now()
+        return d
+    elif regla == 'R_Estacion_Certificada_Datos_Estacion_Sectores_Sector2_Volumen_Referencia_Coeficiente_Reflexion':
+        d['Etiqueta'] = etiqueta
+        d['Valor'] = vdato
+        d['OK_KO'] = 'VISUAL'
+        d['Validacion'] = ''
+        tipo_estacion = procesos_comunes.valor_elemento_xml(fichero,
+                                                            './/Estacion_Certificada/Datos_Estacion/Tipo_Estacion')[
+            'Valor']
+        if tipo_estacion.upper() == 'ER2' or tipo_estacion == 'ER4' or tipo_estacion == 'ER5':
+            d['OK_KO'] = 'KO'
+            V.append('Cuando Tipo Estación es ' + tipo_estacion + ' NO deben aparecer datos del Volumen de referencia')
+        else:
+            if vdato is None:
+                d['OK_KO'] = 'KO'
+                V.append('No existe valor')
+            if not re.match('1|2.56|4', vdato):
+                d['OK_KO'] = 'KO'
+                V.append('Valor debe ser igual a 1 ó 2.56 ó 4')
+        V.append('Para la presente etapa, la validación debe ser visual')
+        d['Validacion'] = V
+        d['Fecha_Hora'] = datetime.datetime.now()
+        return d
+    elif regla == 'R_Estacion_Certificada_Datos_Estacion_Sectores_Sector3_Volumen_Referencia_Coeficiente_Reflexion':
+        d['Etiqueta'] = etiqueta
+        d['Valor'] = vdato
+        d['OK_KO'] = 'VISUAL'
+        d['Validacion'] = ''
+        tipo_estacion = procesos_comunes.valor_elemento_xml(fichero,
+                                                            './/Estacion_Certificada/Datos_Estacion/Tipo_Estacion')[
+            'Valor']
+        if tipo_estacion.upper() == 'ER2' or tipo_estacion == 'ER4' or tipo_estacion == 'ER5':
+            d['OK_KO'] = 'KO'
+            V.append('Cuando Tipo Estación es ' + tipo_estacion + ' NO deben aparecer datos del Volumen de referencia')
+        else:
+            if vdato is None:
+                d['OK_KO'] = 'KO'
+                V.append('No existe valor')
+            if not re.match('1|2.56|4', vdato):
+                d['OK_KO'] = 'KO'
+                V.append('Valor debe ser igual a 1 ó 2.56 ó 4')
+        V.append('Para la presente etapa, la validación debe ser visual')
+        d['Validacion'] = V
+        d['Fecha_Hora'] = datetime.datetime.now()
+        return d
+    elif regla == 'R_Estacion_Certificada_Datos_Estacion_Sectores_Sector4_Volumen_Referencia_Coeficiente_Reflexion':
         d['Etiqueta'] = etiqueta
         d['Valor'] = vdato
         d['OK_KO'] = 'VISUAL'

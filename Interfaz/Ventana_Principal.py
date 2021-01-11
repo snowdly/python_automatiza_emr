@@ -5,7 +5,6 @@ from tkinter import messagebox
 from principal import base_datos
 
 # variables matrices
-Continuar_Proceso = True
 DatosVentana = []
 DTImplantar =	{
                           "DTI_G900": 0,
@@ -118,20 +117,18 @@ DTiltsG5 = {
             "sector4": ""
 }
 Bandera_Principal = "OK"
+Continuar_Proceso = False
 
-
-def ventana():
-    #Bandera_Principal = "OK"
+def ventana(Fichero_Auditoria):
     # Validaciones iniciales
     prueba_bd = base_datos.prueba_conectividad()
     if prueba_bd["Conectividad"] == "KO":
         print("Conectividad con Base de Datos: " + prueba_bd["Error"])
-        Continuar_Proceso = False
     else:
         # Creacion de ventana principal
         Continuar_Proceso = True
         root = tk.Tk()
-        root.title("Automatización Auditorias EMR")
+        root.title("Automatización Auditorias EMR - Fichero: " + Fichero_Auditoria)
         width=870
         height=840
         screenwidth = root.winfo_screenwidth()
@@ -141,7 +138,7 @@ def ventana():
         root.resizable(width=False, height=False)
         # LabelFrame general
         ftl = tkFont.Font(family='Times', size=13)
-        labelframe = tk.LabelFrame(root, text='Ingresar datos ...', font=ftl)
+        labelframe = tk.LabelFrame(root, text='Ingresar datos... ' +  Fichero_Auditoria, font=ftl)
         labelframe.pack(expand='yes', fill='both')
         ft = tkFont.Font(family='Times', size=12)
 
@@ -582,7 +579,7 @@ def ventana():
         else:
             results_for_modeloantena = [""]
             messagebox.showerror("Error", obtiene_antenas["Error"])
-            Continuar_Proceso = False
+            #Continuar_Proceso = False
 
         fts = tkFont.Font(family='Times', size=10)
         cmbANS1 = Combobox(labelAntenas, width="10", values=results_for_modeloantena, font=fts)
@@ -804,3 +801,6 @@ def ventana():
         root.mainloop()
 
     return Continuar_Proceso, DatosVentana
+
+
+#Bandera_Ventana, Array_Ventana = ventana()

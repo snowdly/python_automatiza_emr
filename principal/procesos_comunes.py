@@ -747,8 +747,9 @@ def estructura_xml_completa(fichero_xml):
                         # print(d_xml)
                         lista_d_xml.append(d_xml)
                 except Exception as e:
-                    print("Error en " + elemento + child.tag)
-                    print(e)
+                    #print("Error en " + elemento + child.tag)
+                    #print(e)
+                    pass
     except Exception as er:
         print(
             "No es posible procesar el fichero " + fichero_xml + " , revise si la esctructura y/o nombre son correctos")
@@ -1062,7 +1063,7 @@ def asigna_numeracion_sectores(fichero_xml, ruta_temporal, etiquetas):
 
 # Función para ubicar cada xml, retorna una lista
 def lista_xml_sectores(rootDir):
-    etiquetas = ['Sector', 'Antena_Directiva', 'Volumen_Referencia']
+    etiquetas = ['Sector']
     # Creamos una nueva carpeta si no existe
     ruta_temporal = os.path.join(rootDir, 'Temporal_base')
     if not os.path.exists(ruta_temporal):
@@ -1077,3 +1078,19 @@ def lista_xml_sectores(rootDir):
                 if a['Error'] != 'KO':
                     files_in_dir.append(a['Ruta_XML_Temporal'])
     return files_in_dir
+
+
+def busca_texto_titulo_documento(titulo, texto):
+    respuesta = dict()
+    respuesta['Elemento_Encontrado'] = ''
+    respuesta['Resultado'] = 'OK'
+    try:
+        titulo_dividio = titulo.split('_')
+        for elemento in titulo_dividio:
+            if elemento==texto:
+                respuesta['Elemento_Encontrado'] =  elemento
+                break
+    except Exception as e:
+        respuesta['Elemento_Encontrado'] = ''
+        respuesta['Error'] = 'KO'
+    return respuesta

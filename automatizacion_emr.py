@@ -27,7 +27,7 @@ resumen = pd.DataFrame(columns=('Etapa_Validacion', 'Resultado', 'Fecha'))
 Continuar_Ventana, Fichero_Auditoria = VentanaConsulta.seleccion_fichero(rootDir)
 if Continuar_Ventana :
     # Genera Ventana para ingresar Datos
-    Bandera_Ventana, Array_Ventana = Ventana_Principal.ventana()
+    Bandera_Ventana, Array_Ventana = Ventana_Principal.ventana(Fichero_Auditoria)
     print(Bandera_Ventana, Array_Ventana)
 
     # Empieza el proceso de validación

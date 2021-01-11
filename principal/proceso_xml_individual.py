@@ -38,7 +38,7 @@ def principal_ant(rootDir, rootResultados, nameFile, ficheros_respaldo):
                                                                             fichero, ficheros_respaldo, rootDir)
                     analisis = analisis.append(dv, ignore_index=True)
                 except Exception as err:
-                    print('Error en ' + e['Etiqueta'] + '   ' + err)
+                    #print('Error en ' + e['Etiqueta'] + '   ' + err)
                     logging.debug('Error en ' + e['Etiqueta'] + '   ' + err)
 
         writer = pd.ExcelWriter(
@@ -148,7 +148,7 @@ def principal(rootDir, rootResultados, nameFile, ficheros_respaldo):
 
                 analisis = analisis.append(dv, ignore_index=True)
             except Exception as err:
-                print('Error en ' + elemento['Etiqueta'] + '   ' + err)
+                #print('Error en ' + elemento['Etiqueta'] + '   ' + err)
                 logging.debug('Error en ' + elemento['Etiqueta'] + '   ' + err)
 
         # ELIMINAR TEMPORALES
@@ -217,6 +217,7 @@ def principal_refactor(rootDir, rootResultados, nameFile, ficheros_respaldo, Arr
     #   RECORRE TODOS LOS FICHEROS XML
     for fichero in procesos_comunes.lista_xml_sectores(rootDir):
         logging.debug("Analizando fichero : " + fichero)
+        print("Analizando fichero : " + fichero)
 
         # CREA EL DIRECTORIO SI NO EXISTE
         if not os.path.exists(os.path.join(rootResultados, nameFile + '_analisis_inidvidual_xml/')):
@@ -275,12 +276,12 @@ def principal_refactor(rootDir, rootResultados, nameFile, ficheros_respaldo, Arr
 
                     analisis = analisis.append(dv, ignore_index=True)
                 except Exception as err:
-                    print('Error en ' + elemento['Etiqueta'])
+                    #print('Error en ' + elemento['Etiqueta'])
                     logging.debug('Error en ' + elemento['Etiqueta'])
 
             # ELIMINAR TEMPORALES
-            if os.path.exists(epdf['DirTemporal']):
-                shutil.rmtree(epdf['DirTemporal'], ignore_errors=True)
+            #if os.path.exists(epdf['DirTemporal']):
+            #    shutil.rmtree(epdf['DirTemporal'], ignore_errors=True)
 
             # GRABACION EN EL EXCEL
             writer = pd.ExcelWriter(

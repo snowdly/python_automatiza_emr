@@ -73,9 +73,79 @@ def obtiene_polarizacion(modelo):
     return resultado
 
 
+def ganancia_antena(modelo):
+    resultado = {
+        "Ganancia": "",
+        "Error": ""
+    }
+    try:
+        conn = mysql.connector.connect(user=DBaseDatos["usuario"], password=DBaseDatos["password"],
+                                       host=DBaseDatos["host"],
+                                       database=DBaseDatos["database"])
+        curs = conn.cursor()
+        curs.execute("SELECT DISTINCT TRIM(Gain_dBi_Over_all_Tilts) AS Ganancia_Antena, MAX(FRECUENCIA_MAXIMA) AS Frecuencia_Maxima FROM  datasheet WHERE TRIM(MODELO) = '"+ modelo +"'")
+        results = curs.fetchall()
+        curs.close()
+        conn.close()
+        consulta = [result[0] for result in results]
+        for a in consulta:
+            resultado["Ganancia"] = a
 
-r = obtiene_polarizacion('AQU4518R25v06')
-print (r["Polarizacion"])
+    except Exception as e:
+        resultado["Ganancia"] = ""
+        resultado["Error"]="No se ha podido conectar a la Base de Datos para obtener los datos de Ganancia"
+    return resultado
+
+
+def acimut_maxima_radiacion(modelo):
+    resultado = {
+        "Acimut": "",
+        "Error": ""
+    }
+    try:
+        conn = mysql.connector.connect(user=DBaseDatos["usuario"], password=DBaseDatos["password"],
+                                       host=DBaseDatos["host"],
+                                       database=DBaseDatos["database"])
+        curs = conn.cursor()
+        curs.execute("SELECT DISTINCT TRIM(Azimuth_Beamwidth_deg_Average) AS Acimut_Maxima_Radiacion, MAX(FRECUENCIA_MAXIMA) AS Frecuencia_Maxima FROM  datasheet WHERE TRIM(MODELO) = '"+ modelo +"'")
+        results = curs.fetchall()
+        curs.close()
+        conn.close()
+        consulta = [result[0] for result in results]
+        for a in consulta:
+            resultado["Acimut"] = a
+
+    except Exception as e:
+        resultado["Acimut"] = ""
+        resultado["Error"]="No se ha podido conectar a la Base de Datos para obtener los datos de Ganancia"
+    return resultado
+
+
+def nivel_lobulos_secundarios(modelo):
+    resultado = {
+        "Lobulo": "",
+        "Error": ""
+    }
+    try:
+        conn = mysql.connector.connect(user=DBaseDatos["usuario"], password=DBaseDatos["password"],
+                                       host=DBaseDatos["host"],
+                                       database=DBaseDatos["database"])
+        curs = conn.cursor()
+        curs.execute("SELECT DISTINCT TRIM(First_Upper_Sidelobe_level) AS Nivel_Lobulos_Secundarios, MAX(FRECUENCIA_MAXIMA) AS Frecuencia_Maxima FROM  datasheet WHERE TRIM(MODELO) = '"+ modelo +"'")
+        results = curs.fetchall()
+        curs.close()
+        conn.close()
+        consulta = [result[0] for result in results]
+        for a in consulta:
+            resultado["Lobulo"] = a
+
+    except Exception as e:
+        resultado["Lobulo"] = ""
+        resultado["Error"]="No se ha podido conectar a la Base de Datos para obtener los datos de Ganancia"
+    return resultado
+
+#r = ganancia_antena('AQU4518R24v06')
+#print (r)
 
 #for a in r["Polarizacion"]:
 #    print(a)

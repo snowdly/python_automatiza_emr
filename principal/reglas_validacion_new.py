@@ -1341,7 +1341,11 @@ def reglas_validacion_individual(etiqueta, regla, vdato, fichero, ficheros_respa
         if vdato is None:
             d['OK_KO'] = 'KO'
             V.append('No existe valor')
-        #V.append('Para la presente etapa, la validación debe ser visual')
+        rr = procesos_comunes_segunda_etapa.tecnologia_implantar(Array_Ventana)
+        haz = procesos_comunes_segunda_etapa.inclinacion_haz(Array_Ventana, "Sector1", rr[0])
+        if haz != vdato :
+            d['OK_KO'] = 'KO'
+            V.append('El dato ingresado en la ventana principal '+ haz +' no coincide con el dato encontrado en el fichero XML ' + vdato)
         d['Validacion'] = V
         d['Fecha_Hora'] = datetime.datetime.now()
         return d
@@ -1353,7 +1357,12 @@ def reglas_validacion_individual(etiqueta, regla, vdato, fichero, ficheros_respa
         if vdato is None:
             d['OK_KO'] = 'KO'
             V.append('No existe valor')
-        #V.append('Para la presente etapa, la validación debe ser visual')
+        rr = procesos_comunes_segunda_etapa.tecnologia_implantar(Array_Ventana)
+        haz = procesos_comunes_segunda_etapa.inclinacion_haz(Array_Ventana, "Sector2", rr[0])
+        if haz != vdato:
+            d['OK_KO'] = 'KO'
+            V.append(
+                'El dato ingresado en la ventana principal ' + haz + ' no coincide con el dato encontrado en el fichero XML ' + vdato)
         d['Validacion'] = V
         d['Fecha_Hora'] = datetime.datetime.now()
         return d
@@ -1365,7 +1374,12 @@ def reglas_validacion_individual(etiqueta, regla, vdato, fichero, ficheros_respa
         if vdato is None:
             d['OK_KO'] = 'KO'
             V.append('No existe valor')
-        #V.append('Para la presente etapa, la validación debe ser visual')
+        rr = procesos_comunes_segunda_etapa.tecnologia_implantar(Array_Ventana)
+        haz = procesos_comunes_segunda_etapa.inclinacion_haz(Array_Ventana, "Sector3", rr[0])
+        if haz != vdato:
+            d['OK_KO'] = 'KO'
+            V.append(
+                'El dato ingresado en la ventana principal ' + haz + ' no coincide con el dato encontrado en el fichero XML ' + vdato)
         d['Validacion'] = V
         d['Fecha_Hora'] = datetime.datetime.now()
         return d
@@ -1377,7 +1391,12 @@ def reglas_validacion_individual(etiqueta, regla, vdato, fichero, ficheros_respa
         if vdato is None:
             d['OK_KO'] = 'KO'
             V.append('No existe valor')
-        #V.append('Para la presente etapa, la validación debe ser visual')
+        rr = procesos_comunes_segunda_etapa.tecnologia_implantar(Array_Ventana)
+        haz = procesos_comunes_segunda_etapa.inclinacion_haz(Array_Ventana, "Sector4", rr[0])
+        if haz != vdato:
+            d['OK_KO'] = 'KO'
+            V.append(
+                'El dato ingresado en la ventana principal ' + haz + ' no coincide con el dato encontrado en el fichero XML ' + vdato)
         d['Validacion'] = V
         d['Fecha_Hora'] = datetime.datetime.now()
         return d
@@ -1445,6 +1464,12 @@ def reglas_validacion_individual(etiqueta, regla, vdato, fichero, ficheros_respa
         if vdato is None:
             d['OK_KO'] = 'KO'
             V.append('No existe valor')
+        modelo_antena = procesos_comunes_segunda_etapa.modelo_antena(Array_Ventana, 'Sector1')
+        r = base_datos.ganancia_antena(modelo_antena)
+        if r["Ganancia"] != vdato:
+            d['OK_KO'] = 'KO'
+            V.append(
+                'Para el modelo de Antena ' + modelo_antena + ' no existe dato de Ganancia Antena en la Base de Datos')
         d['Validacion'] = V
         d['Fecha_Hora'] = datetime.datetime.now()
         return d
@@ -1456,6 +1481,12 @@ def reglas_validacion_individual(etiqueta, regla, vdato, fichero, ficheros_respa
         if vdato is None:
             d['OK_KO'] = 'KO'
             V.append('No existe valor')
+        modelo_antena = procesos_comunes_segunda_etapa.modelo_antena(Array_Ventana, 'Sector2')
+        r = base_datos.ganancia_antena(modelo_antena)
+        if r["Ganancia"] != vdato:
+            d['OK_KO'] = 'KO'
+            V.append(
+                'Para el modelo de Antena ' + modelo_antena + ' no existe dato de Ganancia Antena en la Base de Datos')
         d['Validacion'] = V
         d['Fecha_Hora'] = datetime.datetime.now()
         return d
@@ -1467,6 +1498,12 @@ def reglas_validacion_individual(etiqueta, regla, vdato, fichero, ficheros_respa
         if vdato is None:
             d['OK_KO'] = 'KO'
             V.append('No existe valor')
+        modelo_antena = procesos_comunes_segunda_etapa.modelo_antena(Array_Ventana, 'Sector3')
+        r = base_datos.ganancia_antena(modelo_antena)
+        if r["Ganancia"] != vdato:
+            d['OK_KO'] = 'KO'
+            V.append(
+                'Para el modelo de Antena ' + modelo_antena + ' no existe dato de Ganancia Antena en la Base de Datos')
         d['Validacion'] = V
         d['Fecha_Hora'] = datetime.datetime.now()
         return d
@@ -1478,6 +1515,12 @@ def reglas_validacion_individual(etiqueta, regla, vdato, fichero, ficheros_respa
         if vdato is None:
             d['OK_KO'] = 'KO'
             V.append('No existe valor')
+        modelo_antena = procesos_comunes_segunda_etapa.modelo_antena(Array_Ventana, 'Sector4')
+        r = base_datos.ganancia_antena(modelo_antena)
+        if r["Ganancia"] != vdato:
+            d['OK_KO'] = 'KO'
+            V.append(
+                'Para el modelo de Antena ' + modelo_antena + ' no existe dato de Ganancia Antena en la Base de Datos')
         d['Validacion'] = V
         d['Fecha_Hora'] = datetime.datetime.now()
         return d
@@ -1585,7 +1628,12 @@ def reglas_validacion_individual(etiqueta, regla, vdato, fichero, ficheros_respa
         if vdato is None:
             d['OK_KO'] = 'KO'
             V.append('No existe valor')
-        #V.append('Para la presente etapa, la validación debe ser visual')
+        modelo_antena = procesos_comunes_segunda_etapa.modelo_antena(Array_Ventana, 'Sector1')
+        r = base_datos.acimut_maxima_radiacion(modelo_antena)
+        if r["Acimut"] != vdato:
+            d['OK_KO'] = 'KO'
+            V.append(
+                'Para el modelo de Antena ' + modelo_antena + ' no existe dato de Acimut Maxima Radiación en la Base de Datos')
         d['Validacion'] = V
         d['Fecha_Hora'] = datetime.datetime.now()
         return d
@@ -1597,7 +1645,12 @@ def reglas_validacion_individual(etiqueta, regla, vdato, fichero, ficheros_respa
         if vdato is None:
             d['OK_KO'] = 'KO'
             V.append('No existe valor')
-        #V.append('Para la presente etapa, la validación debe ser visual')
+        modelo_antena = procesos_comunes_segunda_etapa.modelo_antena(Array_Ventana, 'Sector2')
+        r = base_datos.acimut_maxima_radiacion(modelo_antena)
+        if r["Acimut"] != vdato:
+            d['OK_KO'] = 'KO'
+            V.append(
+                'Para el modelo de Antena ' + modelo_antena + ' no existe dato de Acimut Maxima Radiación en la Base de Datos')
         d['Validacion'] = V
         d['Fecha_Hora'] = datetime.datetime.now()
         return d
@@ -1609,7 +1662,12 @@ def reglas_validacion_individual(etiqueta, regla, vdato, fichero, ficheros_respa
         if vdato is None:
             d['OK_KO'] = 'KO'
             V.append('No existe valor')
-        #V.append('Para la presente etapa, la validación debe ser visual')
+        modelo_antena = procesos_comunes_segunda_etapa.modelo_antena(Array_Ventana, 'Sector3')
+        r = base_datos.acimut_maxima_radiacion(modelo_antena)
+        if r["Acimut"] != vdato:
+            d['OK_KO'] = 'KO'
+            V.append(
+                'Para el modelo de Antena ' + modelo_antena + ' no existe dato de Acimut Maxima Radiación en la Base de Datos')
         d['Validacion'] = V
         d['Fecha_Hora'] = datetime.datetime.now()
         return d
@@ -1621,7 +1679,12 @@ def reglas_validacion_individual(etiqueta, regla, vdato, fichero, ficheros_respa
         if vdato is None:
             d['OK_KO'] = 'KO'
             V.append('No existe valor')
-        #V.append('Para la presente etapa, la validación debe ser visual')
+        modelo_antena = procesos_comunes_segunda_etapa.modelo_antena(Array_Ventana, 'Sector4')
+        r = base_datos.acimut_maxima_radiacion(modelo_antena)
+        if r["Acimut"] != vdato:
+            d['OK_KO'] = 'KO'
+            V.append(
+                'Para el modelo de Antena ' + modelo_antena + ' no existe dato de Acimut Maxima Radiación en la Base de Datos')
         d['Validacion'] = V
         d['Fecha_Hora'] = datetime.datetime.now()
         return d
@@ -1677,6 +1740,13 @@ def reglas_validacion_individual(etiqueta, regla, vdato, fichero, ficheros_respa
         if vdato is None:
             d['OK_KO'] = 'KO'
             V.append('No existe valor')
+        modelo_antena = procesos_comunes_segunda_etapa.modelo_antena(Array_Ventana, 'Sector1')
+        r = base_datos.nivel_lobulos_secundarios(modelo_antena)
+        lobulo = r["Lobulo"].replace('>', '')
+        if lobulo != vdato:
+            d['OK_KO'] = 'KO'
+            V.append(
+                'Para el modelo de Antena ' + modelo_antena + ' no existe dato de Acimut Maxima Radiación en la Base de Datos')
         d['Validacion'] = V
         d['Fecha_Hora'] = datetime.datetime.now()
         return d
@@ -1688,6 +1758,13 @@ def reglas_validacion_individual(etiqueta, regla, vdato, fichero, ficheros_respa
         if vdato is None:
             d['OK_KO'] = 'KO'
             V.append('No existe valor')
+        modelo_antena = procesos_comunes_segunda_etapa.modelo_antena(Array_Ventana, 'Sector2')
+        r = base_datos.nivel_lobulos_secundarios(modelo_antena)
+        lobulo = r["Lobulo"].replace('>', '')
+        if lobulo != vdato:
+            d['OK_KO'] = 'KO'
+            V.append(
+                'Para el modelo de Antena ' + modelo_antena + ' no existe dato de Acimut Maxima Radiación en la Base de Datos')
         d['Validacion'] = V
         d['Fecha_Hora'] = datetime.datetime.now()
         return d
@@ -1699,6 +1776,13 @@ def reglas_validacion_individual(etiqueta, regla, vdato, fichero, ficheros_respa
         if vdato is None:
             d['OK_KO'] = 'KO'
             V.append('No existe valor')
+        modelo_antena = procesos_comunes_segunda_etapa.modelo_antena(Array_Ventana, 'Sector3')
+        r = base_datos.nivel_lobulos_secundarios(modelo_antena)
+        lobulo = r["Lobulo"].replace('>', '')
+        if lobulo != vdato:
+            d['OK_KO'] = 'KO'
+            V.append(
+                'Para el modelo de Antena ' + modelo_antena + ' no existe dato de Acimut Maxima Radiación en la Base de Datos')
         d['Validacion'] = V
         d['Fecha_Hora'] = datetime.datetime.now()
         return d
@@ -1710,6 +1794,13 @@ def reglas_validacion_individual(etiqueta, regla, vdato, fichero, ficheros_respa
         if vdato is None:
             d['OK_KO'] = 'KO'
             V.append('No existe valor')
+        modelo_antena = procesos_comunes_segunda_etapa.modelo_antena(Array_Ventana, 'Sector4')
+        r = base_datos.nivel_lobulos_secundarios(modelo_antena)
+        lobulo = r["Lobulo"].replace('>', '')
+        if lobulo != vdato:
+            d['OK_KO'] = 'KO'
+            V.append(
+                'Para el modelo de Antena ' + modelo_antena + ' no existe dato de Acimut Maxima Radiación en la Base de Datos')
         d['Validacion'] = V
         d['Fecha_Hora'] = datetime.datetime.now()
         return d

@@ -127,21 +127,75 @@ def tils_mayor_valor(Array_Ventana, dsector):
         pass
     return max(valores)
 
-def tecnologia_implantar(Array_Ventana, dsector):
-    vdato=""
+def tecnologia_implantar(Array_Ventana):
+    implantar=[]
     try:
-        for sector in Array_Ventana[0]:
-            if sector.upper() == dsector.upper():
-                vdato =Array_Ventana[0][sector]
+        TImplantar = Array_Ventana[0]
+        for tecnologia in TImplantar:
+            if TImplantar[tecnologia] > 0:
+                implantar.append(tecnologia)
     except Exception as err:
         pass
-    return vdato
+    return implantar
+
+def tecnologia_posterior(Array_Ventana):
+    posterior=[]
+    try:
+        TImplantar = Array_Ventana[1]
+        for tecnologia in TImplantar:
+            if TImplantar[tecnologia] > 0:
+                posterior.append(tecnologia)
+    except Exception as err:
+        pass
+    return posterior
+
+def inclinacion_haz(Array_Ventana, dsector, till):
+    haz = ''
+    try:
+        if till == 'DTI_G900':
+            for sector in Array_Ventana[8]:
+                if sector.upper() == dsector.upper():
+                    haz = Array_Ventana[8][sector]
+        elif till == 'DTI_G1800':
+            for sector in Array_Ventana[9]:
+                if sector.upper() == dsector.upper():
+                    haz = Array_Ventana[9][sector]
+        elif till == 'DTI_U900':
+            for sector in Array_Ventana[10]:
+                if sector.upper() == dsector.upper():
+                    haz = Array_Ventana[10][sector]
+        elif till == 'DTI_U2100':
+            for sector in Array_Ventana[11]:
+                if sector.upper() == dsector.upper():
+                    haz = Array_Ventana[11][sector]
+        elif till == 'DTI_L800':
+            for sector in Array_Ventana[12]:
+                if sector.upper() == dsector.upper():
+                    haz = Array_Ventana[12][sector]
+        elif till == 'DTI_L1800':
+            for sector in Array_Ventana[13]:
+                if sector.upper() == dsector.upper():
+                    haz = Array_Ventana[13][sector]
+        elif till == 'DTI_L2100':
+            for sector in Array_Ventana[14]:
+                if sector.upper() == dsector.upper():
+                    haz = Array_Ventana[14][sector]
+        elif till == 'DTI_L2600':
+            for sector in Array_Ventana[15]:
+                if sector.upper() == dsector.upper():
+                    haz = Array_Ventana[15][sector]
+        elif till == 'DTI_5G':
+            for sector in Array_Ventana[16]:
+                if sector.upper() == dsector.upper():
+                    haz = Array_Ventana[16][sector]
+    except Exception as err:
+        pass
+    return haz
 
 
-#Bandera_Ventana, Array_Ventana = Ventana_Principal.ventana("")
+
+# Bandera_Ventana, Array_Ventana = Ventana_Principal.ventana("")
 #
-# r = cantidad_sectores(Array_Ventana,3)
-# print(r)
-#
-#rr = valida_tipo_solicitud(Array_Ventana)
-#print(rr)
+# rr = tecnologia_implantar(Array_Ventana)
+# ff = inclinacion_haz(Array_Ventana, "Sector1", rr[0])
+# print(ff)

@@ -5,10 +5,10 @@ from tkinter import filedialog
 import os
 
 # variables matrices
-Continuar_Proceso = True
+Continuar_Proceso = False
 
 def seleccion_fichero(directorio_inicial):
-    Continuar_Proceso = True
+    Continuar_Proceso = False
     Fichero_Auditoria = ""
     root = tk.Tk()
     root.title("Automatización Auditorias EMR")

@@ -126,7 +126,7 @@ def ventana(Fichero_Auditoria):
         print("Conectividad con Base de Datos: " + prueba_bd["Error"])
     else:
         # Creacion de ventana principal
-        Continuar_Proceso = True
+        Continuar_Proceso = False
         root = tk.Tk()
         root.title("Automatización Auditorias EMR - Fichero: " + Fichero_Auditoria)
         width=870
@@ -758,9 +758,9 @@ def ventana(Fichero_Auditoria):
             DTiltsL2600["Sector3"] = TxtTL2600S3.get()
             DTiltsL2600["Sector4"] = TxtTL2600S4.get()
             DTiltsG5["Sector1"] = TxtT5GS1.get()
-            DTiltsG5["Sector2"] = TxtT5GS1.get()
-            DTiltsG5["Sector3"] = TxtT5GS1.get()
-            DTiltsG5["Sector4"] = TxtT5GS1.get()
+            DTiltsG5["Sector2"] = TxtT5GS2.get()
+            DTiltsG5["Sector3"] = TxtT5GS3.get()
+            DTiltsG5["Sector4"] = TxtT5GS4.get()
 
 
         def btnAceptar_command():
@@ -783,7 +783,7 @@ def ventana(Fichero_Auditoria):
             DatosVentana.append(DTiltsL1800)
             DatosVentana.append(DTiltsL2100)
             DatosVentana.append(DTiltsL2600)
-            DatosVentana.append(DTiltsL2600)
+            DatosVentana.append(DTiltsG5)
 
             root.destroy()
 
